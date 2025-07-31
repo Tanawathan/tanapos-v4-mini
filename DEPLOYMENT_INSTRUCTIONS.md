@@ -85,6 +85,11 @@ VITE_APP_VERSION=1.0.0
 
 ## 🎉 **部署狀態更新 (2025/7/31)**
 
+✅ **Node.js 版本兼容性修復**
+- 更新 Netlify 建置環境從 Node.js 18 到 Node.js 20
+- 添加了 package.json engines 欄位確保版本兼容性
+- 修復了 Netlify 不支援的 Node.js 版本問題
+
 ✅ **TypeScript 建置錯誤已修復**
 - 修復了 App-backup.tsx 中的字串字面量錯誤
 - 排除了開發備份檔案避免干擾建置
@@ -95,5 +100,6 @@ VITE_APP_VERSION=1.0.0
 - `npm run build` 成功完成
 - 生成了優化的生產版本 (673.77 KiB)
 - 所有模組正確轉換和打包
+- Node.js 20 兼容性確認
 
 **準備好部署了嗎？** 🚀
