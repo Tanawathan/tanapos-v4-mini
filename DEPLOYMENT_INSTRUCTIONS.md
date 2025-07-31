@@ -33,12 +33,14 @@ git push -u origin main
 在 Netlify 專案設置中添加以下環境變數：
 
 ```
-VITE_SUPABASE_URL=https://peubpisofenlyquqnpan.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBldWJwaXNvZmVubHlxdXFucGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NTgwODgsImV4cCI6MjA2OTQzNDA4OH0.6IzK9jjs-Ld_mFBRQqNk594ayXapjGxwAmhQpoY26cY
-VITE_SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBldWJwaXNvZmVubHlxdXFucGFuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1Mzg1ODA4OCwiZXhwIjoyMDY5NDM0MDg4fQ.hNSQGdCx9QjJD7S7oaoghEFDrCjdVJKbjUr7c9jtvMA
+VITE_SUPABASE_URL=your_supabase_project_url_here
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+VITE_SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
 VITE_APP_NAME=TanaPOS V4-Mini
 VITE_APP_VERSION=1.0.0
 ```
+
+**重要：** 請將上述佔位符替換為您的實際 Supabase 憑證，這些憑證可以從您的 Supabase 專案設置中獲取。
 
 ### 5. 部署確認
 

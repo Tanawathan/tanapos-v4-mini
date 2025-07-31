@@ -9,9 +9,9 @@ export const APP_CONFIG = {
   APP_NAME: 'TanaPOS V4-Mini',
   APP_VERSION: '4.0.0',
   
-  // Supabase 配置
-  SUPABASE_URL: 'https://eyuohprllmpjvnqsuwme.supabase.co',
-  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5dW9ocHJsbG1wanZucXN1d21lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI0Mjg1NjcsImV4cCI6MjA0ODAwNDU2N30.8SYEDOWJQWCg5wBP-f_c2s6llMuGH0x8Vm2V_6T3SYE',
+  // Supabase 配置 - 使用環境變數
+  SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co',
+  SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key-here',
   
   // 系統模式設定
   OFFLINE_MODE: false, // 設為 true 使用離線模式

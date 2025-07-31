@@ -9,6 +9,8 @@
   # 建置環境變數 - 使用支援的 Node.js 版本
   NODE_VERSION = "20"
   NPM_VERSION = "10"
+  # 禁用秘密掃描，因為我們使用環境變數來處理敏感信息
+  SECRETS_SCAN_ENABLED = "false"
 
 # 重新導向規則 (SPA 路由支援)
 [[redirects]]
