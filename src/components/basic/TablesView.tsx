@@ -30,7 +30,7 @@ const TablesView: React.FC = () => {
     try {
       const validStatuses = ['available', 'occupied', 'cleaning', 'reserved', 'out_of_order']
       if (validStatuses.includes(status)) {
-        await updateTableStatus(tableId, status as any)
+        await updateTableStatus(parseInt(tableId), status as any)
       }
     } catch (error) {
       console.error('更新桌位狀態失敗:', error)

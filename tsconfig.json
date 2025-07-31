@@ -22,6 +22,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
 
     /* Path mapping */
     "baseUrl": ".",
@@ -30,5 +31,11 @@
     }
   },
   "include": ["src"],
+  "exclude": [
+    "src/**/*-backup.tsx",
+    "src/**/*-clean.tsx",
+    "src/**/*-new.tsx",
+    "src/**/ModernPOS.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

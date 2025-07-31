@@ -77,7 +77,7 @@ const DashboardWrapper = () => {
 }
 
 // ============================================================================
-// 主應用程式組�?
+// 主應用程式組�?
 // ============================================================================
 function App() {
   const { 
@@ -97,7 +97,7 @@ function App() {
       localStorage.setItem('theme', 'dark')
     }
     
-    // 載入所有初始數�?
+    // 載入所有初始數�?
     const loadInitialData = async () => {
       try {
         await Promise.all([
@@ -108,9 +108,9 @@ function App() {
           loadReservations(),
           loadDashboardStats()
         ])
-        console.log('�?所有初始數據載入完�?)
+        console.log('所有初始數據載入完成')
       } catch (error) {
-        console.error('�?載入初始數據失敗:', error)
+        console.error('載入初始數據失敗:', error)
       }
     }
 
@@ -125,13 +125,13 @@ function App() {
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
               <ModernLayout>
               <Routes>
-                {/* 現代化主�?*/}
+                {/* 現代化主�?*/}
                 <Route path="/" element={<ModernHomePage />} />
                 
                 {/* 傳統儀表板 */}
                 <Route path="/dashboard" element={<DashboardWrapper />} />
                 
-                {/* 現代�?POS 系統 */}
+                {/* 現代�?POS 系統 */}
                 {/* <Route path="/pos-modern" element={<ModernPOS />} /> */}
                 
                 {/* 基本功能頁面 */}
