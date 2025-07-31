@@ -85,6 +85,17 @@ VITE_APP_VERSION=1.0.0
 
 ## 🎉 **部署狀態更新 (2025/7/31)**
 
+✅ **PWA 資源配置修復**
+- 修復了 vite.config.ts 中 PWA 圖示引用錯誤
+- 更新圖示路徑從 pwa-*.png 到實際存在的 favicon-*.png
+- 修復了 includeAssets 配置以引用正確的檔案
+- 解決了 Netlify 建置中的靜默失敗問題
+
+✅ **建置腳本優化**
+- 改進建置腳本使用 `tsc --noEmit` 避免產生不必要檔案
+- 添加了調試建置腳本以便故障排除
+- 增強 Netlify 環境變數以提供更好的日誌記錄
+
 ✅ **Node.js 版本兼容性修復**
 - 更新 Netlify 建置環境從 Node.js 18 到 Node.js 20
 - 添加了 package.json engines 欄位確保版本兼容性
@@ -100,6 +111,7 @@ VITE_APP_VERSION=1.0.0
 - `npm run build` 成功完成
 - 生成了優化的生產版本 (673.77 KiB)
 - 所有模組正確轉換和打包
+- PWA 預快取從 15 項增加到 18 項（確認修復有效）
 - Node.js 20 兼容性確認
 
 **準備好部署了嗎？** 🚀
