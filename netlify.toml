@@ -1,6 +1,6 @@
 [build]
   # 建置指令
-  command = "npm run build"
+  command = "npm install && npm run build"
   
   # 輸出目錄
   publish = "dist"

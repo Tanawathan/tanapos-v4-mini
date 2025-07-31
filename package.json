@@ -5,11 +5,11 @@
   "description": "TanaPOS V4-Mini - Mobile POS System",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",
-    "build": "tsc --noEmit && vite build",
-    "build:debug": "tsc --noEmit --listFiles && vite build --logLevel info",
+    "build": "npx tsc --noEmit && vite build",
+    "build:debug": "npx tsc --noEmit --listFiles && vite build --logLevel info",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "type-check": "tsc --noEmit",
+    "type-check": "npx tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx}\""
   },
