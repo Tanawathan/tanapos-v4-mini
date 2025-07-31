@@ -85,6 +85,12 @@ VITE_APP_VERSION=1.0.0
 
 ## 🎉 **部署狀態更新 (2025/7/31)**
 
+✅ **TypeScript 執行錯誤修復**
+- 修復了 Netlify 中 'tsc: not found' 錯誤（退出代碼 127）
+- 將所有 tsc 命令改為 npx tsc 確保 TypeScript 可被找到
+- 更新 Netlify 建置命令明確運行 npm install
+- 確保 devDependencies 在建置環境中正確安裝
+
 ✅ **PWA 資源配置修復**
 - 修復了 vite.config.ts 中 PWA 圖示引用錯誤
 - 更新圖示路徑從 pwa-*.png 到實際存在的 favicon-*.png
@@ -92,7 +98,7 @@ VITE_APP_VERSION=1.0.0
 - 解決了 Netlify 建置中的靜默失敗問題
 
 ✅ **建置腳本優化**
-- 改進建置腳本使用 `tsc --noEmit` 避免產生不必要檔案
+- 改進建置腳本使用 `npx tsc --noEmit` 避免產生不必要檔案
 - 添加了調試建置腳本以便故障排除
 - 增強 Netlify 環境變數以提供更好的日誌記錄
 
@@ -109,6 +115,7 @@ VITE_APP_VERSION=1.0.0
 
 ✅ **建置測試成功**
 - `npm run build` 成功完成
+- `npm run type-check` TypeScript 檢查通過
 - 生成了優化的生產版本 (673.77 KiB)
 - 所有模組正確轉換和打包
 - PWA 預快取從 15 項增加到 18 項（確認修復有效）
