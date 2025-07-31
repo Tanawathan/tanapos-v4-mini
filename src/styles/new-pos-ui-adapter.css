@@ -1,0 +1,532 @@
+/* ========================================
+   新 POS 系統 UI 風格適配器
+   適配 ui-styles.css 的各種風格
+   ======================================== */
+
+/* ========================================
+   1. 極簡現代風格適配 (預設)
+   ======================================== */
+.new-pos-system.ui-style-modern .pos-product-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+}
+
+.new-pos-system.ui-style-modern .btn-pos-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.new-pos-system.ui-style-modern .btn-pos-primary:hover {
+  background: #2563eb;
+}
+
+/* ========================================
+   2. 新擬物風格適配
+   ======================================== */
+.new-pos-system.ui-style-neumorphism {
+  background: linear-gradient(145deg, #f0f0f3, #cacdd1);
+}
+
+.new-pos-system.ui-style-neumorphism .pos-product-card {
+  background: linear-gradient(145deg, #f0f0f3, #cacdd1);
+  border: none;
+  border-radius: 20px;
+  box-shadow: 15px 15px 30px #bebebe, -15px -15px 30px #ffffff;
+  color: #555555;
+}
+
+.new-pos-system.ui-style-neumorphism .pos-product-card:hover {
+  box-shadow: inset 5px 5px 10px #bebebe, 0 0 20px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+}
+
+.new-pos-system.ui-style-neumorphism .pos-product-info h3 {
+  color: #555555;
+}
+
+.new-pos-system.ui-style-neumorphism .pos-product-info .price {
+  background: linear-gradient(145deg, #f0f0f3, #cacdd1);
+  color: #667eea;
+  padding: 8px 16px;
+  border-radius: 15px;
+  box-shadow: inset 3px 3px 6px #bebebe, inset -3px -3px 6px #ffffff;
+  display: inline-block;
+}
+
+.new-pos-system.ui-style-neumorphism .btn-pos-primary {
+  background: linear-gradient(145deg, #f0f0f3, #cacdd1);
+  color: #555555;
+  border: none;
+  box-shadow: 8px 8px 16px #bebebe, -8px -8px 16px #ffffff;
+}
+
+.new-pos-system.ui-style-neumorphism .btn-pos-primary:hover {
+  box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
+}
+
+.new-pos-system.ui-style-neumorphism .pos-cart-desktop,
+.new-pos-system.ui-style-neumorphism .pos-cart-mobile {
+  background: linear-gradient(145deg, #f0f0f3, #cacdd1);
+  border: none;
+  box-shadow: 15px 15px 30px #bebebe, -15px -15px 30px #ffffff;
+}
+
+.new-pos-system.ui-style-neumorphism .pos-cart-item {
+  background: linear-gradient(145deg, #f0f0f3, #cacdd1);
+  border: none;
+  box-shadow: inset 3px 3px 6px #bebebe, inset -3px -3px 6px #ffffff;
+}
+
+.new-pos-system.ui-style-neumorphism .category-btn {
+  background: linear-gradient(145deg, #f0f0f3, #cacdd1);
+  border: none;
+  color: #555555;
+  box-shadow: 6px 6px 12px #bebebe, -6px -6px 12px #ffffff;
+}
+
+.new-pos-system.ui-style-neumorphism .category-btn:hover,
+.new-pos-system.ui-style-neumorphism .category-btn.active {
+  box-shadow: inset 3px 3px 6px #bebebe, inset -3px -3px 6px #ffffff;
+}
+
+/* ========================================
+   3. 玻璃質感風格適配
+   ======================================== */
+.new-pos-system.ui-style-glassmorphism {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.new-pos-system.ui-style-glassmorphism .pos-product-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: #333333;
+}
+
+.new-pos-system.ui-style-glassmorphism .pos-product-card:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+.new-pos-system.ui-style-glassmorphism .pos-product-info .price {
+  background: rgba(255, 255, 255, 0.2);
+  color: #764ba2;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+}
+
+.new-pos-system.ui-style-glassmorphism .btn-pos-primary {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #333333;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.new-pos-system.ui-style-glassmorphism .btn-pos-primary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.new-pos-system.ui-style-glassmorphism .pos-cart-desktop,
+.new-pos-system.ui-style-glassmorphism .pos-cart-mobile {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.new-pos-system.ui-style-glassmorphism .pos-cart-item {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.new-pos-system.ui-style-glassmorphism .category-btn {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #333333;
+}
+
+.new-pos-system.ui-style-glassmorphism .category-btn:hover,
+.new-pos-system.ui-style-glassmorphism .category-btn.active {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ========================================
+   4. 極繁主義風格適配
+   ======================================== */
+.new-pos-system.ui-style-brutalism {
+  background: #000000;
+  color: #ffffff;
+  font-family: Impact, "Arial Black", sans-serif;
+}
+
+.new-pos-system.ui-style-brutalism .pos-product-card {
+  background: #000000;
+  border: 4px solid #00ffff;
+  border-radius: 0;
+  box-shadow: 8px 8px 0px #00ffff;
+  color: #ffffff;
+  transform: rotate(-1deg);
+  transition: all 0.3s ease;
+}
+
+.new-pos-system.ui-style-brutalism .pos-product-card:hover {
+  border-color: #ffff00;
+  box-shadow: 12px 12px 0px #ffff00;
+  transform: rotate(1deg) scale(1.05);
+}
+
+.new-pos-system.ui-style-brutalism .pos-product-info h3 {
+  color: #ffff00;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0px #ff0080;
+}
+
+.new-pos-system.ui-style-brutalism .pos-product-info .price {
+  color: #ff0080;
+  font-weight: 900;
+  text-shadow: 2px 2px 0px #000000;
+  background: none;
+  border: 2px solid #ff0080;
+  padding: 8px 12px;
+}
+
+.new-pos-system.ui-style-brutalism .btn-pos-primary {
+  background: #ff0080;
+  color: #000000;
+  border: 3px solid #ffffff;
+  border-radius: 0;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px #ffffff;
+  transform: rotate(-2deg);
+  letter-spacing: 1px;
+}
+
+.new-pos-system.ui-style-brutalism .btn-pos-primary:hover {
+  background: #ffff00;
+  border-color: #ff0080;
+  transform: rotate(2deg) scale(1.1);
+  box-shadow: 6px 6px 0px #ff0080;
+}
+
+.new-pos-system.ui-style-brutalism .pos-cart-desktop,
+.new-pos-system.ui-style-brutalism .pos-cart-mobile {
+  background: #000000;
+  border: 4px solid #ff0080;
+  border-radius: 0;
+  box-shadow: -8px 8px 0px #ff0080;
+  transform: rotate(1deg);
+}
+
+.new-pos-system.ui-style-brutalism .pos-cart-item {
+  background: #ff0080;
+  border: 3px solid #ffff00;
+  border-radius: 0;
+  color: #000000;
+  transform: rotate(-0.5deg);
+}
+
+.new-pos-system.ui-style-brutalism .category-btn {
+  background: #ff8000;
+  border: 3px solid #ffffff;
+  border-radius: 0;
+  color: #000000;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px #ffffff;
+  transform: rotate(-1deg);
+  letter-spacing: 1px;
+}
+
+.new-pos-system.ui-style-brutalism .category-btn:hover,
+.new-pos-system.ui-style-brutalism .category-btn.active {
+  background: #00ffff;
+  border-color: #ff0080;
+  transform: rotate(1deg) scale(1.05);
+  box-shadow: 6px 6px 0px #ff0080;
+}
+
+/* ========================================
+   5. 未來科技風格適配
+   ======================================== */
+.new-pos-system.ui-style-cyberpunk {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 50%, #000 100%);
+  color: #00ffff;
+  font-family: "Orbitron", "Courier New", monospace;
+}
+
+.new-pos-system.ui-style-cyberpunk .pos-product-card {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 50%, #000 100%);
+  border: 1px solid #00ffff;
+  border-bottom: 2px solid #ff0080;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(255, 0, 128, 0.1);
+  color: #00ffff;
+}
+
+.new-pos-system.ui-style-cyberpunk .pos-product-card:hover {
+  border-color: #ff0080;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), inset 0 0 30px rgba(255, 0, 128, 0.2);
+  animation: cyber-glow 1s infinite;
+}
+
+@keyframes cyber-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.new-pos-system.ui-style-cyberpunk .pos-product-info h3 {
+  color: #00ffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.new-pos-system.ui-style-cyberpunk .pos-product-info .price {
+  color: #ffff00;
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+  background: none;
+  border: 1px solid #ffff00;
+  padding: 8px 12px;
+}
+
+.new-pos-system.ui-style-cyberpunk .btn-pos-primary {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 128, 0.2));
+  border: 1px solid #00ffff;
+  border-radius: 0.25rem;
+  color: #00ffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.new-pos-system.ui-style-cyberpunk .btn-pos-primary:hover {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.4), rgba(255, 0, 128, 0.4));
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  animation: cyber-glow 0.5s infinite;
+}
+
+.new-pos-system.ui-style-cyberpunk .pos-cart-desktop,
+.new-pos-system.ui-style-cyberpunk .pos-cart-mobile {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 50%, #000 100%);
+  border: 1px solid #00ffff;
+  border-left: 3px solid #ff0080;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.new-pos-system.ui-style-cyberpunk .pos-cart-item {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid #00ffff;
+  border-radius: 0.25rem;
+  color: #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+.new-pos-system.ui-style-cyberpunk .category-btn {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #00ffff;
+  border-radius: 0.25rem;
+  color: #00ffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.new-pos-system.ui-style-cyberpunk .category-btn:hover,
+.new-pos-system.ui-style-cyberpunk .category-btn.active {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 128, 0.2));
+  border-color: #ff0080;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* ========================================
+   6. 可愛風格適配
+   ======================================== */
+.new-pos-system.ui-style-kawaii {
+  background: linear-gradient(135deg, #FFB6C1 0%, #FFE4E1 50%, #FFF0F5 100%);
+  font-family: "Comic Sans MS", cursive;
+}
+
+.new-pos-system.ui-style-kawaii .pos-product-card {
+  background: #FFFFFF;
+  border: 3px solid #FFB6C1;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(255, 182, 193, 0.3);
+  color: #FF69B4;
+  position: relative;
+  overflow: hidden;
+}
+
+.new-pos-system.ui-style-kawaii .pos-product-card::before {
+  content: '✨';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  animation: kawaii-sparkle 2s infinite;
+}
+
+@keyframes kawaii-sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(180deg); }
+}
+
+.new-pos-system.ui-style-kawaii .pos-product-card:hover {
+  background: #FFF0F5;
+  border-color: #FF69B4;
+  transform: scale(1.05);
+  animation: kawaii-bounce 0.6s ease;
+}
+
+@keyframes kawaii-bounce {
+  0%, 20%, 60%, 100% { transform: translateY(0) scale(1.05); }
+  40% { transform: translateY(-10px) scale(1.05); }
+  80% { transform: translateY(-5px) scale(1.05); }
+}
+
+.new-pos-system.ui-style-kawaii .pos-product-info h3 {
+  color: #FF69B4;
+  text-shadow: 2px 2px 4px rgba(255, 182, 193, 0.5);
+}
+
+.new-pos-system.ui-style-kawaii .pos-product-info .price {
+  background: linear-gradient(135deg, #FFB6C1, #FFE4E1);
+  color: #FF1493;
+  border: 2px solid #FF69B4;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(255, 20, 147, 0.2);
+}
+
+.new-pos-system.ui-style-kawaii .btn-pos-primary {
+  background: linear-gradient(135deg, #FF69B4, #FFB6C1);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.4);
+  position: relative;
+}
+
+.new-pos-system.ui-style-kawaii .btn-pos-primary::after {
+  content: '💖';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.new-pos-system.ui-style-kawaii .btn-pos-primary:hover {
+  background: linear-gradient(135deg, #FF1493, #FF69B4);
+  transform: scale(1.1);
+  animation: kawaii-heart-beat 0.8s ease;
+}
+
+@keyframes kawaii-heart-beat {
+  0%, 100% { transform: scale(1.1); }
+  50% { transform: scale(1.15); }
+}
+
+/* ========================================
+   7-9. 其他風格的基礎適配
+   ======================================== */
+
+/* 擬物風格 */
+.new-pos-system.ui-style-skeuomorphism .pos-product-card {
+  background: linear-gradient(145deg, #f5f5f5, #d0d0d0);
+  border: 1px solid #999;
+  border-radius: 12px;
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.8), 
+              inset -2px -2px 5px rgba(0,0,0,0.2),
+              2px 2px 8px rgba(0,0,0,0.3);
+}
+
+/* DOS 風格 */
+.new-pos-system.ui-style-dos {
+  background: #000080;
+  color: #C0C0C0;
+  font-family: "Courier New", monospace;
+}
+
+.new-pos-system.ui-style-dos .pos-product-card {
+  background: #000080;
+  border: 2px solid #C0C0C0;
+  border-radius: 0;
+  color: #FFFF00;
+}
+
+/* BIOS 風格 */
+.new-pos-system.ui-style-bios {
+  background: #000000;
+  color: #00FF00;
+  font-family: "Courier New", monospace;
+}
+
+.new-pos-system.ui-style-bios .pos-product-card {
+  background: #000000;
+  border: 1px solid #00FF00;
+  border-radius: 0;
+  color: #00FF00;
+}
+
+/* 程式碼風格 */
+.new-pos-system.ui-style-code {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: "Fira Code", "Consolas", monospace;
+}
+
+.new-pos-system.ui-style-code .pos-product-card {
+  background: #2d2d30;
+  border: 1px solid #3e3e42;
+  border-radius: 4px;
+  color: #d4d4d4;
+}
+
+/* ========================================
+   響應式適配
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* 手機版風格適配調整 */
+  .new-pos-system.ui-style-brutalism .pos-product-card {
+    transform: rotate(0deg);
+    box-shadow: 4px 4px 0px #00ffff;
+  }
+  
+  .new-pos-system.ui-style-kawaii .pos-product-card {
+    border-width: 2px;
+  }
+  
+  .new-pos-system.ui-style-neumorphism .pos-product-card {
+    box-shadow: 8px 8px 16px #bebebe, -8px -8px 16px #ffffff;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 超小螢幕適配 */
+  .new-pos-system.ui-style-cyberpunk .pos-product-info h3 {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+  
+  .new-pos-system.ui-style-brutalism .pos-product-info h3 {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+}

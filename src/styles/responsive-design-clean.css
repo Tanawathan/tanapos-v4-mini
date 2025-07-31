@@ -1,0 +1,415 @@
+/* ========================================
+   POS 點餐系統響應式設計 - 統一使用 ui-styles.css
+   所有視覺樣式由 ui-styles.css 統一管理
+   此檔案僅處理佈局、響應式設計和基本功能
+   ======================================== */
+
+/* ========================================
+   基礎響應式佈局設定
+   ======================================== */
+
+/* 容器佈局 */
+.pos-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* 主內容區域 - 佈局結構 */
+.pos-main-mobile,
+.pos-main-tablet,
+.pos-main-desktop {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* 產品網格佈局 */
+.pos-products-grid {
+  display: grid;
+  gap: 1rem;
+  flex: 1;
+  padding: 1rem 0;
+}
+
+/* 手機版佈局 (1列) */
+@media (max-width: 768px) {
+  .pos-products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .pos-main-mobile {
+    display: flex;
+  }
+  
+  .pos-main-tablet,
+  .pos-main-desktop {
+    display: none;
+  }
+}
+
+/* 平板版佈局 (2-3列) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .pos-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .pos-main-tablet {
+    display: flex;
+  }
+  
+  .pos-main-mobile,
+  .pos-main-desktop {
+    display: none;
+  }
+}
+
+/* 桌面版佈局 (3-4列) */
+@media (min-width: 1025px) {
+  .pos-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  .pos-main-desktop {
+    display: flex;
+  }
+  
+  .pos-main-mobile,
+  .pos-main-tablet {
+    display: none;
+  }
+}
+
+/* ========================================
+   購物車響應式佈局
+   ======================================== */
+
+/* 購物車容器基礎佈局 */
+.pos-cart-container {
+  width: 350px;
+  max-width: 25%;
+  min-width: 300px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* 手機版隱藏側邊購物車，使用浮動購物車 */
+@media (max-width: 768px) {
+  .pos-cart-container {
+    display: none;
+  }
+}
+
+/* 浮動購物車 - 手機版專用 */
+.pos-cart-mobile {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  max-height: 80vh;
+  z-index: 1000;
+  border-radius: 12px;
+  overflow-y: auto;
+  cursor: move;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+/* 拖拽狀態 */
+.pos-cart-mobile.dragging {
+  transform: scale(1.05);
+  z-index: 1001;
+  opacity: 0.9;
+}
+
+/* 平板和桌面版隱藏浮動購物車 */
+@media (min-width: 769px) {
+  .pos-cart-mobile {
+    display: none;
+  }
+}
+
+/* ========================================
+   搜尋和篩選區域佈局
+   ======================================== */
+
+.pos-search-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pos-search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.pos-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.category-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+/* ========================================
+   產品卡片基礎佈局結構
+   ======================================== */
+
+.pos-product-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 200px;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pos-product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.pos-product-card h3 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+  color: #1f2937;
+}
+
+.pos-product-card p {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  flex: 1;
+  margin-bottom: 1rem;
+  color: #6b7280;
+}
+
+.pos-product-card .price {
+  font-weight: bold;
+  font-size: 1.125rem;
+  margin-bottom: 0.75rem;
+  color: #059669;
+}
+
+.pos-product-card button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+/* 數量徽章 */
+.pos-quantity-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 10;
+}
+
+/* ========================================
+   購物車內容佈局
+   ======================================== */
+
+.pos-cart-content {
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pos-cart-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--ui-border, #e5e7eb);
+}
+
+.pos-cart-items {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.pos-cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--ui-border, #e5e7eb);
+}
+
+.pos-cart-item-info {
+  flex: 1;
+}
+
+.pos-cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pos-cart-total {
+  padding: 1rem 0;
+  border-top: 2px solid var(--ui-border, #e5e7eb);
+  margin-top: auto;
+}
+
+.pos-checkout-btn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* ========================================
+   載入和狀態指示器
+   ======================================== */
+
+.pos-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.pos-empty-state {
+  text-align: center;
+  padding: 2rem;
+  opacity: 0.6;
+}
+
+/* ========================================
+   動畫效果
+   ======================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.pos-product-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.pos-cart-mobile {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.pos-quantity-badge {
+  animation: pulse 0.6s ease-in-out;
+}
+
+/* ========================================
+   輔助功能和互動狀態
+   ======================================== */
+
+/* 鍵盤導航支援 */
+.pos-product-card:focus-visible,
+.category-btn:focus-visible,
+.pos-product-card button:focus-visible {
+  outline: 2px solid var(--focus-color, #3b82f6);
+  outline-offset: 2px;
+}
+
+/* 觸控裝置優化 */
+@media (hover: none) and (pointer: coarse) {
+  .pos-product-card:hover {
+    transform: none;
+  }
+  
+  .category-btn:hover {
+    transform: none;
+  }
+}
+
+/* 高對比模式支援 */
+@media (prefers-contrast: high) {
+  .pos-product-card,
+  .pos-cart-mobile,
+  .category-btn {
+    border: 2px solid !important;
+  }
+}
+
+/* 減少動畫偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .pos-product-card,
+  .pos-cart-mobile,
+  .pos-quantity-badge {
+    animation: none;
+  }
+  
+  * {
+    transition: none !important;
+  }
+}
+
+/* ========================================
+   註釋說明
+   ======================================== */
+
+/*
+  此 CSS 檔案專注於：
+  1. 響應式佈局結構
+  2. 容器和網格系統
+  3. 基礎互動行為
+  4. 輔助功能支援
+  
+  所有視覺樣式（顏色、陰影、邊框、字體等）
+  都由 ui-styles.css 統一管理：
+  - .ui-style-modern
+  - .ui-style-neumorphism  
+  - .ui-style-glassmorphism
+  - .ui-style-brutalism
+  - .ui-style-cyberpunk
+  - .ui-style-skeuomorphism
+  - .ui-style-dos
+  - .ui-style-bios
+  - .ui-style-kawaii
+  - .ui-style-code
+*/

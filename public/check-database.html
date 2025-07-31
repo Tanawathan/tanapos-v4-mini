@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TanaPOS 庫存管理資料庫檢查</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 TanaPOS 庫存管理資料庫檢查</h1>
+        
+        <div class="info">
+            <strong>檢查項目：</strong>
+            <ul>
+                <li>Supabase 連接狀態</li>
+                <li>庫存管理表格是否存在</li>
+                <li>測試數據是否正確載入</li>
+                <li>基本 CRUD 操作是否正常</li>
+            </ul>
+        </div>
+
+        <button onclick="checkDatabase()">🔍 開始檢查資料庫</button>
+        <button onclick="clearResults()">🧹 清除結果</button>
+        <button onclick="goToInventory()">📦 前往庫存管理</button>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+        }
+
+        function goToInventory() {
+            window.location.href = '/inventory';
+        }
+
+        async function checkDatabase() {
+            clearResults();
+            log('🔍 開始檢查資料庫...', 'info');
+
+            // 檢查是否有 Supabase 客戶端
+            if (typeof window.supabase === 'undefined') {
+                log('❌ 無法找到 Supabase 客戶端。請確認您在正確的頁面中運行此檢查。', 'error');
+                return;
+            }
+
+            log('✅ Supabase 客戶端已載入', 'success');
+
+            // 需要檢查的表格
+            const tables = [
+                'raw_materials',
+                'semi_finished_products',
+                'recipes',
+                'recipe_ingredients',
+                'stock_movements',
+                'production_records',
+                'suppliers',
+                'purchase_records',
+                'purchase_items'
+            ];
+
+            let allTablesExist = true;
+
+            // 檢查每個表格
+            for (const tableName of tables) {
+                try {
+                    const { data, error } = await window.supabase
+                        .from(tableName)
+                        .select('*')
+                        .limit(1);
+
+                    if (error) {
+                        log(`❌ 表格 "${tableName}" 不存在或有錯誤: ${error.message}`, 'error');
+                        allTablesExist = false;
+                    } else {
+                        log(`✅ 表格 "${tableName}" 存在且可訪問`, 'success');
+                    }
+                } catch (err) {
+                    log(`❌ 檢查表格 "${tableName}" 時發生錯誤: ${err.message}`, 'error');
+                    allTablesExist = false;
+                }
+            }
+
+            // 檢查測試資料
+            if (allTablesExist) {
+                log('📊 檢查測試資料...', 'info');
+
+                try {
+                    const { data: rawMaterials, error: rawError } = await window.supabase
+                        .from('raw_materials')
+                        .select('*');
+
+                    const { data: semiProducts, error: semiError } = await window.supabase
+                        .from('semi_finished_products')
+                        .select('*');
+
+                    const { data: recipes, error: recipesError } = await window.supabase
+                        .from('recipes')
+                        .select('*');
+
+                    if (rawError || semiError || recipesError) {
+                        log('❌ 讀取測試資料時發生錯誤', 'error');
+                    } else {
+                        log(`✅ 原物料資料: ${rawMaterials?.length || 0} 筆`, 'success');
+                        log(`✅ 半成品資料: ${semiProducts?.length || 0} 筆`, 'success');
+                        log(`✅ 食譜資料: ${recipes?.length || 0} 筆`, 'success');
+
+                        if ((rawMaterials?.length || 0) > 0) {
+                            log('✅ 測試資料已正確載入', 'success');
+                        } else {
+                            log('⚠️ 測試資料似乎沒有載入，但表格結構正常', 'error');
+                        }
+                    }
+                } catch (err) {
+                    log(`❌ 檢查測試資料時發生錯誤: ${err.message}`, 'error');
+                }
+            }
+
+            // 檢查 products 表格的新欄位
+            log('🛠️ 檢查 products 表格的庫存管理欄位...', 'info');
+            try {
+                const { data, error } = await window.supabase
+                    .from('products')
+                    .select('actual_stock, virtual_stock, total_available, total_cost')
+                    .limit(1);
+
+                if (error) {
+                    log(`❌ products 表格缺少庫存管理欄位: ${error.message}`, 'error');
+                } else {
+                    log('✅ products 表格已成功增加庫存管理欄位', 'success');
+                }
+            } catch (err) {
+                log(`❌ 檢查 products 表格欄位時發生錯誤: ${err.message}`, 'error');
+            }
+
+            // 總結
+            log('📋 檢查完成！', 'info');
+            if (allTablesExist) {
+                log('🎉 資料庫設置正常，庫存管理系統可以正常使用！', 'success');
+                log('<a href="/inventory" style="color: #007bff; text-decoration: none;">🔗 點擊這裡進入庫存管理系統</a>', 'success');
+            } else {
+                log('⚠️ 資料庫設置有問題，請檢查 SQL 腳本是否正確執行', 'error');
+            }
+        }
+
+        // 頁面載入時的提示
+        window.addEventListener('load', function() {
+            log('💡 請點擊上方按鈕開始檢查資料庫狀態', 'info');
+            
+            // 如果沒有 Supabase 客戶端，給出提示
+            setTimeout(() => {
+                if (typeof window.supabase === 'undefined') {
+                    log('⚠️ 無法找到 Supabase 客戶端。請前往主頁面再來檢查。', 'error');
+                    log('<a href="/" style="color: #007bff;">🏠 前往主頁</a>', 'info');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

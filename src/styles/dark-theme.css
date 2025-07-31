@@ -1,0 +1,267 @@
+/* TanaPOS 深色模式專用樣式 */
+
+/* 基本深色模式設定 */
+.dark {
+  color-scheme: dark;
+}
+
+/* 確保所有文字在深色模式下可見 */
+.dark body {
+  background: hsl(222.2, 84%, 4.9%);
+  color: hsl(210, 40%, 98%);
+}
+
+/* 修復 Tailwind 預設深色樣式 */
+.dark .text-gray-900 {
+  color: hsl(210, 40%, 98%) !important;
+}
+
+.dark .text-gray-800 {
+  color: hsl(210, 40%, 95%) !important;
+}
+
+.dark .text-gray-700 {
+  color: hsl(215, 20.2%, 65.1%) !important;
+}
+
+.dark .text-gray-600 {
+  color: hsl(215.4, 16.3%, 56.9%) !important;
+}
+
+.dark .text-gray-500 {
+  color: hsl(215.4, 16.3%, 46.9%) !important;
+}
+
+.dark .bg-white {
+  background: hsl(217.2, 32.6%, 17.5%) !important;
+}
+
+.dark .bg-gray-50 {
+  background: hsl(222.2, 84%, 4.9%) !important;
+}
+
+.dark .bg-gray-100 {
+  background: hsl(217.2, 32.6%, 15%) !important;
+}
+
+.dark .bg-gray-200 {
+  background: hsl(217.2, 32.6%, 20%) !important;
+}
+
+.dark .border-gray-200 {
+  border-color: hsl(217.2, 32.6%, 25%) !important;
+}
+
+.dark .border-gray-300 {
+  border-color: hsl(217.2, 32.6%, 30%) !important;
+}
+
+/* POS 專用按鈕樣式 */
+.btn-pos-primary {
+  background: hsl(var(--pos-primary));
+  color: hsl(var(--pos-primary-foreground));
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.btn-pos-primary:hover {
+  background: hsl(var(--pos-primary) / 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-pos-secondary {
+  background: hsl(var(--pos-secondary));
+  color: hsl(var(--pos-secondary-foreground));
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.btn-pos-secondary:hover {
+  background: hsl(var(--pos-secondary) / 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-pos-success {
+  background: hsl(var(--pos-success));
+  color: hsl(var(--pos-success-foreground));
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.btn-pos-success:hover {
+  background: hsl(var(--pos-success) / 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-pos-warning {
+  background: hsl(var(--pos-warning));
+  color: hsl(var(--pos-warning-foreground));
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.btn-pos-warning:hover {
+  background: hsl(var(--pos-warning) / 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-pos-danger {
+  background: hsl(var(--pos-danger));
+  color: hsl(var(--pos-danger-foreground));
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.btn-pos-danger:hover {
+  background: hsl(var(--pos-danger) / 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* POS 組件樣式 */
+.pos-navbar {
+  background: hsl(var(--card));
+  border-bottom: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.pos-product-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.pos-product-card:hover {
+  background: hsl(var(--accent));
+  transform: scale(1.02);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-color: hsl(var(--pos-primary) / 0.3);
+}
+
+.pos-cart {
+  background: hsl(var(--card));
+  border-left: 1px solid hsl(var(--border));
+  box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), -2px 0 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.pos-cart-item {
+  background: hsl(var(--muted) / 0.5);
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+}
+
+.dashboard-stat-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.dashboard-stat-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.category-btn {
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.category-btn:hover {
+  background: hsl(var(--accent));
+  transform: scale(1.05);
+}
+
+.category-btn.active {
+  background: hsl(var(--pos-primary));
+  color: hsl(var(--pos-primary-foreground));
+  border-color: hsl(var(--pos-primary));
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transform: scale(1.05);
+}
+
+.quantity-btn {
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.quantity-btn:hover {
+  background: hsl(var(--accent));
+  transform: scale(1.1);
+}
+
+/* KDS 樣式 */
+.kds-order-card {
+  background: hsl(var(--card));
+  border: 2px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.kds-order-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.kds-order-card.urgent {
+  border-color: hsl(var(--pos-danger));
+  background: hsl(var(--pos-danger) / 0.05);
+}
+
+.kds-order-card.warning {
+  border-color: hsl(var(--pos-warning));
+  background: hsl(var(--pos-warning) / 0.05);
+}
+
+.kds-order-card.normal {
+  border-color: hsl(var(--pos-success));
+  background: hsl(var(--pos-success) / 0.05);
+}
+
+/* 深色模式轉換動畫 */
+.dark-mode-transition {
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+}
+
+/* 確保所有元素都有轉換動畫 */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}

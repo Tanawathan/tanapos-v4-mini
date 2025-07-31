@@ -1,0 +1,192 @@
+/* 購物車右側對齊特殊樣式 */
+.pos-cart-container {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-left: 2px solid hsl(var(--pos-primary, 139 84% 54%) / 0.2);
+  background: linear-gradient(135deg, hsl(var(--card, 0 0% 100%)) 0%, hsl(var(--muted, 210 40% 96%) / 0.1) 100%);
+}
+
+.pos-cart-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(135deg, hsl(var(--card, 0 0% 100%) / 0.95) 0%, hsl(var(--background, 0 0% 100%) / 0.95) 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid hsl(var(--border, 214.3 31.8% 91.4%) / 0.5);
+}
+
+.pos-cart-content {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted, 210 40% 96%)) transparent;
+}
+
+.pos-cart-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pos-cart-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pos-cart-content::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted, 210 40% 96%));
+  border-radius: 10px;
+}
+
+.pos-cart-content::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground, 215.4 16.3% 46.9%) / 0.5);
+}
+
+.pos-cart-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background: linear-gradient(135deg, hsl(var(--card, 0 0% 100%) / 0.98) 0%, hsl(var(--background, 0 0% 100%) / 0.98) 100%);
+  backdrop-filter: blur(15px);
+  border-top: 1px solid hsl(var(--border, 214.3 31.8% 91.4%) / 0.5);
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* 購物車項目增強動畫 */
+.pos-cart-item-enter {
+  opacity: 0;
+  transform: translateX(20px);
+  animation: cartItemSlideIn 0.3s ease-out forwards;
+}
+
+@keyframes cartItemSlideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.pos-cart-item-exit {
+  animation: cartItemSlideOut 0.2s ease-in forwards;
+}
+
+@keyframes cartItemSlideOut {
+  to {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.95);
+  }
+}
+
+/* 購物車數量徽章 */
+.cart-badge {
+  background: linear-gradient(135deg, hsl(var(--pos-primary, 139 84% 54%)), hsl(var(--pos-secondary, 217 91% 60%)));
+  color: hsl(var(--pos-primary-foreground, 0 0% 100%));
+  border-radius: 9999px;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* 空購物車狀態樣式 */
+.empty-cart-illustration {
+  opacity: 0.3;
+  filter: grayscale(100%);
+  transition: all 0.3s ease;
+}
+
+.empty-cart-state:hover .empty-cart-illustration {
+  opacity: 0.6;
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+
+/* 購物車總計區域特殊效果 */
+.cart-total-highlight {
+  background: linear-gradient(135deg, hsl(var(--pos-success, 120 61% 50%) / 0.1) 0%, hsl(var(--pos-primary, 139 84% 54%) / 0.1) 100%);
+  border: 2px solid hsl(var(--pos-primary, 139 84% 54%) / 0.3);
+  border-radius: 0.75rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.cart-total-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* 改進的購物車項目樣式 */
+.pos-cart-item-enhanced {
+  background: linear-gradient(145deg, hsl(var(--card, 0 0% 100%)), hsl(var(--muted, 210 40% 96%) / 0.5));
+  border: 1px solid hsl(var(--border, 214.3 31.8% 91.4%));
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.pos-cart-item-enhanced:hover {
+  background: linear-gradient(145deg, hsl(var(--accent, 210 40% 96%) / 0.8), hsl(var(--accent, 210 40% 96%)));
+  border-color: hsl(var(--pos-primary, 139 84% 54%) / 0.5);
+  transform: translateX(-3px);
+  box-shadow: 3px 0 15px -3px hsl(var(--pos-primary, 139 84% 54%) / 0.3);
+}
+
+.pos-cart-item-enhanced::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, hsl(var(--pos-primary, 139 84% 54%)), hsl(var(--pos-secondary, 217 91% 60%)));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.pos-cart-item-enhanced:hover::before {
+  opacity: 1;
+}
+
+/* 響應式購物車 */
+@media (max-width: 768px) {
+  .pos-cart-container {
+    width: 100%;
+    height: auto;
+    border-left: none;
+    border-top: 2px solid hsl(var(--pos-primary, 139 84% 54%) / 0.2);
+  }
+  
+  .pos-cart-content {
+    max-height: 300px;
+  }
+}

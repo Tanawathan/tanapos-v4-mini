@@ -1,0 +1,2016 @@
+/* ========================================
+   全局 UI 風格系統 CSS
+   支持 9 種不同的 UI 風格切換
+   ======================================== */
+
+/* 基礎風格重置 */
+.style-switcher {
+  position: relative;
+  z-index: 1000;
+}
+
+.style-select {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 0.375rem;
+  background: var(--color-white);
+  font-size: 0.875rem;
+  min-width: 150px;
+}
+
+/* ========================================
+   1. 極簡現代風格 (預設)
+   ======================================== */
+.ui-style-modern nav,
+.ui-style-modern .modern-card,
+.ui-style-modern .modern-btn {
+  /* 使用現有的 modern-design.css 樣式 */
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  color: var(--color-gray-900);
+}
+
+/* ========================================
+   2. 新擬物風格 (Neumorphism)
+   ======================================== */
+.ui-style-neumorphism {
+  --neumorphic-bg: linear-gradient(145deg, #f0f0f3, #cacdd1);
+  --neumorphic-shadow-light: #ffffff;
+  --neumorphic-shadow-dark: #bebebe;
+  --neumorphic-text: #555555;
+}
+
+.neumorphism-body {
+  background: var(--neumorphic-bg) !important;
+  color: var(--neumorphic-text) !important;
+}
+
+.ui-style-neumorphism nav,
+.ui-style-neumorphism .modern-card,
+.ui-style-neumorphism .modern-btn {
+  background: var(--neumorphic-bg);
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 9px 9px 18px var(--neumorphic-shadow-dark), 
+              -9px -9px 18px var(--neumorphic-shadow-light);
+  color: var(--neumorphic-text);
+}
+
+.ui-style-neumorphism .modern-btn:hover,
+.ui-style-neumorphism .modern-btn-primary {
+  box-shadow: inset 9px 9px 18px var(--neumorphic-shadow-dark), 
+              inset -9px -9px 18px var(--neumorphic-shadow-light);
+}
+
+/* Neumorphism 風格 POS 特定樣式 */
+.ui-style-neumorphism .pos-product-card {
+  background: var(--neumorphic-bg);
+  border: none;
+  border-radius: 20px;
+  padding: 20px;
+  margin: 10px;
+  box-shadow: 15px 15px 30px var(--neumorphic-shadow-dark),
+              -15px -15px 30px var(--neumorphic-shadow-light);
+  transition: all 0.3s ease;
+  color: var(--neumorphic-text);
+}
+
+.ui-style-neumorphism .pos-product-card:hover {
+  box-shadow: inset 5px 5px 10px var(--neumorphic-shadow-dark),
+              inset -5px -5px 10px var(--neumorphic-shadow-light),
+              0 0 20px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+}
+
+.ui-style-neumorphism .pos-product-card h3 {
+  color: var(--neumorphic-text);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.ui-style-neumorphism .pos-product-card .price {
+  background: var(--neumorphic-bg);
+  color: #667eea;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 15px;
+  box-shadow: inset 3px 3px 6px var(--neumorphic-shadow-dark),
+              inset -3px -3px 6px var(--neumorphic-shadow-light);
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.ui-style-neumorphism .btn-pos-primary {
+  background: var(--neumorphic-bg);
+  color: var(--neumorphic-text);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 15px;
+  box-shadow: 8px 8px 16px var(--neumorphic-shadow-dark),
+              -8px -8px 16px var(--neumorphic-shadow-light);
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.ui-style-neumorphism .btn-pos-primary:hover {
+  box-shadow: inset 5px 5px 10px var(--neumorphic-shadow-dark),
+              inset -5px -5px 10px var(--neumorphic-shadow-light);
+}
+
+.ui-style-neumorphism .pos-cart {
+  background: var(--neumorphic-bg);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 15px 15px 30px var(--neumorphic-shadow-dark),
+              -15px -15px 30px var(--neumorphic-shadow-light);
+  color: var(--neumorphic-text);
+}
+
+.ui-style-neumorphism .pos-cart h3 {
+  color: var(--neumorphic-text);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.ui-style-neumorphism .pos-cart-item {
+  background: var(--neumorphic-bg);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 8px 0;
+  box-shadow: inset 3px 3px 6px var(--neumorphic-shadow-dark),
+              inset -3px -3px 6px var(--neumorphic-shadow-light);
+}
+
+.ui-style-neumorphism .pos-cart-total {
+  background: var(--neumorphic-bg);
+  color: #667eea;
+  font-weight: bold;
+  padding: 15px;
+  border-radius: 15px;
+  margin-top: 15px;
+  box-shadow: inset 5px 5px 10px var(--neumorphic-shadow-dark),
+              inset -5px -5px 10px var(--neumorphic-shadow-light);
+  text-align: center;
+}
+
+/* Neumorphism 搜尋與篩選樣式 */
+.ui-style-neumorphism input[type="text"],
+.ui-style-neumorphism select {
+  background: var(--neumorphic-bg);
+  border: none;
+  border-radius: 15px;
+  padding: 12px 16px;
+  color: var(--neumorphic-text);
+  box-shadow: inset 5px 5px 10px var(--neumorphic-shadow-dark),
+              inset -5px -5px 10px var(--neumorphic-shadow-light);
+  transition: all 0.3s ease;
+}
+
+.ui-style-neumorphism input[type="text"]:focus,
+.ui-style-neumorphism select:focus {
+  outline: none;
+  box-shadow: inset 8px 8px 15px var(--neumorphic-shadow-dark),
+              inset -8px -8px 15px var(--neumorphic-shadow-light),
+              0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.ui-style-neumorphism button {
+  background: var(--neumorphic-bg);
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: var(--neumorphic-text);
+  box-shadow: 6px 6px 12px var(--neumorphic-shadow-dark),
+              -6px -6px 12px var(--neumorphic-shadow-light);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.ui-style-neumorphism button:hover {
+  box-shadow: inset 3px 3px 6px var(--neumorphic-shadow-dark),
+              inset -3px -3px 6px var(--neumorphic-shadow-light);
+  transform: scale(0.98);
+}
+
+.ui-style-neumorphism h1,
+.ui-style-neumorphism h2,
+.ui-style-neumorphism h3 {
+  background: var(--neumorphic-bg);
+  color: var(--neumorphic-text);
+  text-shadow: 2px 2px 4px var(--neumorphic-shadow-dark);
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: inset -4px -4px 8px rgba(255, 255, 255, 0.6), 
+              inset 4px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   3. 玻璃質感風格 (Glassmorphism)
+   ======================================== */
+.ui-style-glassmorphism {
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-text: #333333;
+}
+
+.glassmorphism-body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  min-height: 100vh;
+}
+
+.ui-style-glassmorphism nav,
+.ui-style-glassmorphism .modern-card,
+.ui-style-glassmorphism .modern-btn {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: var(--glass-text);
+}
+
+.ui-style-glassmorphism .modern-btn:hover,
+.ui-style-glassmorphism .modern-btn-primary {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Glassmorphism 風格 POS 特定樣式 */
+.ui-style-glassmorphism .pos-product-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: var(--glass-text);
+  transition: all 0.3s ease;
+}
+
+.ui-style-glassmorphism .pos-product-card:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+.ui-style-glassmorphism .pos-product-card h3 {
+  color: var(--glass-text);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.ui-style-glassmorphism .pos-product-card .price {
+  background: rgba(255, 255, 255, 0.2);
+  color: #764ba2;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.ui-style-glassmorphism .btn-pos-primary {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  color: var(--glass-text);
+  border: 1px solid var(--glass-border);
+  padding: 12px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.ui-style-glassmorphism .btn-pos-primary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.ui-style-glassmorphism .pos-cart {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: var(--glass-text);
+}
+
+.ui-style-glassmorphism .pos-cart h3 {
+  color: var(--glass-text);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.ui-style-glassmorphism .pos-cart-item {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 8px 0;
+}
+
+.ui-style-glassmorphism .pos-cart-total {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  color: #764ba2;
+  font-weight: bold;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-top: 15px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Glassmorphism 搜尋與篩選樣式 */
+.ui-style-glassmorphism input[type="text"],
+.ui-style-glassmorphism select {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--glass-text);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ui-style-glassmorphism input[type="text"]:focus,
+.ui-style-glassmorphism select:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15),
+              0 0 20px rgba(118, 75, 162, 0.3);
+}
+
+.ui-style-glassmorphism button {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  color: var(--glass-text);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.ui-style-glassmorphism button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.ui-style-glassmorphism h1,
+.ui-style-glassmorphism h2,
+.ui-style-glassmorphism h3 {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--glass-text);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   4. 極繁主義風格 (Brutalism)
+   ======================================== */
+.ui-style-brutalism {
+  --brutal-primary: #ff0080;
+  --brutal-secondary: #00ffff;
+  --brutal-tertiary: #ffff00;
+  --brutal-quaternary: #ff8000;
+  --brutal-bg: #000000;
+  --brutal-text: #ffffff;
+  --brutal-border: #ffffff;
+}
+
+.brutalism-body {
+  background: var(--brutal-bg) !important;
+  color: var(--brutal-text) !important;
+  font-family: Impact, "Arial Black", sans-serif !important;
+}
+
+.ui-style-brutalism nav,
+.ui-style-brutalism .modern-card {
+  background: var(--brutal-bg);
+  border: 4px solid var(--brutal-primary);
+  border-radius: 0;
+  box-shadow: 8px 8px 0px var(--brutal-primary);
+  color: var(--brutal-text);
+  transform: rotate(-1deg);
+}
+
+.ui-style-brutalism .modern-btn {
+  background: var(--brutal-secondary);
+  color: var(--brutal-bg);
+  border: 3px solid var(--brutal-bg);
+  border-radius: 0;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px var(--brutal-bg);
+  transform: rotate(2deg);
+  transition: transform 0.1s ease;
+}
+
+.ui-style-brutalism .modern-btn:hover {
+  background: var(--brutal-primary);
+  transform: rotate(0deg) scale(1.05);
+}
+
+.ui-style-brutalism .modern-btn-primary {
+  background: var(--brutal-primary);
+  color: var(--brutal-text);
+}
+
+/* POS 商品卡片的極繁主義樣式 */
+.ui-style-brutalism .pos-product-card {
+  background: var(--brutal-bg);
+  border: 4px solid var(--brutal-secondary);
+  border-radius: 0;
+  box-shadow: 8px 8px 0px var(--brutal-secondary);
+  color: var(--brutal-text);
+  transform: rotate(-1deg);
+  font-family: Impact, "Arial Black", sans-serif;
+}
+
+.ui-style-brutalism .pos-product-card:hover {
+  background: var(--brutal-bg);
+  border-color: var(--brutal-tertiary);
+  box-shadow: 12px 12px 0px var(--brutal-tertiary);
+  transform: rotate(1deg) scale(1.05);
+}
+
+.ui-style-brutalism .pos-product-card h3 {
+  color: var(--brutal-tertiary);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0px var(--brutal-primary);
+}
+
+.ui-style-brutalism .pos-product-card p {
+  color: var(--brutal-text);
+  font-weight: 700;
+}
+
+.ui-style-brutalism .pos-product-card .text-primary {
+  color: var(--brutal-primary) !important;
+  font-weight: 900;
+  text-shadow: 2px 2px 0px var(--brutal-bg);
+  font-size: 1.2em;
+}
+
+.ui-style-brutalism .btn-pos-primary {
+  background: var(--brutal-primary);
+  color: var(--brutal-bg);
+  border: 3px solid var(--brutal-border);
+  border-radius: 0;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px var(--brutal-border);
+  transform: rotate(-2deg);
+  transition: transform 0.1s ease;
+  letter-spacing: 1px;
+}
+
+.ui-style-brutalism .btn-pos-primary:hover {
+  background: var(--brutal-tertiary);
+  color: var(--brutal-bg);
+  border-color: var(--brutal-primary);
+  transform: rotate(2deg) scale(1.1);
+  box-shadow: 6px 6px 0px var(--brutal-primary);
+}
+
+/* 購物車的極繁主義樣式 */
+.ui-style-brutalism .pos-cart {
+  background: var(--brutal-bg);
+  border: 4px solid var(--brutal-primary);
+  border-radius: 0;
+  box-shadow: -8px 8px 0px var(--brutal-primary);
+  transform: rotate(1deg);
+}
+
+.ui-style-brutalism .pos-cart h2 {
+  color: var(--brutal-secondary);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.ui-style-brutalism .pos-cart-item {
+  background: var(--brutal-primary);
+  border: 3px solid var(--brutal-tertiary);
+  border-radius: 0;
+  color: var(--brutal-bg);
+  transform: rotate(-0.5deg);
+  margin: 0.5rem 0;
+}
+
+.ui-style-brutalism .pos-cart-item:hover {
+  background: var(--brutal-secondary);
+  transform: rotate(0.5deg) scale(1.02);
+  box-shadow: 4px 4px 0px var(--brutal-bg);
+}
+
+.ui-style-brutalism .pos-cart-item h4 {
+  color: var(--brutal-bg);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+/* 分類按鈕的極繁主義樣式 */
+.ui-style-brutalism .category-btn {
+  background: var(--brutal-quaternary);
+  border: 3px solid var(--brutal-border);
+  border-radius: 0;
+  color: var(--brutal-bg);
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px var(--brutal-border);
+  transform: rotate(-1deg);
+  letter-spacing: 1px;
+}
+
+.ui-style-brutalism .category-btn:hover {
+  background: var(--brutal-secondary);
+  color: var(--brutal-bg);
+  border-color: var(--brutal-primary);
+  transform: rotate(1deg) scale(1.05);
+  box-shadow: 6px 6px 0px var(--brutal-primary);
+}
+
+.ui-style-brutalism .category-btn.active,
+.ui-style-brutalism .bg-primary {
+  background: var(--brutal-primary) !important;
+  color: var(--brutal-bg) !important;
+  border-color: var(--brutal-tertiary) !important;
+  transform: rotate(2deg) scale(1.1) !important;
+  box-shadow: 8px 8px 0px var(--brutal-tertiary) !important;
+}
+
+/* 數量按鈕的極繁主義樣式 */
+.ui-style-brutalism .quantity-btn {
+  background: var(--brutal-secondary);
+  border: 3px solid var(--brutal-bg);
+  border-radius: 0;
+  color: var(--brutal-bg);
+  font-weight: 900;
+  box-shadow: 3px 3px 0px var(--brutal-bg);
+  transform: rotate(-5deg);
+}
+
+.ui-style-brutalism .quantity-btn:hover {
+  background: var(--brutal-tertiary);
+  transform: rotate(5deg) scale(1.2);
+  box-shadow: 4px 4px 0px var(--brutal-bg);
+}
+
+/* Brutalism 搜尋與篩選樣式 */
+.ui-style-brutalism input[type="text"],
+.ui-style-brutalism select {
+  background: var(--brutal-bg);
+  border: 4px solid var(--brutal-primary);
+  border-radius: 0;
+  padding: 12px 16px;
+  color: var(--brutal-text);
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px var(--brutal-secondary);
+  transform: rotate(-1deg);
+  transition: all 0.3s ease;
+}
+
+.ui-style-brutalism input[type="text"]:focus,
+.ui-style-brutalism select:focus {
+  outline: none;
+  border-color: var(--brutal-tertiary);
+  box-shadow: 6px 6px 0px var(--brutal-primary);
+  transform: rotate(1deg) scale(1.02);
+}
+
+.ui-style-brutalism button {
+  background: var(--brutal-primary);
+  border: 3px solid var(--brutal-bg);
+  border-radius: 0;
+  padding: 10px 16px;
+  color: var(--brutal-bg);
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px var(--brutal-bg);
+  transform: rotate(-2deg);
+  transition: all 0.3s ease;
+}
+
+.ui-style-brutalism button:hover {
+  background: var(--brutal-secondary);
+  border-color: var(--brutal-tertiary);
+  transform: rotate(2deg) scale(1.05);
+  box-shadow: 6px 6px 0px var(--brutal-bg);
+}
+
+.ui-style-brutalism h1,
+.ui-style-brutalism h2,
+.ui-style-brutalism h3 {
+  color: var(--brutal-text);
+  font-weight: 900;
+  text-transform: uppercase;
+  text-shadow: 4px 4px 0px var(--brutal-primary);
+  transform: rotate(-1deg);
+}
+
+/* ========================================
+   5. 未來科技風格 (Cyberpunk)
+   ======================================== */
+.ui-style-cyberpunk {
+  --cyber-primary: #00ffff;
+  --cyber-secondary: #ff0080;
+  --cyber-tertiary: #ffff00;
+  --cyber-bg: #0a0a0a;
+  --cyber-text: #00ffff;
+}
+
+.cyberpunk-body {
+  background: linear-gradient(135deg, var(--cyber-bg) 0%, #1a0033 50%, #000 100%) !important;
+  color: var(--cyber-text) !important;
+  font-family: "Orbitron", "Courier New", monospace !important;
+}
+
+.ui-style-cyberpunk nav,
+.ui-style-cyberpunk .modern-card {
+  background: linear-gradient(135deg, var(--cyber-bg) 0%, #1a0033 50%, #000 100%);
+  border: 1px solid var(--cyber-primary);
+  border-bottom: 2px solid var(--cyber-secondary);
+  border-radius: 0.25rem;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 
+              inset 0 0 20px rgba(255, 0, 128, 0.1);
+  color: var(--cyber-text);
+}
+
+.ui-style-cyberpunk .modern-btn {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+  border-radius: 0.25rem;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.ui-style-cyberpunk .modern-btn:hover,
+.ui-style-cyberpunk .modern-btn-primary {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 128, 0.2));
+  border-color: var(--cyber-primary);
+  color: var(--cyber-primary);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), 
+              inset 0 0 10px rgba(255, 0, 128, 0.1);
+}
+
+/* 發光動畫 */
+@keyframes cyber-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.ui-style-cyberpunk .cyber-glow {
+  animation: cyber-glow 2s infinite;
+}
+
+/* POS 商品卡片的未來科技樣式 */
+.ui-style-cyberpunk .pos-product-card {
+  background: linear-gradient(135deg, var(--cyber-bg) 0%, #1a0033 50%, #000 100%);
+  border: 1px solid var(--cyber-primary);
+  border-bottom: 2px solid var(--cyber-secondary);
+  border-radius: 0.25rem;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 
+              inset 0 0 20px rgba(255, 0, 128, 0.1);
+  color: var(--cyber-text);
+  font-family: "Orbitron", "Courier New", monospace;
+}
+
+.ui-style-cyberpunk .pos-product-card:hover {
+  border-color: var(--cyber-secondary);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), 
+              inset 0 0 30px rgba(255, 0, 128, 0.2);
+  animation: cyber-glow 1s infinite;
+}
+
+.ui-style-cyberpunk .pos-product-card h3 {
+  color: var(--cyber-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.ui-style-cyberpunk .pos-product-card p {
+  color: var(--cyber-text);
+  opacity: 0.8;
+}
+
+.ui-style-cyberpunk .pos-product-card .text-primary {
+  color: var(--cyber-tertiary) !important;
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+.ui-style-cyberpunk .btn-pos-primary {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 128, 0.2));
+  border: 1px solid var(--cyber-primary);
+  border-radius: 0.25rem;
+  color: var(--cyber-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.ui-style-cyberpunk .btn-pos-primary:hover {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.4), rgba(255, 0, 128, 0.4));
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  animation: cyber-glow 0.5s infinite;
+}
+
+.ui-style-cyberpunk .pos-cart {
+  background: linear-gradient(135deg, var(--cyber-bg) 0%, #1a0033 50%, #000 100%);
+  border: 1px solid var(--cyber-primary);
+  border-left: 3px solid var(--cyber-secondary);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.ui-style-cyberpunk .pos-cart h2 {
+  color: var(--cyber-secondary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
+}
+
+.ui-style-cyberpunk .pos-cart-item {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid var(--cyber-primary);
+  border-radius: 0.25rem;
+  color: var(--cyber-text);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+.ui-style-cyberpunk .pos-cart-item:hover {
+  background: rgba(255, 0, 128, 0.1);
+  border-color: var(--cyber-secondary);
+  box-shadow: 0 0 15px rgba(255, 0, 128, 0.3);
+}
+
+.ui-style-cyberpunk .category-btn {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--cyber-primary);
+  border-radius: 0.25rem;
+  color: var(--cyber-text);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ui-style-cyberpunk .category-btn:hover,
+.ui-style-cyberpunk .category-btn.active {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 128, 0.2));
+  border-color: var(--cyber-secondary);
+  color: var(--cyber-primary);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* Cyberpunk 搜尋與篩選樣式 */
+.ui-style-cyberpunk input[type="text"],
+.ui-style-cyberpunk select {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--cyber-primary);
+  border-radius: 0.25rem;
+  padding: 12px 16px;
+  color: var(--cyber-text);
+  font-weight: 500;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2),
+              inset 0 0 10px rgba(0, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ui-style-cyberpunk input[type="text"]:focus,
+.ui-style-cyberpunk select:focus {
+  outline: none;
+  border-color: var(--cyber-secondary);
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.4),
+              inset 0 0 15px rgba(255, 0, 128, 0.2);
+  color: var(--cyber-primary);
+}
+
+.ui-style-cyberpunk button {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 128, 0.1));
+  border: 1px solid var(--cyber-primary);
+  border-radius: 0.25rem;
+  padding: 10px 16px;
+  color: var(--cyber-text);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.ui-style-cyberpunk button:hover {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 128, 0.2));
+  border-color: var(--cyber-secondary);
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.5);
+  transform: translateY(-2px);
+}
+
+.ui-style-cyberpunk h1,
+.ui-style-cyberpunk h2,
+.ui-style-cyberpunk h3 {
+  background: linear-gradient(135deg, var(--cyber-bg) 0%, #1a0033 50%, #000 100%);
+  color: var(--cyber-text);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  padding: 1rem 1.5rem;
+  border: 1px solid var(--cyber-primary);
+  border-radius: 0.25rem;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 
+              inset 0 0 20px rgba(255, 0, 128, 0.1);
+}
+
+/* ========================================
+   6. 擬物風格 (Skeuomorphism)
+   ======================================== */
+.ui-style-skeuomorphism {
+  --skeuo-bg: linear-gradient(to bottom, #f8f8f8, #e8e8e8);
+  --skeuo-border: #cccccc;
+  --skeuo-text: #333333;
+  --skeuo-primary: #4a9eff;
+}
+
+.ui-style-skeuomorphism nav,
+.ui-style-skeuomorphism .modern-card {
+  background: var(--skeuo-bg);
+  border: 1px solid var(--skeuo-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1), 
+              inset 0 1px 0 rgba(255,255,255,0.8);
+  color: var(--skeuo-text);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.ui-style-skeuomorphism .modern-btn {
+  background: linear-gradient(to bottom, #ffffff, #e8e8e8);
+  border: 1px solid var(--skeuo-border);
+  border-radius: 0.5rem;
+  color: var(--skeuo-text);
+  font-weight: 500;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 
+              inset 0 1px 0 rgba(255,255,255,0.8);
+  transition: all 0.2s ease;
+}
+
+.ui-style-skeuomorphism .modern-btn:hover,
+.ui-style-skeuomorphism .modern-btn-primary {
+  background: linear-gradient(to bottom, var(--skeuo-primary), #0066cc);
+  border-color: #0066cc;
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.3);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 
+              0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* POS 商品卡片的擬物樣式 */
+.ui-style-skeuomorphism .pos-product-card {
+  background: var(--skeuo-bg);
+  border: 1px solid var(--skeuo-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1), 
+              inset 0 1px 0 rgba(255,255,255,0.8);
+  color: var(--skeuo-text);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.ui-style-skeuomorphism .pos-product-card:hover {
+  background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15), 
+              inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.ui-style-skeuomorphism .pos-product-card h3 {
+  color: var(--skeuo-text);
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.ui-style-skeuomorphism .pos-product-card .text-primary {
+  color: var(--skeuo-primary) !important;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.ui-style-skeuomorphism .btn-pos-primary {
+  background: linear-gradient(to bottom, var(--skeuo-primary), #0066cc);
+  border: 1px solid #0066cc;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font-weight: 500;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2), 
+              inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.ui-style-skeuomorphism .btn-pos-primary:hover {
+  background: linear-gradient(to bottom, #0066cc, #004499);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 
+              0 1px 0 rgba(255,255,255,0.1);
+}
+
+.ui-style-skeuomorphism .pos-cart {
+  background: var(--skeuo-bg);
+  border: 1px solid var(--skeuo-border);
+  border-left: 3px solid var(--skeuo-primary);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1), 
+              inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.ui-style-skeuomorphism .pos-cart-item {
+  background: linear-gradient(to bottom, #ffffff, #f8f8f8);
+  border: 1px solid #ddd;
+  border-radius: 0.375rem;
+  color: var(--skeuo-text);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), 
+              inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.ui-style-skeuomorphism .category-btn {
+  background: linear-gradient(to bottom, #ffffff, #e8e8e8);
+  border: 1px solid var(--skeuo-border);
+  border-radius: 0.5rem;
+  color: var(--skeuo-text);
+  font-weight: 500;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 
+              inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.ui-style-skeuomorphism .category-btn:hover,
+.ui-style-skeuomorphism .category-btn.active {
+  background: linear-gradient(to bottom, var(--skeuo-primary), #0066cc);
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.3);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 
+              0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* ========================================
+   7. DOS復古風格
+   ======================================== */
+.ui-style-dos {
+  --dos-bg: #000080;
+  --dos-text: #ffffff;
+  --dos-secondary: #c0c0c0;
+  --dos-active: #ffff00;
+  --dos-border: #c0c0c0;
+  --dos-highlight: #ffff00;
+}
+
+.dos-body {
+  background: var(--dos-bg) !important;
+  color: var(--dos-text) !important;
+  font-family: "Perfect DOS VGA 437", "Courier New", monospace !important;
+  font-size: 16px !important;
+}
+
+.ui-style-dos nav,
+.ui-style-dos .modern-card {
+  background: var(--dos-bg);
+  border: 2px inset var(--dos-secondary);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--dos-text);
+}
+
+.ui-style-dos .modern-btn {
+  background: var(--dos-secondary);
+  color: #000000;
+  border: 2px outset var(--dos-secondary);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 14px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+}
+
+.ui-style-dos .modern-btn:hover,
+.ui-style-dos .modern-btn-primary {
+  background: var(--dos-active);
+  color: var(--dos-bg);
+  border: 2px inset var(--dos-active);
+}
+
+/* POS 商品卡片的 DOS 風格樣式 */
+.ui-style-dos .pos-product-card {
+  background: var(--dos-bg);
+  border: 2px inset var(--dos-secondary);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--dos-text);
+  font-family: "Perfect DOS VGA 437", "Courier New", monospace;
+  padding: 8px;
+}
+
+.ui-style-dos .pos-product-card:hover {
+  border: 2px outset var(--dos-secondary);
+  background: #000099;
+}
+
+.ui-style-dos .pos-product-card h3 {
+  color: var(--dos-text);
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
+  margin: 0 0 4px 0;
+}
+
+.ui-style-dos .pos-product-card p {
+  color: var(--dos-secondary);
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.ui-style-dos .pos-product-card .text-primary {
+  color: var(--dos-active) !important;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.ui-style-dos .btn-pos-primary {
+  background: var(--dos-active);
+  color: var(--dos-bg);
+  border: 2px outset var(--dos-active);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  font-weight: bold;
+}
+
+.ui-style-dos .btn-pos-primary:hover {
+  border: 2px inset var(--dos-active);
+}
+
+.ui-style-dos .pos-cart {
+  background: var(--dos-bg);
+  border: 2px inset var(--dos-secondary);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--dos-text);
+}
+
+.ui-style-dos .pos-cart h2 {
+  color: var(--dos-text);
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 16px;
+  background: var(--dos-secondary);
+  color: var(--dos-bg);
+  padding: 4px 8px;
+  margin: -8px -8px 8px -8px;
+}
+
+.ui-style-dos .pos-cart-item {
+  background: #000099;
+  border: 1px solid var(--dos-secondary);
+  border-radius: 0;
+  color: var(--dos-text);
+  margin: 4px 0;
+  padding: 4px;
+}
+
+.ui-style-dos .pos-cart-item:hover {
+  background: #0000bb;
+}
+
+.ui-style-dos .category-btn {
+  background: var(--dos-secondary);
+  color: #000000;
+  border: 2px outset var(--dos-secondary);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  font-weight: bold;
+}
+
+.ui-style-dos .category-btn:hover,
+.ui-style-dos .category-btn.active {
+  background: var(--dos-active);
+  color: var(--dos-bg);
+  border: 2px inset var(--dos-active);
+}
+
+.ui-style-dos .quantity-btn {
+  background: var(--dos-secondary);
+  color: #000000;
+  border: 1px outset var(--dos-secondary);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+}
+
+.ui-style-dos .quantity-btn:hover {
+  background: var(--dos-active);
+  color: var(--dos-bg);
+  border: 1px inset var(--dos-active);
+}
+
+/* ========================================
+   8. BIOS系統風格
+   ======================================== */
+.ui-style-bios {
+  --bios-bg: linear-gradient(to bottom, #000040, #000080);
+  --bios-text: #00ffff;
+  --bios-secondary: #008080;
+  --bios-active: #ffff00;
+  --bios-border: #008080;
+  --bios-highlight: #ffff00;
+  --bios-accent: #00ffff;
+}
+
+.bios-body {
+  background: var(--bios-bg) !important;
+  color: var(--bios-text) !important;
+  font-family: "Courier New", monospace !important;
+  font-size: 14px !important;
+}
+
+.ui-style-bios nav,
+.ui-style-bios .modern-card {
+  background: var(--bios-bg);
+  border: 1px solid var(--bios-secondary);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--bios-text);
+}
+
+.ui-style-bios .modern-btn {
+  background: transparent;
+  color: var(--bios-text);
+  border: 1px solid #004040;
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+}
+
+.ui-style-bios .modern-btn:hover,
+.ui-style-bios .modern-btn-primary {
+  background: var(--bios-active);
+  color: #000080;
+  border-color: var(--bios-secondary);
+}
+
+/* POS 商品卡片的 BIOS 風格樣式 */
+.ui-style-bios .pos-product-card {
+  background: var(--bios-bg);
+  border: 1px solid var(--bios-secondary);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--bios-text);
+  font-family: "Courier New", monospace;
+  padding: 8px;
+}
+
+.ui-style-bios .pos-product-card:hover {
+  border-color: var(--bios-active);
+  background: linear-gradient(to bottom, #000050, #000090);
+  box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
+}
+
+.ui-style-bios .pos-product-card h3 {
+  color: var(--bios-text);
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
+  margin: 0 0 4px 0;
+  letter-spacing: 1px;
+}
+
+.ui-style-bios .pos-product-card p {
+  color: #008080;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.ui-style-bios .pos-product-card .text-primary {
+  color: var(--bios-active) !important;
+  font-weight: bold;
+  font-size: 14px;
+  text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+
+.ui-style-bios .btn-pos-primary {
+  background: var(--bios-active);
+  color: #000080;
+  border: 1px solid var(--bios-secondary);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  font-weight: bold;
+}
+
+.ui-style-bios .btn-pos-primary:hover {
+  background: #ffffff;
+  color: #000080;
+  box-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+
+.ui-style-bios .pos-cart {
+  background: var(--bios-bg);
+  border: 1px solid var(--bios-secondary);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--bios-text);
+}
+
+.ui-style-bios .pos-cart h2 {
+  color: var(--bios-text);
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
+  background: #004040;
+  padding: 4px 8px;
+  margin: -8px -8px 8px -8px;
+  border-bottom: 1px solid var(--bios-secondary);
+}
+
+.ui-style-bios .pos-cart-item {
+  background: #000050;
+  border: 1px solid #004040;
+  border-radius: 0;
+  color: var(--bios-text);
+  margin: 4px 0;
+  padding: 4px;
+}
+
+.ui-style-bios .pos-cart-item:hover {
+  background: #000070;
+  border-color: var(--bios-secondary);
+}
+
+.ui-style-bios .category-btn {
+  background: transparent;
+  color: var(--bios-text);
+  border: 1px solid #004040;
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  font-weight: bold;
+}
+
+.ui-style-bios .category-btn:hover,
+.ui-style-bios .category-btn.active {
+  background: var(--bios-active);
+  color: #000080;
+  border-color: var(--bios-secondary);
+}
+
+.ui-style-bios .quantity-btn {
+  background: transparent;
+  color: var(--bios-text);
+  border: 1px solid #004040;
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  width: 24px;
+  height: 24px;
+}
+
+.ui-style-bios .quantity-btn:hover {
+  background: var(--bios-active);
+  color: #000080;
+  border-color: var(--bios-secondary);
+}
+
+/* ========================================
+   9. 撲撲可愛風格 (Kawaii)
+   ======================================== */
+.ui-style-kawaii {
+  --kawaii-primary: #FF69B4;
+  --kawaii-secondary: #FFB6C1;
+  --kawaii-tertiary: #FFC0CB;
+  --kawaii-bg: #FFF0F5;
+  --kawaii-text: #FF1493;
+}
+
+.kawaii-body {
+  background: linear-gradient(135deg, var(--kawaii-secondary), var(--kawaii-tertiary), #FFCCCB) !important;
+  color: var(--kawaii-text) !important;
+  font-family: "Comic Sans MS", "Marker Felt", cursive !important;
+}
+
+.ui-style-kawaii nav,
+.ui-style-kawaii .modern-card {
+  background: linear-gradient(135deg, var(--kawaii-secondary), var(--kawaii-tertiary));
+  border: 3px solid var(--kawaii-primary);
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+  color: var(--kawaii-text);
+  position: relative;
+}
+
+.ui-style-kawaii .modern-btn {
+  background: linear-gradient(135deg, var(--kawaii-secondary), #FFFFFF);
+  color: #8B008B;
+  border: 3px solid #FFFFFF;
+  border-radius: 25px;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(255, 105, 180, 0.2), 
+              inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+  transform: rotate(1deg);
+}
+
+.ui-style-kawaii .modern-btn:hover {
+  transform: rotate(0deg) scale(1.1);
+  box-shadow: 0 6px 12px rgba(255, 105, 180, 0.4), 
+              inset 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.ui-style-kawaii .modern-btn-primary {
+  background: linear-gradient(135deg, #FFFFFF, #FFE4E1);
+  border-color: var(--kawaii-primary);
+  color: var(--kawaii-text);
+  position: relative;
+}
+
+.ui-style-kawaii .modern-btn-primary::after {
+  content: '💕';
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 1rem;
+  animation: kawaii-bounce 1s infinite;
+}
+
+/* 可愛彈跳動畫 */
+@keyframes kawaii-bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-8px); }
+  60% { transform: translateY(-4px); }
+}
+
+/* POS 商品卡片的可愛風格樣式 */
+.ui-style-kawaii .pos-product-card {
+  background: linear-gradient(135deg, var(--kawaii-secondary), var(--kawaii-tertiary));
+  border: 3px solid var(--kawaii-primary);
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+  color: var(--kawaii-text);
+  font-family: "Comic Sans MS", "Marker Felt", cursive;
+  position: relative;
+  transform: rotate(1deg);
+}
+
+.ui-style-kawaii .pos-product-card:hover {
+  transform: rotate(-1deg) scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 105, 180, 0.4);
+  border-color: #FF1493;
+}
+
+.ui-style-kawaii .pos-product-card::before {
+  content: '💕';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 1.2rem;
+  animation: kawaii-bounce 2s infinite;
+}
+
+.ui-style-kawaii .pos-product-card h3 {
+  color: var(--kawaii-text);
+  font-weight: 700;
+  font-size: 16px;
+  margin: 0 0 8px 0;
+}
+
+.ui-style-kawaii .pos-product-card p {
+  color: #8B008B;
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.ui-style-kawaii .pos-product-card .text-primary {
+  color: var(--kawaii-primary) !important;
+  font-weight: 800;
+  font-size: 18px;
+  text-shadow: 0 2px 4px rgba(255, 105, 180, 0.3);
+}
+
+.ui-style-kawaii .btn-pos-primary {
+  background: linear-gradient(135deg, #FFFFFF, #FFE4E1);
+  border: 3px solid var(--kawaii-primary);
+  border-radius: 25px;
+  color: var(--kawaii-text);
+  font-weight: 600;
+  font-family: inherit;
+  box-shadow: 0 4px 8px rgba(255, 105, 180, 0.2), 
+              inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  transform: rotate(1deg);
+  position: relative;
+}
+
+.ui-style-kawaii .btn-pos-primary:hover {
+  transform: rotate(0deg) scale(1.1);
+  box-shadow: 0 6px 12px rgba(255, 105, 180, 0.4), 
+              inset 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.ui-style-kawaii .btn-pos-primary::after {
+  content: '✨';
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 1rem;
+  animation: kawaii-bounce 1.5s infinite;
+}
+
+.ui-style-kawaii .pos-cart {
+  background: linear-gradient(135deg, var(--kawaii-secondary), var(--kawaii-tertiary));
+  border: 3px solid var(--kawaii-primary);
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+  position: relative;
+}
+
+.ui-style-kawaii .pos-cart::before {
+  content: '🛍️';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  background: var(--kawaii-bg);
+  padding: 4px 8px;
+  border-radius: 15px;
+  border: 2px solid var(--kawaii-primary);
+}
+
+.ui-style-kawaii .pos-cart h2 {
+  color: var(--kawaii-text);
+  font-weight: 700;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.ui-style-kawaii .pos-cart-item {
+  background: linear-gradient(135deg, #FFFFFF, var(--kawaii-tertiary));
+  border: 2px solid var(--kawaii-secondary);
+  border-radius: 20px;
+  color: var(--kawaii-text);
+  margin: 8px 0;
+  padding: 8px;
+  position: relative;
+  transform: rotate(-0.5deg);
+}
+
+.ui-style-kawaii .pos-cart-item:hover {
+  transform: rotate(0.5deg) scale(1.02);
+  border-color: var(--kawaii-primary);
+}
+
+.ui-style-kawaii .pos-cart-item::before {
+  content: '🍽️';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 1rem;
+}
+
+.ui-style-kawaii .category-btn {
+  background: linear-gradient(135deg, var(--kawaii-secondary), #FFFFFF);
+  color: #8B008B;
+  border: 3px solid #FFFFFF;
+  border-radius: 25px;
+  font-weight: 600;
+  font-family: inherit;
+  box-shadow: 0 4px 8px rgba(255, 105, 180, 0.2), 
+              inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  transform: rotate(1deg);
+}
+
+.ui-style-kawaii .category-btn:hover,
+.ui-style-kawaii .category-btn.active {
+  background: linear-gradient(135deg, #FFFFFF, #FFE4E1);
+  border-color: var(--kawaii-primary);
+  color: var(--kawaii-text);
+  transform: rotate(0deg) scale(1.1);
+  box-shadow: 0 6px 12px rgba(255, 105, 180, 0.4), 
+              inset 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.ui-style-kawaii .quantity-btn {
+  background: linear-gradient(135deg, #FFFFFF, var(--kawaii-tertiary));
+  border: 2px solid var(--kawaii-primary);
+  border-radius: 50%;
+  color: var(--kawaii-text);
+  font-weight: 700;
+  font-family: inherit;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.ui-style-kawaii .quantity-btn:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 8px rgba(255, 105, 180, 0.3);
+  animation: kawaii-bounce 0.5s;
+}
+
+/* ========================================
+   10. Code 彩蛋風格 (程式碼 × 極繁主義)
+   ======================================== */
+.ui-style-code {
+  --code-bg: #0D1117;
+  --code-surface: #161B22;
+  --code-border: #21262D;
+  --code-text: #C9D1D9;
+  --code-primary: #61DAFB;
+  --code-secondary: #F7DF1E;
+  --code-success: #4ECDC4;
+  --code-warning: #FFEAA7;
+  --code-danger: #FF6B6B;
+  --code-purple: #DDA0DD;
+  --code-blue: #45B7D1;
+  --code-green: #96CEB4;
+}
+
+.code-body {
+  background: var(--code-bg) !important;
+  color: var(--code-text) !important;
+  font-family: "Fira Code", "JetBrains Mono", "Source Code Pro", monospace !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  overflow-x: hidden;
+}
+
+/* Code 風格的基礎容器 */
+.ui-style-code nav,
+.ui-style-code .modern-card {
+  background: var(--code-surface);
+  border: 1px solid var(--code-border);
+  border-radius: 8px;
+  box-shadow: 
+    0 0 20px rgba(97, 218, 251, 0.1),
+    inset 0 1px 0 rgba(97, 218, 251, 0.1);
+  color: var(--code-text);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 程式碼風格的按鈕 */
+.ui-style-code .modern-btn {
+  background: var(--code-surface);
+  color: var(--code-text);
+  border: 1px solid var(--code-border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.ui-style-code .modern-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(97, 218, 251, 0.4),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.ui-style-code .modern-btn:hover::before {
+  left: 100%;
+}
+
+.ui-style-code .modern-btn:hover {
+  border-color: var(--code-primary);
+  color: var(--code-primary);
+  text-shadow: 0 0 8px var(--code-primary);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 8px 25px rgba(97, 218, 251, 0.3),
+    0 0 0 1px rgba(97, 218, 251, 0.2);
+}
+
+.ui-style-code .modern-btn-primary {
+  background: linear-gradient(135deg, var(--code-primary), var(--code-blue));
+  color: var(--code-bg);
+  border-color: var(--code-primary);
+  font-weight: 600;
+  text-shadow: none;
+  animation: code-pulse 2s infinite, code-rainbow-border 3s linear infinite;
+}
+
+.ui-style-code .modern-btn-primary:hover {
+  transform: translateY(-3px) scale(1.1) rotate(1deg);
+  box-shadow: 
+    0 15px 35px rgba(97, 218, 251, 0.4),
+    0 5px 15px rgba(255, 107, 107, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.ui-style-code .modern-btn-secondary {
+  background: linear-gradient(135deg, var(--code-secondary), var(--code-warning));
+  color: var(--code-bg);
+  border-color: var(--code-secondary);
+  animation: code-glitch 4s infinite;
+}
+
+.ui-style-code .modern-btn-ghost {
+  background: transparent;
+  color: var(--code-success);
+  border-color: var(--code-success);
+  animation: code-typing 3s infinite;
+}
+
+/* 極繁主義動畫效果 */
+@keyframes code-pulse {
+  0%, 100% { 
+    box-shadow: 
+      0 0 5px var(--code-primary),
+      0 0 10px var(--code-primary),
+      0 0 15px var(--code-primary);
+  }
+  50% { 
+    box-shadow: 
+      0 0 10px var(--code-primary),
+      0 0 20px var(--code-primary),
+      0 0 30px var(--code-primary);
+  }
+}
+
+@keyframes code-rainbow-border {
+  0% { border-color: var(--code-primary); }
+  16.66% { border-color: var(--code-secondary); }
+  33.33% { border-color: var(--code-success); }
+  50% { border-color: var(--code-warning); }
+  66.66% { border-color: var(--code-danger); }
+  83.33% { border-color: var(--code-purple); }
+  100% { border-color: var(--code-primary); }
+}
+
+@keyframes code-glitch {
+  0%, 90%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-2px) skew(-5deg); }
+  20% { transform: translateX(2px) skew(5deg); }
+  30% { transform: translateX(-1px) skew(-2deg); }
+  40% { transform: translateX(1px) skew(2deg); }
+  50% { transform: translateX(-0.5px) skew(-1deg); }
+  60% { transform: translateX(0.5px) skew(1deg); }
+}
+
+@keyframes code-typing {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0.3; }
+}
+
+/* 程式碼風格的語法高亮效果 */
+.ui-style-code .modern-card-title {
+  color: var(--code-primary);
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(97, 218, 251, 0.3);
+  position: relative;
+}
+
+.ui-style-code .modern-card-title::before {
+  content: '// ';
+  color: var(--code-success);
+  opacity: 0.7;
+}
+
+.ui-style-code .modern-card-subtitle {
+  color: var(--code-warning);
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.ui-style-code .modern-card-subtitle::before {
+  content: '/* ';
+  color: var(--code-purple);
+}
+
+.ui-style-code .modern-card-subtitle::after {
+  content: ' */';
+  color: var(--code-purple);
+}
+
+/* 導航欄特殊效果 */
+.ui-style-code nav {
+  position: relative;
+}
+
+.ui-style-code nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--code-primary),
+    var(--code-secondary),
+    var(--code-success),
+    var(--code-warning),
+    var(--code-danger),
+    var(--code-purple),
+    var(--code-blue),
+    var(--code-green)
+  );
+  background-size: 400% 100%;
+  animation: code-rainbow-flow 4s linear infinite;
+}
+
+@keyframes code-rainbow-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
+}
+
+/* 程式碼風格的容器效果 */
+.ui-style-code .modern-container {
+  position: relative;
+}
+
+.ui-style-code .modern-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(97, 218, 251, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 107, 107, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(78, 205, 196, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  animation: code-bg-float 8s ease-in-out infinite;
+}
+
+@keyframes code-bg-float {
+  0%, 100% { opacity: 0.3; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.6; transform: scale(1.1) rotate(180deg); }
+}
+
+/* 程式碼風格的滾動條 */
+.ui-style-code ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.ui-style-code ::-webkit-scrollbar-track {
+  background: var(--code-bg);
+  border-radius: 6px;
+}
+
+.ui-style-code ::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, var(--code-primary), var(--code-success));
+  border-radius: 6px;
+  border: 2px solid var(--code-bg);
+}
+
+.ui-style-code ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, var(--code-secondary), var(--code-warning));
+  box-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
+}
+
+/* 極繁主義的載入動畫 */
+.ui-style-code .code-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.ui-style-code .code-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(97, 218, 251, 0.4),
+    rgba(255, 107, 107, 0.4),
+    rgba(78, 205, 196, 0.4),
+    transparent
+  );
+  animation: code-loading-sweep 2s infinite;
+}
+
+@keyframes code-loading-sweep {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* 程式碼風格的文字效果 */
+.ui-style-code {
+  --syntax-keyword: #FF79C6;
+  --syntax-string: #F1FA8C;
+  --syntax-comment: #6272A4;
+  --syntax-function: #50FA7B;
+  --syntax-variable: #8BE9FD;
+  --syntax-number: #BD93F9;
+}
+
+.ui-style-code .code-syntax {
+  font-family: inherit;
+}
+
+.ui-style-code .code-keyword { color: var(--syntax-keyword); font-weight: 600; }
+.ui-style-code .code-string { color: var(--syntax-string); }
+.ui-style-code .code-comment { color: var(--syntax-comment); font-style: italic; }
+.ui-style-code .code-function { color: var(--syntax-function); font-weight: 500; }
+.ui-style-code .code-variable { color: var(--syntax-variable); }
+.ui-style-code .code-number { color: var(--syntax-number); }
+
+/* 特殊的震動效果 */
+@keyframes code-crazy-shake {
+  0% { transform: translate(0); }
+  10% { transform: translate(-2px, -1px) rotate(-1deg); }
+  20% { transform: translate(2px, 1px) rotate(1deg); }
+  30% { transform: translate(-1px, 2px) rotate(-1deg); }
+  40% { transform: translate(1px, -2px) rotate(1deg); }
+  50% { transform: translate(-2px, 1px) rotate(-1deg); }
+  60% { transform: translate(2px, -1px) rotate(1deg); }
+  70% { transform: translate(-1px, -2px) rotate(-1deg); }
+  80% { transform: translate(1px, 2px) rotate(1deg); }
+  90% { transform: translate(-2px, -1px) rotate(-1deg); }
+  100% { transform: translate(0); }
+}
+
+.ui-style-code .code-crazy:hover {
+  animation: code-crazy-shake 0.5s infinite;
+}
+
+/* Code 風格 POS 特定樣式 */
+.ui-style-code .pos-product-card {
+  background: #1a1a1a;
+  border: 1px solid #333333;
+  border-radius: 0;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  padding: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+}
+
+.ui-style-code .pos-product-card::before {
+  content: '> ';
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.ui-style-code .pos-product-card:hover {
+  background: #0d1117;
+  border-color: #00ff00;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  transform: scale(1.02);
+}
+
+.ui-style-code .pos-product-card h3 {
+  color: #58a6ff;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+}
+
+.ui-style-code .pos-product-card .price {
+  color: #ffa657;
+  font-weight: bold;
+  font-size: 16px;
+  background: #21262d;
+  padding: 4px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.ui-style-code .btn-pos-primary {
+  background: #238636;
+  color: #ffffff;
+  border: 1px solid #238636;
+  padding: 8px 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 3px;
+}
+
+.ui-style-code .btn-pos-primary:hover {
+  background: #2ea043;
+  border-color: #2ea043;
+  box-shadow: 0 0 10px rgba(46, 160, 67, 0.5);
+}
+
+.ui-style-code .pos-cart {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  color: #c9d1d9;
+  font-family: 'Courier New', monospace;
+  padding: 16px;
+}
+
+.ui-style-code .pos-cart h3 {
+  color: #58a6ff;
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.ui-style-code .pos-cart-item {
+  background: #161b22;
+  border: 1px solid #30363d;
+  padding: 8px;
+  margin: 4px 0;
+  border-radius: 3px;
+}
+
+.ui-style-code .pos-cart-total {
+  background: #21262d;
+  color: #ffa657;
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 3px;
+  margin-top: 12px;
+  border: 1px solid #30363d;
+}
+
+/* ========================================
+   響應式設計調整
+   ======================================== */
+@media (max-width: 768px) {
+  .ui-style-brutalism nav,
+  .ui-style-brutalism .modern-card {
+    transform: rotate(0deg);
+  }
+  
+  .ui-style-kawaii .modern-btn {
+    transform: rotate(0deg);
+  }
+  
+  .ui-style-kawaii .modern-btn:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* ========================================
+   風格切換過渡效果
+   ======================================== */
+body {
+  transition: background 0.5s ease, color 0.3s ease, font-family 0.3s ease;
+}
+
+.modern-btn,
+.modern-card,
+nav {
+  transition: all 0.3s ease;
+}

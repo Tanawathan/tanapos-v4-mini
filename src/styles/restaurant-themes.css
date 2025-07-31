@@ -1,0 +1,351 @@
+/* 餐廳專用設計風格主題 */
+
+/* 溫馨咖啡廳風格 */
+.cafe-theme {
+  --primary-color: #8B4513;
+  --secondary-color: #D2B48C;
+  --accent-color: #CD853F;
+  --background-color: #FDF5E6;
+  --text-color: #3E2723;
+  --card-background: #FFFEF7;
+  
+  /* 咖啡色調的陰影 */
+  --shadow-warm: 0 4px 6px rgba(139, 69, 19, 0.15);
+  --shadow-soft: 0 2px 4px rgba(139, 69, 19, 0.08);
+}
+
+.cafe-navigation {
+  background: linear-gradient(135deg, var(--card-background), var(--background-color));
+  border-bottom: 2px solid var(--secondary-color);
+  box-shadow: var(--shadow-soft);
+}
+
+.cafe-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  box-shadow: var(--shadow-warm);
+  transition: all 0.3s ease;
+}
+
+.cafe-button:hover {
+  background: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(139, 69, 19, 0.2);
+}
+
+.cafe-card {
+  background: var(--card-background);
+  border: 1px solid var(--secondary-color);
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+}
+
+.cafe-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  border-radius: 15px 15px 0 0;
+}
+
+/* 高級餐廳風格 */
+.fine-dining-theme {
+  --primary-color: #1C1C1C;
+  --secondary-color: #D4AF37;
+  --accent-color: #B8860B;
+  --background-color: #FAFAFA;
+  --text-color: #1C1C1C;
+  --card-background: #FFFFFF;
+  
+  /* 金色質感陰影 */
+  --shadow-gold: 0 4px 6px rgba(212, 175, 55, 0.15);
+  --shadow-elegant: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.fine-dining-navigation {
+  background: var(--card-background);
+  border-bottom: 1px solid var(--secondary-color);
+  box-shadow: var(--shadow-elegant);
+}
+
+.fine-dining-button {
+  background: linear-gradient(135deg, var(--primary-color), #333);
+  color: var(--secondary-color);
+  border: 1px solid var(--secondary-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.fine-dining-button:hover {
+  background: var(--secondary-color);
+  color: var(--primary-color);
+  box-shadow: var(--shadow-gold);
+}
+
+.fine-dining-card {
+  background: var(--card-background);
+  border: 1px solid #E0E0E0;
+  border-radius: 2px;
+  padding: 2rem;
+  box-shadow: var(--shadow-elegant);
+  position: relative;
+}
+
+.fine-dining-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: var(--secondary-color);
+}
+
+/* 快餐店風格 */
+.fast-food-theme {
+  --primary-color: #FF6B35;
+  --secondary-color: #F7931E;
+  --accent-color: #FFD23F;
+  --background-color: #FFF8F0;
+  --text-color: #2C1810;
+  --card-background: #FFFFFF;
+  
+  /* 活潑的陰影 */
+  --shadow-fun: 0 4px 6px rgba(255, 107, 53, 0.2);
+  --shadow-pop: 0 6px 12px rgba(255, 107, 53, 0.3);
+}
+
+.fast-food-navigation {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  box-shadow: var(--shadow-pop);
+}
+
+.fast-food-button {
+  background: var(--accent-color);
+  color: var(--text-color);
+  border: 2px solid var(--primary-color);
+  padding: 0.875rem 1.75rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-fun);
+  transition: all 0.2s ease;
+}
+
+.fast-food-button:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: var(--shadow-pop);
+}
+
+.fast-food-card {
+  background: var(--card-background);
+  border: 3px solid var(--secondary-color);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-fun);
+  transform: rotate(-0.5deg);
+  transition: transform 0.3s ease;
+}
+
+.fast-food-card:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+/* 日式料理風格 */
+.japanese-theme {
+  --primary-color: #8B0000;
+  --secondary-color: #F5F5DC;
+  --accent-color: #FF6347;
+  --background-color: #FFF8DC;
+  --text-color: #2F2F2F;
+  --card-background: #FFFFFF;
+  
+  /* 禪意陰影 */
+  --shadow-zen: 0 2px 8px rgba(139, 0, 0, 0.1);
+  --shadow-subtle: 0 1px 3px rgba(139, 0, 0, 0.08);
+}
+
+.japanese-navigation {
+  background: var(--card-background);
+  border-bottom: 3px solid var(--primary-color);
+  box-shadow: var(--shadow-zen);
+}
+
+.japanese-button {
+  background: var(--card-background);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.japanese-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-color);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.japanese-button:hover {
+  color: white;
+}
+
+.japanese-button:hover::before {
+  left: 0;
+}
+
+.japanese-card {
+  background: var(--card-background);
+  border: 1px solid var(--secondary-color);
+  border-radius: 0;
+  padding: 2rem;
+  box-shadow: var(--shadow-subtle);
+  position: relative;
+}
+
+.japanese-card::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border: 1px solid var(--secondary-color);
+  pointer-events: none;
+}
+
+/* 地中海風格 */
+.mediterranean-theme {
+  --primary-color: #4682B4;
+  --secondary-color: #87CEEB;
+  --accent-color: #20B2AA;
+  --background-color: #F0F8FF;
+  --text-color: #2F4F4F;
+  --card-background: #FFFFFF;
+  
+  /* 海洋風陰影 */
+  --shadow-ocean: 0 4px 6px rgba(70, 130, 180, 0.15);
+  --shadow-wave: 0 6px 12px rgba(70, 130, 180, 0.2);
+}
+
+.mediterranean-navigation {
+  background: linear-gradient(135deg, var(--card-background), var(--background-color));
+  border-bottom: 2px solid var(--secondary-color);
+  box-shadow: var(--shadow-ocean);
+}
+
+.mediterranean-button {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 30px;
+  font-weight: 600;
+  box-shadow: var(--shadow-ocean);
+  transition: all 0.3s ease;
+}
+
+.mediterranean-button:hover {
+  background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-wave);
+}
+
+.mediterranean-card {
+  background: var(--card-background);
+  border: 1px solid var(--secondary-color);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-ocean);
+  background-image: linear-gradient(45deg, transparent 49%, rgba(135, 206, 235, 0.1) 50%, transparent 51%);
+}
+
+/* 有機健康風格 */
+.organic-theme {
+  --primary-color: #228B22;
+  --secondary-color: #90EE90;
+  --accent-color: #32CD32;
+  --background-color: #F0FFF0;
+  --text-color: #2F4F2F;
+  --card-background: #FFFFFF;
+  
+  /* 自然風陰影 */
+  --shadow-natural: 0 4px 6px rgba(34, 139, 34, 0.15);
+  --shadow-fresh: 0 6px 12px rgba(34, 139, 34, 0.2);
+}
+
+.organic-navigation {
+  background: var(--card-background);
+  border-bottom: 3px solid var(--secondary-color);
+  box-shadow: var(--shadow-natural);
+}
+
+.organic-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.organic-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: var(--accent-color);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.organic-button:hover::before {
+  width: 200%;
+  height: 200%;
+}
+
+.organic-card {
+  background: var(--card-background);
+  border: 2px solid var(--secondary-color);
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-natural);
+  background-image: radial-gradient(circle at 20px 20px, var(--secondary-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-repeat: repeat;
+}

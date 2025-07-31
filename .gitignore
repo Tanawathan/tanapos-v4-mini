@@ -1,0 +1,55 @@
+# 依賴項目
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 建置輸出
+dist/
+dist-ssr/
+*.local
+
+# 編輯器
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 環境變數 (保留範例檔案)
+.env
+.env.local
+.env.production
+!.env.example
+
+# 臨時和測試檔案
+*.log
+*.tmp
+*.temp
+test-*.js
+test-*.cjs
+test-*.mjs
+*.bak
+*.backup
+
+# 快取
+.cache/
+.parcel-cache/
+.eslintcache
+.npm
+
+# 覆蓋率報告
+coverage/
+*.lcov
+.nyc_output/
+
+# 系統檔案
+Thumbs.db
+.DS_Store
+Desktop.ini

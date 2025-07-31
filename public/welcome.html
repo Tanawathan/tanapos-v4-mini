@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TanaPOS V4-Mini - 專業餐廳管理系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #718096;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .status-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+        
+        .status-card.success {
+            background: #f0fff4;
+            border-color: #9ae6b4;
+        }
+        
+        .status-card.info {
+            background: #ebf8ff;
+            border-color: #90cdf4;
+        }
+        
+        .status-card.warning {
+            background: #fffaf0;
+            border-color: #f6ad55;
+        }
+        
+        .status-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+        
+        .status-text {
+            font-size: 0.95rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #a0aec0;
+            font-size: 0.85rem;
+        }
+        
+        .tech-stack {
+            margin-top: 10px;
+            color: #718096;
+            font-size: 0.8rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .container {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .logo {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🍽️</div>
+        <h1>TanaPOS V4-Mini</h1>
+        <div class="subtitle">專業餐廳點餐管理系統</div>
+        
+        <div class="status-card success">
+            <div class="status-icon">✅</div>
+            <div class="status-text">前端界面載入成功</div>
+        </div>
+        
+        <div class="status-card info">
+            <div class="status-icon">🚀</div>
+            <div class="status-text">Vite 開發伺服器運行正常</div>
+        </div>
+        
+        <div class="status-card success">
+            <div class="status-icon">📊</div>
+            <div class="status-text">Supabase 資料庫連線就緒</div>
+        </div>
+        
+        <div class="status-card warning">
+            <div class="status-icon">⚙️</div>
+            <div class="status-text">React 組件正在準備中...</div>
+        </div>
+        
+        <button class="btn" onclick="showSystemInfo()">
+            系統資訊與下一步
+        </button>
+        
+        <div class="footer">
+            <div>TanaPOS V4-Mini © 2025</div>
+            <div class="tech-stack">React + TypeScript + Vite + Supabase</div>
+        </div>
+    </div>
+    
+    <script>
+        function showSystemInfo() {
+            const info = `
+🎉 TanaPOS V4-Mini 系統狀態
+
+✅ 基礎架構已完成：
+• V3 系統已封存
+• V4-Mini 項目已建立
+• Supabase 資料庫已設置
+
+📊 資料庫內容：
+• 1 間示範餐廳
+• 4 個產品分類
+• 16 個示範產品
+• 12 張桌位
+• 多筆測試訂單
+
+🔧 技術堆疊：
+• React 18 + TypeScript
+• Vite 開發伺服器
+• Supabase 後端
+• Tailwind CSS 樣式
+
+📱 功能特色：
+• 手機優先設計
+• 即時資料同步
+• 完整點餐流程
+• KDS 廚房系統
+• 桌位管理
+• 訂單追蹤
+
+🌐 存取位址：
+• 本機: http://localhost:5173
+• 網路: http://192.168.1.100:5173
+
+下一步：繼續完善 React 組件...
+            `;
+            
+            alert(info);
+        }
+        
+        // 頁面載入動畫
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelector('.status-card.warning .status-text').textContent = 'React 組件載入中，請稍候...';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+[build]
+  # 建置指令
+  command = "npm run build"
+  
+  # 輸出目錄
+  publish = "dist"
+  
+  # Node.js 版本
+  node_bundler = "esbuild"
+
+[build.environment]
+  # 建置環境變數
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+
+# 重新導向規則 (SPA 路由支援)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# 標頭設定
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# 快取設定
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# 開發用設定
+[dev]
+  command = "npm run dev"
+  port = 5173
+  publish = "dist"

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TanaPOS 測試頁面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .success {
+            color: #059669;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h1 class="success">🎉 TanaPOS V4-Mini 測試成功！</h1>
+        <p>如果您看到這個頁面，代表基本的 Web 伺服器設置是正確的。</p>
+        <p><strong>伺服器地址:</strong> http://localhost:5176/</p>
+        <p><strong>當前時間:</strong> <span id="time"></span></p>
+        <p><strong>狀態:</strong> ✅ 運行正常</p>
+        
+        <h3>下一步:</h3>
+        <ul>
+            <li>✅ 基本 HTML 顯示正常</li>
+            <li>🔄 React 應用程式載入測試</li>
+            <li>🔄 POS 系統功能測試</li>
+        </ul>
+    </div>
+    
+    <script>
+        // 顯示當前時間
+        document.getElementById('time').textContent = new Date().toLocaleString('zh-TW');
+        
+        // 每秒更新時間
+        setInterval(() => {
+            document.getElementById('time').textContent = new Date().toLocaleString('zh-TW');
+        }, 1000);
+        
+        console.log('🎉 靜態測試頁面載入成功!');
+    </script>
+</body>
+</html>

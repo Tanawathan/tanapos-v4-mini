@@ -1,0 +1,386 @@
+/* ========================================
+   購物車元素的 UI 風格適配
+   ======================================== */
+
+/* Modern 風格購物車元素 */
+.ui-style-modern .pos-cart-header {
+  background: linear-gradient(135deg, var(--color-white) 0%, var(--color-gray-50) 100%);
+  border-bottom: 1px solid var(--color-gray-200);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.ui-style-modern .pos-cart-footer {
+  background: linear-gradient(135deg, var(--color-white) 0%, var(--color-gray-50) 100%);
+  border-top: 1px solid var(--color-gray-200);
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.ui-style-modern .cart-total-highlight {
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-white) 100%);
+  border: 1px solid var(--color-primary);
+  border-radius: 0.5rem;
+}
+
+.ui-style-modern .btn-pos-success {
+  background: var(--color-accent);
+  color: var(--color-white);
+  border: none;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.ui-style-modern .btn-pos-success:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Neumorphism 風格購物車元素 */
+.ui-style-neumorphism .pos-cart-header {
+  background: var(--neumorphic-bg);
+  border-bottom: none;
+  box-shadow: inset 0 -8px 16px rgba(0, 0, 0, 0.1), inset 0 8px 16px rgba(255, 255, 255, 0.7);
+}
+
+.ui-style-neumorphism .pos-cart-footer {
+  background: var(--neumorphic-bg);
+  border-top: none;
+  box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.1), inset 0 -8px 16px rgba(255, 255, 255, 0.7);
+}
+
+.ui-style-neumorphism .cart-total-highlight {
+  background: var(--neumorphic-bg);
+  border: none;
+  border-radius: 1rem;
+  box-shadow: inset -4px -4px 8px rgba(255, 255, 255, 0.6), inset 4px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ui-style-neumorphism .btn-pos-success {
+  background: var(--neumorphic-bg);
+  color: var(--neumorphic-text);
+  border: none;
+  border-radius: 1rem;
+  box-shadow: -4px -4px 8px rgba(255, 255, 255, 0.6), 4px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ui-style-neumorphism .btn-pos-success:hover {
+  box-shadow: -2px -2px 4px rgba(255, 255, 255, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.1);
+  transform: scale(0.98);
+}
+
+/* Glassmorphism 風格購物車元素 */
+.ui-style-glassmorphism .pos-cart-header {
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.ui-style-glassmorphism .pos-cart-footer {
+  background: rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.ui-style-glassmorphism .cart-total-highlight {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  backdrop-filter: blur(15px);
+}
+
+.ui-style-glassmorphism .btn-pos-success {
+  background: rgba(16, 185, 129, 0.7);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.ui-style-glassmorphism .btn-pos-success:hover {
+  background: rgba(16, 185, 129, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+/* Brutalism 風格購物車元素 */
+.ui-style-brutalism .pos-cart-header {
+  background: var(--brutal-bg) !important;
+  border-bottom: 4px solid var(--brutal-primary);
+  box-shadow: 8px 8px 0px var(--brutal-primary);
+  transform: rotate(1deg);
+}
+
+.ui-style-brutalism .pos-cart-footer {
+  background: var(--brutal-bg);
+  border-top: 4px solid var(--brutal-quaternary);
+  box-shadow: -8px -8px 0px var(--brutal-quaternary);
+  transform: rotate(-1deg);
+}
+
+.ui-style-brutalism .cart-total-highlight {
+  background: var(--brutal-quaternary);
+  color: var(--brutal-bg);
+  border: 4px solid var(--brutal-border);
+  border-radius: 0;
+  transform: rotate(1deg);
+  box-shadow: 8px 8px 0px var(--brutal-border);
+  font-weight: 900;
+}
+
+.ui-style-brutalism .btn-pos-success {
+  background: var(--brutal-secondary);
+  color: var(--brutal-bg);
+  border: 4px solid var(--brutal-border);
+  border-radius: 0;
+  font-weight: 900;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+  box-shadow: 4px 4px 0px var(--brutal-border);
+  transition: all 0.1s ease;
+  letter-spacing: 1px;
+}
+
+.ui-style-brutalism .btn-pos-success:hover {
+  background: var(--brutal-primary);
+  color: var(--brutal-bg);
+  border-color: var(--brutal-tertiary);
+  transform: rotate(-2deg) scale(1.05);
+  box-shadow: 6px 6px 0px var(--brutal-tertiary);
+}
+
+/* Cyberpunk 風格購物車元素 */
+.ui-style-cyberpunk .pos-cart-header {
+  background: linear-gradient(135deg, var(--cyber-bg) 0%, var(--cyber-secondary) / 0.1 100%);
+  border-bottom: 2px solid var(--cyber-primary);
+  box-shadow: 0 4px 20px var(--cyber-primary) / 0.3, inset 0 -1px 0 var(--cyber-primary) / 0.5;
+}
+
+.ui-style-cyberpunk .pos-cart-footer {
+  background: linear-gradient(135deg, var(--cyber-bg) 0%, var(--cyber-secondary) / 0.1 100%);
+  border-top: 2px solid var(--cyber-primary);
+  box-shadow: 0 -4px 20px var(--cyber-primary) / 0.3, inset 0 1px 0 var(--cyber-primary) / 0.5;
+}
+
+.ui-style-cyberpunk .cart-total-highlight {
+  background: linear-gradient(135deg, var(--cyber-bg) 0%, var(--cyber-primary) / 0.1 100%);
+  border: 2px solid var(--cyber-primary);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 20px var(--cyber-primary) / 0.5, inset 0 0 10px var(--cyber-primary) / 0.2;
+  animation: cyberpunkGlow 2s ease-in-out infinite alternate;
+}
+
+.ui-style-cyberpunk .btn-pos-success {
+  background: linear-gradient(135deg, var(--cyber-primary) 0%, var(--cyber-secondary) 100%);
+  color: var(--cyber-bg);
+  border: 2px solid var(--cyber-primary);
+  border-radius: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 15px var(--cyber-primary) / 0.5;
+  transition: all 0.3s ease;
+}
+
+.ui-style-cyberpunk .btn-pos-success:hover {
+  box-shadow: 0 0 25px var(--cyber-primary), 0 0 40px var(--cyber-primary) / 0.5;
+  transform: translateY(-2px);
+}
+
+@keyframes cyberpunkGlow {
+  0% { box-shadow: 0 0 20px var(--cyber-primary) / 0.5, inset 0 0 10px var(--cyber-primary) / 0.2; }
+  100% { box-shadow: 0 0 30px var(--cyber-primary) / 0.8, inset 0 0 15px var(--cyber-primary) / 0.4; }
+}
+
+/* Skeuomorphism 風格購物車元素 */
+.ui-style-skeuomorphism .pos-cart-header {
+  background: linear-gradient(to bottom, #f8f8f8 0%, var(--skeuo-bg) 100%);
+  border-bottom: 2px inset var(--skeuo-border);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ui-style-skeuomorphism .pos-cart-footer {
+  background: linear-gradient(to bottom, var(--skeuo-bg) 0%, #d0d0d0 100%);
+  border-top: 2px inset var(--skeuo-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 -4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ui-style-skeuomorphism .cart-total-highlight {
+  background: linear-gradient(to bottom, #f8f8f8 0%, var(--skeuo-bg) 100%);
+  border: 2px inset var(--skeuo-border);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.ui-style-skeuomorphism .btn-pos-success {
+  background: linear-gradient(to bottom, #5cb85c 0%, #449d44 100%);
+  color: white;
+  border: 2px outset #5cb85c;
+  border-radius: 8px;
+  font-weight: 600;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.ui-style-skeuomorphism .btn-pos-success:hover {
+  background: linear-gradient(to bottom, #47a447 0%, #398439 100%);
+  transform: translateY(1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* DOS 風格購物車元素 */
+.ui-style-dos .pos-cart-header {
+  background: var(--dos-bg);
+  border-bottom: 2px solid var(--dos-border);
+  box-shadow: none;
+  font-family: "Perfect DOS VGA 437", "Courier New", monospace;
+}
+
+.ui-style-dos .pos-cart-footer {
+  background: var(--dos-bg);
+  border-top: 2px solid var(--dos-border);
+  box-shadow: none;
+  font-family: "Perfect DOS VGA 437", "Courier New", monospace;
+}
+
+.ui-style-dos .cart-total-highlight {
+  background: var(--dos-highlight);
+  color: var(--dos-bg);
+  border: 2px solid var(--dos-border);
+  border-radius: 0;
+  font-weight: bold;
+}
+
+.ui-style-dos .btn-pos-success {
+  background: var(--dos-highlight);
+  color: var(--dos-bg);
+  border: 2px outset var(--dos-border);
+  border-radius: 0;
+  font-family: "Perfect DOS VGA 437", "Courier New", monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.ui-style-dos .btn-pos-success:hover {
+  background: var(--dos-border);
+  color: var(--dos-text);
+}
+
+/* BIOS 風格購物車元素 */
+.ui-style-bios .pos-cart-header {
+  background: var(--bios-bg);
+  border-bottom: 1px solid var(--bios-border);
+  box-shadow: none;
+  font-family: "Courier New", monospace;
+}
+
+.ui-style-bios .pos-cart-footer {
+  background: var(--bios-bg);
+  border-top: 1px solid var(--bios-border);
+  box-shadow: none;
+  font-family: "Courier New", monospace;
+}
+
+.ui-style-bios .cart-total-highlight {
+  background: var(--bios-highlight);
+  color: var(--bios-bg);
+  border: 1px solid var(--bios-border);
+  border-radius: 0;
+  font-weight: bold;
+}
+
+.ui-style-bios .btn-pos-success {
+  background: var(--bios-accent);
+  color: var(--bios-bg);
+  border: 1px solid var(--bios-border);
+  border-radius: 0;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.ui-style-bios .btn-pos-success:hover {
+  background: var(--bios-highlight);
+  color: var(--bios-bg);
+}
+
+/* Kawaii 風格購物車元素 */
+.ui-style-kawaii .pos-cart-header {
+  background: linear-gradient(135deg, var(--kawaii-bg) 0%, var(--kawaii-secondary) 100%);
+  border-bottom: 2px solid var(--kawaii-primary);
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3);
+}
+
+.ui-style-kawaii .pos-cart-footer {
+  background: linear-gradient(135deg, var(--kawaii-bg) 0%, var(--kawaii-secondary) 100%);
+  border-top: 2px solid var(--kawaii-primary);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 20px rgba(255, 182, 193, 0.3);
+}
+
+.ui-style-kawaii .cart-total-highlight {
+  background: linear-gradient(135deg, var(--kawaii-tertiary) 0%, var(--kawaii-secondary) 100%);
+  border: 2px solid var(--kawaii-primary);
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+}
+
+.ui-style-kawaii .btn-pos-success {
+  background: linear-gradient(135deg, var(--kawaii-primary) 0%, var(--kawaii-secondary) 100%);
+  color: white;
+  border: 2px solid var(--kawaii-primary);
+  border-radius: 25px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+  transition: all 0.3s ease;
+}
+
+.ui-style-kawaii .btn-pos-success:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(255, 182, 193, 0.6);
+}
+
+/* Code 風格購物車元素 */
+.ui-style-code .pos-cart-header {
+  background: var(--code-bg);
+  border-bottom: 1px solid var(--code-border);
+  box-shadow: none;
+  font-family: "Fira Code", "JetBrains Mono", monospace;
+}
+
+.ui-style-code .pos-cart-footer {
+  background: var(--code-bg);
+  border-top: 1px solid var(--code-border);
+  box-shadow: none;
+  font-family: "Fira Code", "JetBrains Mono", monospace;
+}
+
+.ui-style-code .cart-total-highlight {
+  background: var(--code-surface);
+  color: var(--code-secondary);
+  border: 1px solid var(--code-primary);
+  border-radius: 4px;
+  font-family: "Fira Code", "JetBrains Mono", monospace;
+  font-weight: 600;
+}
+
+.ui-style-code .btn-pos-success {
+  background: var(--code-success);
+  color: var(--code-bg);
+  border: 1px solid var(--code-primary);
+  border-radius: 4px;
+  font-family: "Fira Code", "JetBrains Mono", monospace;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+.ui-style-code .btn-pos-success:hover {
+  background: var(--code-primary);
+  color: var(--code-text);
+}

@@ -1,0 +1,316 @@
+/* UI 修復樣式 - 確保所有元素正確顯示 */
+
+/* 全局重置和修復 */
+* {
+  box-sizing: border-box;
+}
+
+/* 確保 HTML 和 body 正確設置 */
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  height: 100%;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 修復圖片和媒體元素 */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 修復輸入元素 */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* 修復可能的文字顯示問題 */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* 修復 Flexbox 和 Grid 顯示問題 */
+.flex {
+  display: flex;
+}
+
+.grid {
+  display: grid;
+}
+
+/* 確保容器正確顯示 */
+#root, #__next {
+  isolation: isolate;
+  min-height: 100vh;
+}
+
+/* 修復可能的 z-index 問題 */
+.fixed {
+  position: fixed;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.relative {
+  position: relative;
+}
+
+/* 修復深色模式下的可見性問題 */
+.dark * {
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .text-black {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .bg-white {
+  background-color: hsl(var(--card)) !important;
+}
+
+/* 修復按鈕顯示問題 */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 修復表單元素顯示問題 */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* 修復 loading 動畫 */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* 修復間距問題 */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.space-x-2 > * + * {
+  margin-left: 0.5rem;
+}
+
+.space-x-4 > * + * {
+  margin-left: 1rem;
+}
+
+/* 修復網格顯示問題 */
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* 修復響應式網格 */
+@media (min-width: 768px) {
+  .md\\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .md\\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  
+  .md\\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  
+  .md\\:grid-cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  
+  .lg\\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* 修復 Gap 間距 */
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+/* 修復 Padding 和 Margin */
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.m-4 {
+  margin: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+/* 修復字體大小 */
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+/* 修復字體粗細 */
+.font-medium {
+  font-weight: 500;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+/* 修復圓角 */
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-md {
+  border-radius: 0.375rem;
+}
+
+/* 修復 hover 效果 */
+.hover\\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+.hover\\:shadow-lg:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.hover\\:shadow-md:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* 修復過渡效果 */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.duration-200 {
+  transition-duration: 200ms;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}
+
+/* 確保最大寬度 */
+.max-w-7xl {
+  max-width: 80rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 修復最小高度 */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* 修復對齊 */
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}

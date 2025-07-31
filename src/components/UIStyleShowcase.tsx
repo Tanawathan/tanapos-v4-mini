@@ -1,0 +1,392 @@
+import React, { useState, useEffect } from 'react';
+import { useUIStyle, STYLE_CONFIGS } from '../contexts/UIStyleContext';
+
+const UIStyleShowcase: React.FC = () => {
+  const { currentStyle, setStyle, availableStyles } = useUIStyle();
+  const [secretCode, setSecretCode] = useState('');
+  const [showCodeStyle, setShowCodeStyle] = useState(false);
+  const [konamiSequence] = useState(['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA']);
+  const [currentSequence, setCurrentSequence] = useState<string[]>([]);
+
+  // Konami Code 彩蛋檢測
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const newSequence = [...currentSequence, event.code];
+      
+      // 保持序列長度不超過 Konami Code 長度
+      if (newSequence.length > konamiSequence.length) {
+        newSequence.shift();
+      }
+      
+      setCurrentSequence(newSequence);
+      
+      // 檢查是否輸入了完整的 Konami Code
+      if (newSequence.length === konamiSequence.length && 
+          newSequence.every((code, index) => code === konamiSequence[index])) {
+        setShowCodeStyle(true);
+        setSecretCode('KONAMI_UNLOCKED');
+        
+        // 播放彩蛋音效（如果可能）
+        try {
+          const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAcBDWU2u3Ka');
+          audio.play().catch(() => {}); // 忽略播放錯誤
+        } catch (e) {}
+        
+        // 3秒後自動切換到 Code 風格
+        setTimeout(() => {
+          setStyle('code');
+        }, 1000);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentSequence, konamiSequence, setStyle]);
+
+  // 檢查是否已解鎖 Code 風格
+  useEffect(() => {
+    const unlocked = localStorage.getItem('code-style-unlocked');
+    if (unlocked === 'true') {
+      setShowCodeStyle(true);
+    }
+  }, []);
+
+  // 保存解鎖狀態
+  useEffect(() => {
+    if (showCodeStyle) {
+      localStorage.setItem('code-style-unlocked', 'true');
+    }
+  }, [showCodeStyle]);
+
+  // 過濾顯示的風格列表
+  const displayStyles = showCodeStyle ? availableStyles : availableStyles.filter(style => style !== 'code');
+
+  const getStyleFeatures = (style: string) => {
+    const features = {
+      modern: ['大量留白設計', '精簡的視覺元素', '統一的配色方案', '現代化字體', 'subtle 微互動效果'],
+      neumorphism: ['內凹/凸陰影效果', '浮雕質感設計', '統一的材質感', '柔和的色彩過渡', '立體層次感'],
+      glassmorphism: ['模糊半透明背景', '玻璃質感邊框', '漸層色彩運用', '現代科技感', '層次透明效果'],
+      brutalism: ['強烈對比色彩', '粗體字型運用', '不規則排版', '視覺衝擊力強', '反主流設計'],
+      cyberpunk: ['螢光色彩搭配', '黑色背景基調', '科技感字體', '霓虹發光效果', '未來感設計'],
+      skeuomorphism: ['模仿真實物件', '立體陰影效果', '材質紋理運用', '傳統設計感', '直觀易理解'],
+      dos: ['經典藍色背景', 'DOS 字體風格', '命令行界面感', '復古電腦美學', '像素完美邊框'],
+      bios: ['系統設定界面', '青色文字顯示', '功能鍵提示', '技術感佈局', '專業系統風格'],
+      kawaii: ['粉色系可愛配色', '圓潤卡通字體', '表情符號裝飾', '彈跳動畫效果', '日式可愛美學'],
+      code: ['等寬程式字體', '語法高亮配色', '極繁主義動畫', '彩虹邊框效果', '程式碼美學', '衝突感設計']
+    };
+    return features[style as keyof typeof features] || [];
+  };
+
+  const getStyleScenarios = (style: string) => {
+    const scenarios = {
+      modern: '適合商業系統、企業應用、需要專業感的產品。提升使用者專注度，減少視覺干擾，符合現代設計趨勢。',
+      neumorphism: '適合概念設計、創意展示、健康追蹤應用。獨特的視覺效果，但需注意無障礙性和對比度問題。',
+      glassmorphism: '適合科技品牌、操作系統介面、現代 Web 應用。具有未來感和科技感，適合年輕用戶群體。',
+      brutalism: '適合創意產業、藝術展示、個性化品牌。強烈的視覺衝擊，適合需要突出個性的應用。',
+      cyberpunk: '適合遊戲界面、科幻應用、AR/VR 平台。強烈的未來科技感，適合科技愛好者。',
+      skeuomorphism: '適合傳統行業、年長用戶群、需要直觀操作的應用。容易理解和學習，但可能顯得過時。',
+      dos: '適合復古主題餐廳、科技博物館、懷舊風格應用。喚起80-90年代電腦使用體驗，具有強烈的懷舊感。',
+      bios: '適合技術人員工具、系統管理界面、專業診斷應用。營造專業技術感，適合 IT 從業人員和技術愛好者。',
+      kawaii: '適合兒童餐廳、主題咖啡廳、年輕女性客群應用。可愛療癒的視覺體驗，增加親和力和記憶點。',
+      code: '🎯 隱藏彩蛋風格！適合程式設計師聚會、Hackathon、科技公司內部使用。結合程式碼的原始美感和極繁主義的視覺衝擊，營造獨特的反差萌效果。支援語法高亮、彩虹動畫、震動特效等瘋狂元素！'
+    };
+    return scenarios[style as keyof typeof scenarios] || '';
+  };
+
+  return (
+    <div className="modern-container" style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <div className="modern-page-header">
+        <h1 className="modern-page-title">UI 風格展示館</h1>
+        <p className="modern-page-subtitle">
+          探索不同的設計風格，為您的系統選擇最適合的視覺呈現
+          <br />
+          <strong>🎯 現在所有風格都是真實可用的！</strong>
+        </p>
+      </div>
+
+      {/* 風格選擇器 */}
+      <div className="modern-card" style={{ marginBottom: '2rem' }}>
+        <div className="modern-card-header">
+          <h3 className="modern-card-title">選擇風格</h3>
+          <p className="modern-card-subtitle">
+            點擊下方按鈕切換不同的 UI 風格，整個系統界面將立即切換
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {displayStyles.map((style) => {
+            const config = STYLE_CONFIGS[style];
+            return (
+              <button
+                key={style}
+                className={`modern-btn ${currentStyle === style ? 'modern-btn-primary' : 'modern-btn-secondary'}`}
+                onClick={() => setStyle(style)}
+                style={{ textTransform: 'capitalize' }}
+              >
+                {config.icon} {config.displayName}
+              </button>
+            );
+          })}
+          
+          {/* 彩蛋提示 */}
+          {!showCodeStyle && (
+            <div style={{ 
+              width: '100%', 
+              marginTop: '1rem', 
+              padding: '1rem', 
+              background: 'linear-gradient(45deg, #f0f0f0, #e0e0e0)', 
+              borderRadius: '8px', 
+              border: '2px dashed #ccc',
+              textAlign: 'center',
+              opacity: 0.7
+            }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🕵️‍♂️</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: '500', marginBottom: '0.25rem' }}>
+                隱藏著一個神秘的彩蛋風格...
+              </div>
+              <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                提示：試試經典的遊戲祕技 ↑↑↓↓←→←→BA
+              </div>
+            </div>
+          )}
+          
+          {/* 解鎖慶祝 */}
+          {showCodeStyle && secretCode === 'KONAMI_UNLOCKED' && (
+            <div style={{ 
+              position: 'fixed', 
+              top: '50%', 
+              left: '50%', 
+              transform: 'translate(-50%, -50%)',
+              background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4)',
+              padding: '2rem',
+              borderRadius: '16px',
+              border: '3px solid #fff',
+              textAlign: 'center',
+              zIndex: 9999,
+              animation: 'code-crazy-shake 0.5s infinite',
+              boxShadow: '0 0 50px rgba(255, 107, 107, 0.5)'
+            }}
+            onClick={() => setSecretCode('')}
+            >
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉👾🌈</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#fff', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                彩蛋解鎖！
+              </div>
+              <div style={{ fontSize: '1rem', color: '#fff', marginTop: '0.5rem' }}>
+                Code 風格已解鎖！點擊關閉
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 當前風格展示 */}
+      <div className="modern-card" style={{ marginBottom: '2rem' }}>
+        <div className="modern-card-header">
+          <h3 className="modern-card-title">
+            當前風格：{STYLE_CONFIGS[currentStyle].displayName}
+          </h3>
+          <p className="modern-card-subtitle">
+            {STYLE_CONFIGS[currentStyle].description}
+          </p>
+        </div>
+        <div style={{ 
+          border: '1px solid var(--color-gray-200)', 
+          borderRadius: 'var(--radius-lg)', 
+          overflow: 'hidden',
+          background: ['cyberpunk', 'dos', 'bios'].includes(currentStyle) ? '#000' : '#f9f9f9',
+          padding: '2rem',
+          textAlign: 'center'
+        }}>
+          <h4 style={{ margin: '0 0 1rem 0', fontSize: '1.5rem', fontWeight: '600' }}>
+            🎨 當前界面已應用 {STYLE_CONFIGS[currentStyle].displayName} 風格
+          </h4>
+          <p style={{ margin: '0 0 1rem 0', opacity: 0.8, fontSize: '1.1rem' }}>
+            ✅ 導航欄、按鈕、卡片等所有 UI 組件已自動切換到此風格
+          </p>
+          <p style={{ margin: 0, opacity: 0.7 }}>
+            你可以導航到其他頁面（如點餐、桌台管理等），風格設定會保持一致
+          </p>
+
+          {/* 實時風格預覽 */}
+          <div style={{ 
+            marginTop: '2rem', 
+            padding: '1rem', 
+            border: '1px dashed rgba(0,0,0,0.2)', 
+            borderRadius: '0.5rem' 
+          }}>
+            <h5 style={{ margin: '0 0 1rem 0' }}>實時預覽區域</h5>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button className="modern-btn modern-btn-primary">主要按鈕</button>
+              <button className="modern-btn modern-btn-secondary">次要按鈕</button>
+              <button className="modern-btn modern-btn-ghost">幽靈按鈕</button>
+            </div>
+
+            {/* Code 風格特殊展示 */}
+            {currentStyle === 'code' && (
+              <div style={{ marginTop: '2rem', padding: '1rem', background: 'var(--code-surface, #161B22)', borderRadius: '8px', border: '1px solid var(--code-border, #21262D)' }}>
+                <h6 style={{ margin: '0 0 1rem 0', color: 'var(--code-primary, #61DAFB)' }}>
+                  <span className="code-keyword">function</span> <span className="code-function">initPOS</span>() &#123;
+                </h6>
+                <div style={{ paddingLeft: '2rem', fontFamily: 'inherit' }}>
+                  <div><span className="code-comment">// 彩蛋模式已啟動！</span></div>
+                  <div><span className="code-keyword">const</span> <span className="code-variable">style</span> = <span className="code-string">"extreme_chaos"</span>;</div>
+                  <div><span className="code-keyword">return</span> <span className="code-number">42</span>; <span className="code-comment">// 生命的答案</span></div>
+                </div>
+                <div>&#125;</div>
+                
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <button className="modern-btn modern-btn-primary code-crazy">瘋狂震動</button>
+                  <button className="modern-btn modern-btn-secondary code-loading">彩虹載入</button>
+                  <button className="modern-btn modern-btn-ghost" style={{ animation: 'code-glitch 1s infinite' }}>故障特效</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 如何使用說明 */}
+      <div className="modern-card" style={{ marginBottom: '2rem' }}>
+        <div className="modern-card-header">
+          <h3 className="modern-card-title">如何使用真實風格系統</h3>
+        </div>
+        <div>
+          <ol style={{ margin: 0, paddingLeft: '1.5rem', lineHeight: '1.8' }}>
+            <li>
+              <strong>即時切換：</strong>選擇任何風格，系統會立即應用到所有頁面
+            </li>
+            <li>
+              <strong>持久保存：</strong>風格選擇會保存在瀏覽器中，下次訪問時自動恢復
+            </li>
+            <li>
+              <strong>全局生效：</strong>導航到點餐、桌台、訂單等任何頁面，風格都會保持一致
+            </li>
+            <li>
+              <strong>導航欄切換：</strong>右上角的風格選擇器可以隨時切換風格
+            </li>
+            <li>
+              <strong>響應式設計：</strong>所有風格都支援手機、平板、桌面等不同設備
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      {/* 風格說明 */}
+      <div className="modern-grid modern-grid-2" style={{ gap: '1.5rem' }}>
+        <div className="modern-card">
+          <div className="modern-card-header">
+            <h3 className="modern-card-title">風格特徵</h3>
+          </div>
+          <div>
+            <ul style={{ margin: 0, paddingLeft: '1.5rem', lineHeight: '1.6' }}>
+              {getStyleFeatures(currentStyle).map((feature, index) => (
+                <li key={index}>{feature}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="modern-card">
+          <div className="modern-card-header">
+            <h3 className="modern-card-title">適用場景</h3>
+          </div>
+          <div>
+            <p style={{ margin: 0, lineHeight: '1.6', color: 'var(--color-gray-600)' }}>
+              {getStyleScenarios(currentStyle)}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 技術實現說明 */}
+      <div className="modern-card" style={{ marginTop: '2rem' }}>
+        <div className="modern-card-header">
+          <h3 className="modern-card-title">技術實現</h3>
+        </div>
+        <div>
+          {currentStyle === 'code' ? (
+            /* Code 風格特殊說明 */
+            <div>
+              <div style={{ marginBottom: '2rem', padding: '1rem', background: 'var(--code-surface, #161B22)', borderRadius: '8px', border: '1px solid var(--code-border, #21262D)' }}>
+                <pre style={{ margin: 0, color: 'var(--code-text, #C9D1D9)', fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.6' }}>
+{`// Code 彩蛋風格實現
+const codeStyle = {
+  // 基礎設定
+  fontFamily: "Fira Code",
+  background: "#0D1117", // GitHub Dark
+  
+  // 瘋狂動畫
+  animations: [
+    "code-pulse",      // 脈衝發光
+    "code-rainbow",    // 彩虹邊框
+    "code-glitch",     // 故障特效
+    "code-crazy-shake" // 震動效果
+  ],
+  
+  // 語法高亮
+  syntax: {
+    keyword: "#FF79C6",  // 粉紅
+    string: "#F1FA8C",   // 黃色
+    comment: "#6272A4",  // 灰藍
+    function: "#50FA7B", // 綠色
+    variable: "#8BE9FD", // 青色
+    number: "#BD93F9"    // 紫色
+  }
+};`}
+                </pre>
+              </div>
+              <div className="modern-grid modern-grid-2" style={{ gap: '1rem' }}>
+                <div>
+                  <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', fontWeight: '600', color: 'var(--code-primary, #61DAFB)' }}>
+                    👾 衝突美學
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.8 }}>
+                    程式碼的極簡 × 極繁主義的瘋狂 = 獨特的反差萌
+                  </p>
+                </div>
+                <div>
+                  <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', fontWeight: '600', color: 'var(--code-secondary, #F7DF1E)' }}>
+                    🌈 瘋狂動畫
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.8 }}>
+                    彩虹流動、震動特效、故障風格、脈衝發光
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* 一般風格說明 */
+            <div className="modern-grid modern-grid-3" style={{ gap: '1rem' }}>
+              <div>
+                <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', fontWeight: '600' }}>
+                  🎯 React Context
+                </h4>
+                <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.8 }}>
+                  使用 UIStyleProvider 提供全局風格狀態管理
+                </p>
+              </div>
+              <div>
+                <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', fontWeight: '600' }}>
+                  🎨 CSS 變數
+                </h4>
+                <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.8 }}>
+                  動態設置 CSS 自定義屬性，實現即時風格切換
+                </p>
+              </div>
+              <div>
+                <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', fontWeight: '600' }}>
+                  💾 本地存儲
+                </h4>
+                <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.8 }}>
+                  風格選擇保存在 localStorage，持久化用戶偏好
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UIStyleShowcase;

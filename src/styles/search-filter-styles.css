@@ -1,0 +1,456 @@
+/* ========================================
+   搜尋與篩選元素的 UI 風格適配
+   ======================================== */
+
+/* Modern 風格搜尋與篩選 */
+.ui-style-modern input[type="text"],
+.ui-style-modern select {
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: 0.5rem;
+  padding: 12px 16px;
+  color: var(--color-gray-900);
+  transition: all 0.3s ease;
+}
+
+.ui-style-modern input[type="text"]:focus,
+.ui-style-modern select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.ui-style-modern button {
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: 0.5rem;
+  padding: 10px 16px;
+  color: var(--color-gray-700);
+  transition: all 0.3s ease;
+}
+
+.ui-style-modern button:hover {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-400);
+}
+
+.ui-style-modern h1,
+.ui-style-modern h2,
+.ui-style-modern h3 {
+  background: linear-gradient(135deg, var(--color-white) 0%, var(--color-gray-50) 100%);
+  color: var(--color-gray-900);
+  font-weight: 700;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-gray-200);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Skeuomorphism 搜尋與篩選樣式 */
+.ui-style-skeuomorphism input[type="text"],
+.ui-style-skeuomorphism select {
+  background: var(--skeuo-bg);
+  border: 2px inset var(--skeuo-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--skeuo-text);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+              inset -2px -2px 4px rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.ui-style-skeuomorphism input[type="text"]:focus,
+.ui-style-skeuomorphism select:focus {
+  outline: none;
+  border-color: var(--skeuo-primary);
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.15),
+              inset -3px -3px 6px rgba(255, 255, 255, 0.9),
+              0 0 10px rgba(74, 158, 255, 0.3);
+}
+
+.ui-style-skeuomorphism button {
+  background: var(--skeuo-bg);
+  border: 2px outset var(--skeuo-border);
+  border-radius: 6px;
+  padding: 10px 16px;
+  color: var(--skeuo-text);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.ui-style-skeuomorphism button:hover {
+  background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.ui-style-skeuomorphism button:active {
+  border-style: inset;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.ui-style-skeuomorphism h1,
+.ui-style-skeuomorphism h2,
+.ui-style-skeuomorphism h3 {
+  background: linear-gradient(to bottom, #f8f8f8 0%, var(--skeuo-bg) 100%);
+  color: var(--skeuo-text);
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+  padding: 1rem 1.5rem;
+  border: 2px outset var(--skeuo-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Brutalism 風格搜尋與篩選 */
+.ui-style-brutalism input[type="text"],
+.ui-style-brutalism select {
+  background: var(--brutal-bg);
+  border: 4px solid var(--brutal-primary);
+  border-radius: 0;
+  padding: 12px 16px;
+  color: var(--brutal-text);
+  font-family: Impact, "Arial Black", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: all 0.1s ease;
+}
+
+.ui-style-brutalism input[type="text"]:focus,
+.ui-style-brutalism select:focus {
+  outline: none;
+  border-color: var(--brutal-secondary);
+  box-shadow: 8px 8px 0px var(--brutal-secondary);
+  transform: translateX(-4px) translateY(-4px);
+}
+
+.ui-style-brutalism button {
+  background: var(--brutal-tertiary);
+  color: var(--brutal-bg);
+  border: 4px solid var(--brutal-bg);
+  border-radius: 0;
+  padding: 12px 20px;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 6px 6px 0px var(--brutal-bg);
+  transform: rotate(-2deg);
+  transition: all 0.1s ease;
+}
+
+.ui-style-brutalism button:hover {
+  background: var(--brutal-secondary);
+  color: var(--brutal-bg);
+  border-color: var(--brutal-primary);
+  box-shadow: 8px 8px 0px var(--brutal-primary);
+  transform: rotate(1deg) scale(1.05);
+}
+
+.ui-style-brutalism h1,
+.ui-style-brutalism h2,
+.ui-style-brutalism h3 {
+  background: var(--brutal-bg);
+  color: var(--brutal-text);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 4px 4px 0px var(--brutal-primary);
+  padding: 1rem 1.5rem;
+  border: 4px solid var(--brutal-primary);
+  border-radius: 0;
+  box-shadow: 8px 8px 0px var(--brutal-primary);
+  transform: rotate(-1deg);
+}
+
+/* DOS 搜尋與篩選樣式 */
+.ui-style-dos input[type="text"],
+.ui-style-dos select {
+  background: var(--dos-bg);
+  border: 1px solid var(--dos-border);
+  border-radius: 0;
+  padding: 8px 12px;
+  color: var(--dos-text);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.ui-style-dos input[type="text"]:focus,
+.ui-style-dos select:focus {
+  outline: none;
+  background: var(--dos-highlight);
+  color: var(--dos-bg);
+  border-color: var(--dos-text);
+}
+
+.ui-style-dos button {
+  background: var(--dos-bg);
+  border: 1px solid var(--dos-border);
+  border-radius: 0;
+  padding: 8px 12px;
+  color: var(--dos-text);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.ui-style-dos button:hover {
+  background: var(--dos-highlight);
+  color: var(--dos-bg);
+}
+
+.ui-style-dos h1,
+.ui-style-dos h2,
+.ui-style-dos h3 {
+  background: var(--dos-bg);
+  color: var(--dos-text);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 1rem 1.5rem;
+  border: 2px solid var(--dos-border);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* BIOS 搜尋與篩選樣式 */
+.ui-style-bios input[type="text"],
+.ui-style-bios select {
+  background: var(--bios-bg);
+  border: 1px solid var(--bios-border);
+  border-radius: 0;
+  padding: 8px 12px;
+  color: var(--bios-text);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.ui-style-bios input[type="text"]:focus,
+.ui-style-bios select:focus {
+  outline: none;
+  background: var(--bios-highlight);
+  color: var(--bios-bg);
+  border-color: var(--bios-accent);
+}
+
+.ui-style-bios button {
+  background: var(--bios-bg);
+  border: 1px solid var(--bios-border);
+  border-radius: 0;
+  padding: 8px 12px;
+  color: var(--bios-text);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.ui-style-bios button:hover {
+  background: var(--bios-highlight);
+  color: var(--bios-bg);
+}
+
+.ui-style-bios h1,
+.ui-style-bios h2,
+.ui-style-bios h3 {
+  background: var(--bios-bg);
+  color: var(--bios-text);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  padding: 1rem 1.5rem;
+  border: 1px solid var(--bios-border);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Kawaii 搜尋與篩選樣式 */
+.ui-style-kawaii input[type="text"],
+.ui-style-kawaii select {
+  background: linear-gradient(145deg, #fff0f5, #ffe4e1);
+  border: 2px solid #ffb6c1;
+  border-radius: 20px;
+  padding: 12px 16px;
+  color: #8b4b8a;
+  font-weight: 500;
+  box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);
+  transition: all 0.3s ease;
+}
+
+.ui-style-kawaii input[type="text"]:focus,
+.ui-style-kawaii select:focus {
+  outline: none;
+  border-color: #ff69b4;
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.4),
+              0 8px 25px rgba(255, 182, 193, 0.5);
+  transform: scale(1.02);
+}
+
+.ui-style-kawaii button {
+  background: linear-gradient(145deg, #ffd1dc, #ffb6c1);
+  border: 2px solid #ff69b4;
+  border-radius: 15px;
+  padding: 10px 16px;
+  color: #8b4b8a;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+  transition: all 0.3s ease;
+}
+
+.ui-style-kawaii button:hover {
+  background: linear-gradient(145deg, #ff69b4, #ffb6c1);
+  color: white;
+  box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.ui-style-kawaii h1,
+.ui-style-kawaii h2,
+.ui-style-kawaii h3 {
+  background: linear-gradient(145deg, #fff0f5, #ffe4e1);
+  color: #8b4b8a;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(255, 182, 193, 0.5);
+  padding: 1rem 1.5rem;
+  border: 2px solid #ffb6c1;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);
+}
+
+/* Code 搜尋與篩選樣式 */
+.ui-style-code input[type="text"],
+.ui-style-code select {
+  background: #1a1a1a;
+  border: 1px solid #333333;
+  border-radius: 0;
+  padding: 12px 16px;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ui-style-code input[type="text"]:focus,
+.ui-style-code select:focus {
+  outline: none;
+  border-color: #00ff00;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  color: #58a6ff;
+}
+
+.ui-style-code button {
+  background: #238636;
+  border: 1px solid #238636;
+  border-radius: 3px;
+  padding: 10px 16px;
+  color: #ffffff;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.ui-style-code button:hover {
+  background: #2ea043;
+  border-color: #2ea043;
+  box-shadow: 0 0 10px rgba(46, 160, 67, 0.5);
+}
+
+.ui-style-code h1,
+.ui-style-code h2,
+.ui-style-code h3 {
+  background: #1a1a1a;
+  color: #58a6ff;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 1rem 1.5rem;
+  border: 1px solid #333333;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 通用搜尋框圖標樣式 */
+.ui-style-neumorphism .lucide-search {
+  color: var(--neumorphic-text);
+}
+
+.ui-style-glassmorphism .lucide-search {
+  color: var(--glass-text);
+}
+
+.ui-style-brutalism .lucide-search {
+  color: var(--brutal-text);
+}
+
+.ui-style-cyberpunk .lucide-search {
+  color: var(--cyber-text);
+}
+
+.ui-style-skeuomorphism .lucide-search {
+  color: var(--skeuo-text);
+}
+
+.ui-style-dos .lucide-search {
+  color: var(--dos-text);
+}
+
+.ui-style-bios .lucide-search {
+  color: var(--bios-text);
+}
+
+.ui-style-kawaii .lucide-search {
+  color: #8b4b8a;
+}
+
+.ui-style-code .lucide-search {
+  color: #00ff00;
+}
+
+/* 篩選按鈕徽章樣式 */
+.ui-style-brutalism .bg-blue-500 {
+  background: var(--brutal-tertiary) !important;
+  color: var(--brutal-bg) !important;
+}
+
+.ui-style-cyberpunk .bg-blue-500 {
+  background: var(--cyber-secondary) !important;
+  color: var(--cyber-bg) !important;
+}
+
+.ui-style-kawaii .bg-blue-500 {
+  background: #ff69b4 !important;
+  color: white !important;
+}
+
+.ui-style-code .bg-blue-500 {
+  background: #ffa657 !important;
+  color: #1a1a1a !important;
+}
+
+/* 清除按鈕樣式 */
+.ui-style-brutalism .text-gray-600 {
+  color: var(--brutal-text) !important;
+}
+
+.ui-style-cyberpunk .text-gray-600 {
+  color: var(--cyber-text) !important;
+}
+
+.ui-style-dos .text-gray-600 {
+  color: var(--dos-text) !important;
+}
+
+.ui-style-bios .text-gray-600 {
+  color: var(--bios-text) !important;
+}
+
+.ui-style-kawaii .text-gray-600 {
+  color: #8b4b8a !important;
+}
+
+.ui-style-code .text-gray-600 {
+  color: #00ff00 !important;
+}

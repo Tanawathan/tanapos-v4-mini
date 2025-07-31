@@ -1,0 +1,834 @@
+Attached HTML and CSS Context
+
+<div class="hidden sm:block w-80 pos-cart pos-cart-container pos-cart-desktop p-6 border-l border-border bg-card/50"><div class="pos-cart-header sticky top-0 bg-card/90 backdrop-blur-sm p-4 -m-4 mb-4 rounded-lg"><h2 class="text-xl font-bold text-foreground flex items-center justify-between text-responsive-lg"><span>購物車</span></h2></div><div class="empty-cart-state text-center py-12"><div class="empty-cart-illustration text-6xl mb-4 opacity-20">🛒</div><p class="text-muted-foreground">購物車是空的</p><p class="text-sm text-muted-foreground mt-2">選擇商品開始點餐</p></div></div>
+
+
+/* Matched Rule from user-agent */
+div {
+  display: block;
+}
+
+/* Matched Rule from user-agent */
+address, blockquote, center, div, figure, figcaption, footer, form, header, hr, legend, listing, main, p, plaintext, pre, summary, xmp, article, aside, h1, h2, h3, h4, h5, h6, hgroup, nav, section, search, table, caption, colgroup, col, thead, tbody, tfoot, tr, td, th, dir, dd, dl, dt, menu, ol, ul, li, bdi, output, [dir="ltr" i], [dir="rtl" i], [dir="auto" i] {
+  unicode-bidi: isolate;
+}
+
+/* Matched Rule from regular */
+* {
+  border-color: hsl(var(--border));
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Matched Rule from regular */
+.pos-cart {
+  background-color: hsl(var(--card));
+  border-left: 2px solid hsl(var(--pos-primary) / 0.3);
+  box-shadow: -5px 0 15px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(8px);
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+  background-color: hsl(var(--card));
+  box-shadow: rgba(0, 0, 0, 0.1) -5px 0px 15px -5px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+  backdrop-filter: blur(8px);
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+}
+
+/* Matched Rule from regular */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Matched Rule from regular */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Matched Rule from regular */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Matched Rule from regular */
+.pos-cart {
+  background: hsl(var(--card));
+  border-left: 1px solid hsl(var(--border));
+  box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), -2px 0 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: rgba(0, 0, 0, 0.1) -4px 0px 6px -1px, rgba(0, 0, 0, 0.06) -2px 0px 4px -1px;
+}
+
+/* Matched Rule from regular */
+.p-6 {
+  padding: 1.5rem;
+  padding-top: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+/* Matched Rule from regular */
+.pos-cart-container {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-left: 2px solid hsl(var(--pos-primary, 139 84% 54%) / 0.2);
+  background: linear-gradient(135deg, hsl(var(--card, 0 0% 100%)) 0%, hsl(var(--muted, 210 40% 96%) / 0.1) 100%);
+  position: sticky;
+  top: 0px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Matched Rule from regular */
+.pos-cart-container {
+  height: 100vh !important;
+  position: sticky !important;
+  top: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  position: sticky !important;
+  top: 0px !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Matched Rule from regular */
+.ui-style-brutalism .pos-cart {
+  background: var(--brutal-bg);
+  border: 4px solid var(--brutal-primary);
+  border-radius: 0;
+  box-shadow: -8px 8px 0px var(--brutal-primary);
+  transform: rotate(1deg);
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+  box-shadow: -8px 8px 0px var(--brutal-primary);
+  transform: rotate(1deg);
+}
+
+/* Inherited from ancestor level 1 (user-agent) */
+div {
+  display: block;
+}
+
+/* Inherited from ancestor level 1 (user-agent) */
+address, blockquote, center, div, figure, figcaption, footer, form, header, hr, legend, listing, main, p, plaintext, pre, summary, xmp, article, aside, h1, h2, h3, h4, h5, h6, hgroup, nav, section, search, table, caption, colgroup, col, thead, tbody, tfoot, tr, td, th, dir, dd, dl, dt, menu, ol, ul, li, bdi, output, [dir="ltr" i], [dir="rtl" i], [dir="auto" i] {
+  unicode-bidi: isolate;
+}
+
+/* Inherited from ancestor level 1 (regular) */
+* {
+  border-color: hsl(var(--border));
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 1 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 1 (regular) */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 1 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 1 (regular) */
+.flex {
+  display: flex;
+  display: flex;
+}
+
+/* Inherited from ancestor level 1 (regular) */
+.pos-layout-tablet {
+  height: 100vh !important;
+  height: 100vh !important;
+}
+
+/* Inherited from ancestor level 2 (user-agent) */
+div {
+  display: block;
+}
+
+/* Inherited from ancestor level 2 (user-agent) */
+address, blockquote, center, div, figure, figcaption, footer, form, header, hr, legend, listing, main, p, plaintext, pre, summary, xmp, article, aside, h1, h2, h3, h4, h5, h6, hgroup, nav, section, search, table, caption, colgroup, col, thead, tbody, tfoot, tr, td, th, dir, dd, dl, dt, menu, ol, ul, li, bdi, output, [dir="ltr" i], [dir="rtl" i], [dir="auto" i] {
+  unicode-bidi: isolate;
+}
+
+/* Inherited from ancestor level 2 (regular) */
+* {
+  border-color: hsl(var(--border));
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 2 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 2 (regular) */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 2 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 2 (regular) */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: 100vh;
+}
+
+/* Inherited from ancestor level 3 (user-agent) */
+article, aside, footer, header, hgroup, main, nav, search, section {
+  display: block;
+}
+
+/* Inherited from ancestor level 3 (user-agent) */
+address, blockquote, center, div, figure, figcaption, footer, form, header, hr, legend, listing, main, p, plaintext, pre, summary, xmp, article, aside, h1, h2, h3, h4, h5, h6, hgroup, nav, section, search, table, caption, colgroup, col, thead, tbody, tfoot, tr, td, th, dir, dd, dl, dt, menu, ol, ul, li, bdi, output, [dir="ltr" i], [dir="rtl" i], [dir="auto" i] {
+  unicode-bidi: isolate;
+}
+
+/* Inherited from ancestor level 3 (regular) */
+* {
+  border-color: hsl(var(--border));
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 3 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 3 (regular) */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 3 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 4 (user-agent) */
+div {
+  display: block;
+}
+
+/* Inherited from ancestor level 4 (user-agent) */
+address, blockquote, center, div, figure, figcaption, footer, form, header, hr, legend, listing, main, p, plaintext, pre, summary, xmp, article, aside, h1, h2, h3, h4, h5, h6, hgroup, nav, section, search, table, caption, colgroup, col, thead, tbody, tfoot, tr, td, th, dir, dd, dl, dt, menu, ol, ul, li, bdi, output, [dir="ltr" i], [dir="rtl" i], [dir="auto" i] {
+  unicode-bidi: isolate;
+}
+
+/* Inherited from ancestor level 4 (regular) */
+* {
+  border-color: hsl(var(--border));
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 4 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 4 (regular) */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 4 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 5 (user-agent) */
+div {
+  display: block;
+}
+
+/* Inherited from ancestor level 5 (user-agent) */
+address, blockquote, center, div, figure, figcaption, footer, form, header, hr, legend, listing, main, p, plaintext, pre, summary, xmp, article, aside, h1, h2, h3, h4, h5, h6, hgroup, nav, section, search, table, caption, colgroup, col, thead, tbody, tfoot, tr, td, th, dir, dd, dl, dt, menu, ol, ul, li, bdi, output, [dir="ltr" i], [dir="rtl" i], [dir="auto" i] {
+  unicode-bidi: isolate;
+}
+
+/* Inherited from ancestor level 5 (regular) */
+* {
+  border-color: hsl(var(--border));
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 5 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 5 (regular) */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 5 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 5 (regular) */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: 100vh;
+}
+
+/* Inherited from ancestor level 6 (user-agent) */
+div {
+  display: block;
+}
+
+/* Inherited from ancestor level 6 (user-agent) */
+address, blockquote, center, div, figure, figcaption, footer, form, header, hr, legend, listing, main, p, plaintext, pre, summary, xmp, article, aside, h1, h2, h3, h4, h5, h6, hgroup, nav, section, search, table, caption, colgroup, col, thead, tbody, tfoot, tr, td, th, dir, dd, dl, dt, menu, ol, ul, li, bdi, output, [dir="ltr" i], [dir="rtl" i], [dir="auto" i] {
+  unicode-bidi: isolate;
+}
+
+/* Inherited from ancestor level 6 (regular) */
+* {
+  border-color: hsl(var(--border));
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 6 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 6 (regular) */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 6 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 6 (regular) */
+#root, #__next {
+  isolation: isolate;
+  min-height: 100vh;
+  isolation: isolate;
+  min-height: 100vh;
+}
+
+/* Inherited from ancestor level 7 (user-agent) */
+body {
+  display: block;
+  margin-top: 8px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  margin-left: 8px;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+* {
+  border-color: hsl(var(--border));
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+  margin: 0;
+  padding: 0;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig", "calt";
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  padding-top: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--color-gray-800);
+  background-color: var(--color-gray-50);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--color-gray-800);
+  background-color: var(--color-gray-50);
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  padding-top: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+body {
+  height: 100%;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+body {
+  transition: background 0.5s ease, color 0.3s ease, font-family 0.3s ease;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.5s, 0.3s, 0.3s;
+  transition-timing-function: ease, ease, ease;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background, color, font-family;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f9fafb;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  padding-top: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+  background-color: rgb(249, 250, 251);
+}
+
+/* Inherited from ancestor level 7 (regular) */
+.ui-style-brutalism {
+  --brutal-primary: #ff0080;
+  --brutal-secondary: #00ffff;
+  --brutal-tertiary: #ffff00;
+  --brutal-quaternary: #ff8000;
+  --brutal-bg: #000000;
+  --brutal-text: #ffffff;
+  --brutal-border: #ffffff;
+  --brutal-primary: #ff0080;
+  --brutal-secondary: #00ffff;
+  --brutal-tertiary: #ffff00;
+  --brutal-quaternary: #ff8000;
+  --brutal-bg: #000000;
+  --brutal-text: #ffffff;
+  --brutal-border: #ffffff;
+}
+
+/* Inherited from ancestor level 7 (regular) */
+.brutalism-body {
+  background: var(--brutal-bg) !important;
+  color: var(--brutal-text) !important;
+  font-family: Impact, "Arial Black", sans-serif !important;
+  background-image:  !important;
+  background-position-x:  !important;
+  background-position-y:  !important;
+  background-size:  !important;
+  background-repeat:  !important;
+  background-attachment:  !important;
+  background-origin:  !important;
+  background-clip:  !important;
+  background-color:  !important;
+  color: var(--brutal-text) !important;
+  font-family: Impact, "Arial Black", sans-serif !important;
+}
+
+/* Inherited from ancestor level 8 (user-agent) */
+html {
+  display: block;
+}
+
+/* Inherited from ancestor level 8 (user-agent) */
+:root {
+  view-transition-name: root;
+}
+
+/* Inherited from ancestor level 8 (regular) */
+* {
+  border-color: hsl(var(--border));
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 8 (regular) */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --radius: 0.5rem;
+  --pos-primary: 139 84% 54%;
+  --pos-primary-foreground: 0 0% 100%;
+  --pos-secondary: 217 91% 60%;
+  --pos-secondary-foreground: 0 0% 100%;
+  --pos-warning: 45 93% 47%;
+  --pos-warning-foreground: 0 0% 100%;
+  --pos-danger: 0 84% 60%;
+  --pos-danger-foreground: 0 0% 100%;
+  --pos-success: 120 61% 50%;
+  --pos-success-foreground: 0 0% 100%;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --radius: 0.5rem;
+  --pos-primary: 139 84% 54%;
+  --pos-primary-foreground: 0 0% 100%;
+  --pos-secondary: 217 91% 60%;
+  --pos-secondary-foreground: 0 0% 100%;
+  --pos-warning: 45 93% 47%;
+  --pos-warning-foreground: 0 0% 100%;
+  --pos-danger: 0 84% 60%;
+  --pos-danger-foreground: 0 0% 100%;
+  --pos-success: 120 61% 50%;
+  --pos-success-foreground: 0 0% 100%;
+}
+
+/* Inherited from ancestor level 8 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 8 (regular) */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition-behavior: normal, normal, normal;
+  transition-duration: 0.2s, 0.2s, 0.2s;
+  transition-timing-function: ease-in-out, ease-in-out, ease-in-out;
+  transition-delay: 0s, 0s, 0s;
+  transition-property: background-color, color, border-color;
+}
+
+/* Inherited from ancestor level 8 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 8 (regular) */
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+  height: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Inherited from ancestor level 8 (regular) */
+:root {
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #dbeafe;
+  --color-secondary: #f1f5f9;
+  --color-secondary-hover: #e2e8f0;
+  --color-accent: #10b981;
+  --color-accent-hover: #059669;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-white: #ffffff;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --font-family-sans: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #dbeafe;
+  --color-secondary: #f1f5f9;
+  --color-secondary-hover: #e2e8f0;
+  --color-accent: #10b981;
+  --color-accent-hover: #059669;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-white: #ffffff;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --font-family-sans: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+}
+
+/* Inherited from ancestor level 8 (regular) */
+:root {
+  --spacing-mobile: 0.5rem;
+  --spacing-tablet: 0.75rem;
+  --spacing-desktop: 1rem;
+  --font-mobile-sm: 0.75rem;
+  --font-mobile-base: 0.875rem;
+  --font-mobile-lg: 1rem;
+  --font-tablet-sm: 0.875rem;
+  --font-tablet-base: 1rem;
+  --font-tablet-lg: 1.125rem;
+  --font-desktop-sm: 0.875rem;
+  --font-desktop-base: 1rem;
+  --font-desktop-lg: 1.25rem;
+  --card-mobile-height: 120px;
+  --card-tablet-height: 140px;
+  --card-desktop-height: 160px;
+  --content-priority-high: 1;
+  --content-priority-medium: 2;
+  --content-priority-low: 3;
+  --text-clamp-mobile: 1;
+  --text-clamp-tablet: 2;
+  --text-clamp-desktop: 3;
+  --spacing-mobile: 0.5rem;
+  --spacing-tablet: 0.75rem;
+  --spacing-desktop: 1rem;
+  --font-mobile-sm: 0.75rem;
+  --font-mobile-base: 0.875rem;
+  --font-mobile-lg: 1rem;
+  --font-tablet-sm: 0.875rem;
+  --font-tablet-base: 1rem;
+  --font-tablet-lg: 1.125rem;
+  --font-desktop-sm: 0.875rem;
+  --font-desktop-base: 1rem;
+  --font-desktop-lg: 1.25rem;
+  --card-mobile-height: 120px;
+  --card-tablet-height: 140px;
+  --card-desktop-height: 160px;
+  --content-priority-high: 1;
+  --content-priority-medium: 2;
+  --content-priority-low: 3;
+  --text-clamp-mobile: 1;
+  --text-clamp-tablet: 2;
+  --text-clamp-desktop: 3;
+}
