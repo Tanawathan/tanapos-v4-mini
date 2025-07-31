@@ -85,6 +85,13 @@ VITE_APP_VERSION=1.0.0
 
 ## 🎉 **部署狀態更新 (2025/7/31)**
 
+✅ **建置腳本簡化修復**
+- 創建了簡化的 vite.config.debug.ts（暫時禁用 PWA 插件）
+- 添加了 build:simple 腳本用於調試和部署
+- 更新 Netlify 配置使用簡化建置避免退出代碼 2 錯誤
+- 添加 .nvmrc 明確指定 Node.js 版本
+- 移除可能有問題的 NODE_OPTIONS 環境變數
+
 ✅ **TypeScript 執行錯誤修復**
 - 修復了 Netlify 中 'tsc: not found' 錯誤（退出代碼 127）
 - 將所有 tsc 命令改為 npx tsc 確保 TypeScript 可被找到
@@ -114,11 +121,12 @@ VITE_APP_VERSION=1.0.0
 - 添加了資料庫映射的類型註解
 
 ✅ **建置測試成功**
-- `npm run build` 成功完成
+- `npm run build:simple` 成功完成（簡化版本，無 PWA）
 - `npm run type-check` TypeScript 檢查通過
-- 生成了優化的生產版本 (673.77 KiB)
+- 生成了優化的生產版本 (547.82 KiB)
 - 所有模組正確轉換和打包
-- PWA 預快取從 15 項增加到 18 項（確認修復有效）
 - Node.js 20 兼容性確認
 
 **準備好部署了嗎？** 🚀
+
+**注意：** 當前使用簡化建置（暫時禁用 PWA）以確保 Netlify 部署成功。PWA 功能將在部署成功後重新啟用。
