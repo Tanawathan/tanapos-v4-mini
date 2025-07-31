@@ -1,19 +1,14 @@
 [build]
-  # 建置指令
-  command = "npm install && npm run build"
+  # 建置指令 - 暫時使用簡化建置避免PWA相關問題
+  command = "npm run build:simple"
   
   # 輸出目錄
   publish = "dist"
-  
-  # Node.js 版本
-  node_bundler = "esbuild"
 
 [build.environment]
   # 建置環境變數 - 使用支援的 Node.js 版本
   NODE_VERSION = "20"
   NPM_VERSION = "10"
-  NODE_OPTIONS = "--trace-warnings --trace-deprecation"
-  NODE_ENV = "production"
 
 # 重新導向規則 (SPA 路由支援)
 [[redirects]]

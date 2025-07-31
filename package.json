@@ -7,6 +7,7 @@
     "dev": "vite --host 0.0.0.0 --port 5173",
     "build": "npx tsc --noEmit && vite build",
     "build:debug": "npx tsc --noEmit --listFiles && vite build --logLevel info",
+    "build:simple": "vite build --config vite.config.debug.ts",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "npx tsc --noEmit",
