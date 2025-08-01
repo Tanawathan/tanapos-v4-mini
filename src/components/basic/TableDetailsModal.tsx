@@ -15,7 +15,14 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
   isOpen, 
   onClose 
 }) => {
-  if (!isOpen || !table) return null
+  console.log('🔍 TableDetailsModal 接收到的 props:', { table, orders, isOpen })
+  
+  if (!isOpen || !table) {
+    console.log('❌ Modal 未開啟或沒有 table 數據:', { isOpen, table })
+    return null
+  }
+  
+  console.log('✅ Modal 將顯示，table 數據:', table)
 
   // 獲取該桌的訂單
   const tableOrders = orders.filter((order: Order) => 
@@ -91,17 +98,26 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
   const mockItems = getMockMenuItems()
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+      style={{ zIndex: 9999 }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose()
+        }
+      }}
+    >
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+           onClick={(e) => e.stopPropagation()}>
         {/* 標題欄 */}
         <div className="bg-blue-600 text-white p-4 rounded-t-lg">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">
-              {table.table_name ? table.table_name : `桌號 ${table.table_number}`} - 詳細資訊
+              {table.table_name || `桌號 ${table.table_number}`} - 詳細資訊
             </h2>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 text-2xl font-bold"
+              className="text-white hover:text-gray-200 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded hover:bg-white hover:bg-opacity-20"
             >
               ×
             </button>

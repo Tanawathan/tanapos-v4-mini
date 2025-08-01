@@ -34,6 +34,7 @@ import MobilePOSInterfaceFull from './components/mobile/MobilePOSInterfaceFull'
 import OrderManagement from './components/advanced/OrderManagement'
 import TableManagement from './components/advanced/TableManagement'
 import TablesView from './components/basic/TablesView'
+import NewTablesView from './components/basic/NewTablesView'
 import ModernTablesManagement from './components/advanced/ModernTablesManagement'
 import CheckoutSystemAdvanced from './components/advanced/CheckoutSystemAdvanced'
 import InventoryManagement from './components/advanced/InventoryManagement'
@@ -131,7 +132,7 @@ function App() {
                 
                 {/* 高級功能頁面 */}
                 <Route path="/orders" element={<OrderManagement />} />
-                <Route path="/tables" element={<ModernTablesManagement />} />
+                <Route path="/tables" element={<NewTablesView />} />
                 <Route path="/tables-legacy" element={<TablesView />} />
                 <Route path="/tables-modern" element={<ModernTablesManagement />} />
                 <Route path="/checkout" element={<CheckoutSystemAdvanced />} />

@@ -70,6 +70,7 @@ const TablesView: React.FC = () => {
 
   // 創建測試桌台數據（如果沒有數據的話）
   const createTestTables = () => {
+    console.log('🔧 正在創建測試桌台數據...')
     const testTables: Table[] = [
       {
         id: '1',
@@ -85,8 +86,8 @@ const TablesView: React.FC = () => {
         id: '2',
         table_number: 2,
         table_name: 'VIP包廂A',
-        capacity: 4,
-        status: 'occupied',
+        capacity: 3,
+        status: 'available',
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -95,7 +96,7 @@ const TablesView: React.FC = () => {
         id: '3',
         table_number: 3,
         table_name: '中央圓桌',
-        capacity: 6,
+        capacity: 2,
         status: 'available',
         is_active: true,
         created_at: new Date().toISOString(),
@@ -105,7 +106,7 @@ const TablesView: React.FC = () => {
         id: '4',
         table_number: 4,
         table_name: '露台座位',
-        capacity: 4,
+        capacity: 2,
         status: 'available',
         is_active: true,
         created_at: new Date().toISOString(),
@@ -114,15 +115,26 @@ const TablesView: React.FC = () => {
       {
         id: '5',
         table_number: 5,
+        table_name: '二樓包廂',
         capacity: 2,
         status: 'cleaning',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '6',
+        table_number: 6,
+        table_name: '戶外雅座',
+        capacity: 4,
+        status: 'available',
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
     ];
     
-    console.log('🔧 創建測試桌台數據:', testTables)
+    console.log('✅ 測試桌台數據創建完成:', testTables)
     return testTables
   }
 
@@ -136,6 +148,14 @@ const TablesView: React.FC = () => {
 
   // 篩選桌位（優先使用真實數據）
   const currentTables = tables.length > 0 ? tables : (loading ? [] : createTestTables())
+  
+  // 添加調試資訊
+  console.log('🔍 當前桌台數據狀態:')
+  console.log('   - tables.length:', tables.length)
+  console.log('   - loading:', loading)
+  console.log('   - currentTables.length:', currentTables.length)
+  console.log('   - currentTables:', currentTables)
+  
   const filteredTables = currentTables.filter((table: Table) => {
     if (selectedFilter === 'available') return table.status === 'available'
     if (selectedFilter === 'occupied') return table.status === 'occupied'
@@ -170,8 +190,10 @@ const TablesView: React.FC = () => {
 
   // 處理打開桌位詳細資訊
   const handleTableDetails = (table: Table) => {
+    console.log('🔍 點擊桌位詳細資訊:', table)
     setSelectedTable(table)
     setIsModalOpen(true)
+    console.log('📊 詳細資訊模組狀態:', { selectedTable: table, isModalOpen: true })
   }
 
   // 處理關閉詳細資訊模組
@@ -298,7 +320,7 @@ const TablesView: React.FC = () => {
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    {table.table_name ? table.table_name : `桌號 ${table.table_number}`}
+                    {table.table_name || `桌號 ${table.table_number}`}
                   </h3>
                   <span className="text-sm text-gray-600 font-medium bg-gray-100 px-2 py-1 rounded">
                     #{table.table_number}
@@ -352,7 +374,7 @@ const TablesView: React.FC = () => {
                       className="w-full"
                       variant="primary"
                     >
-                      標記為占用
+                      占用
                     </Button>
                   ) : (
                     <Button
@@ -360,15 +382,18 @@ const TablesView: React.FC = () => {
                       className="w-full"
                       variant="outline"
                     >
-                      標記為可用
+                      清理
                     </Button>
                   )}
                   
                   {/* 詳細資訊按鈕 */}
                   <Button
-                    onClick={() => handleTableDetails(table)}
-                    className="w-full"
-                    variant="outline"
+                    onClick={() => {
+                      console.log('🔍 詳細資訊按鈕被點擊！', table)
+                      handleTableDetails(table)
+                    }}
+                    className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                    variant="primary"
                   >
                     📊 詳細資訊
                   </Button>
