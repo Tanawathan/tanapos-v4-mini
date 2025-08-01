@@ -3,6 +3,7 @@ import { usePOSStore } from '../../lib/store-supabase'
 import { Table, Order } from '../../lib/types-unified'
 import Button from '../ui/Button'
 import LoadingSpinner from '../ui/LoadingSpinner'
+import TableDetailsModal from './TableDetailsModal'
 
 const TablesView: React.FC = () => {
   console.log('🏗️ TablesView 組件開始載入...')
@@ -10,6 +11,8 @@ const TablesView: React.FC = () => {
   const { tables, orders, updateTableStatus, loadTables, loadOrders, loading } = usePOSStore()
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'available' | 'occupied'>('all')
   const [isLoading, setIsLoading] = useState(false)
+  const [selectedTable, setSelectedTable] = useState<Table | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   console.log('🔧 TablesView 初始狀態:', {
     tablesCount: tables.length,
@@ -71,6 +74,7 @@ const TablesView: React.FC = () => {
       {
         id: '1',
         table_number: 1,
+        table_name: '窗邊雅座',
         capacity: 2,
         status: 'available',
         is_active: true,
@@ -80,6 +84,7 @@ const TablesView: React.FC = () => {
       {
         id: '2',
         table_number: 2,
+        table_name: 'VIP包廂A',
         capacity: 4,
         status: 'occupied',
         is_active: true,
@@ -89,8 +94,28 @@ const TablesView: React.FC = () => {
       {
         id: '3',
         table_number: 3,
+        table_name: '中央圓桌',
         capacity: 6,
         status: 'available',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '4',
+        table_number: 4,
+        table_name: '露台座位',
+        capacity: 4,
+        status: 'available',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '5',
+        table_number: 5,
+        capacity: 2,
+        status: 'cleaning',
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -141,6 +166,18 @@ const TablesView: React.FC = () => {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // 處理打開桌位詳細資訊
+  const handleTableDetails = (table: Table) => {
+    setSelectedTable(table)
+    setIsModalOpen(true)
+  }
+
+  // 處理關閉詳細資訊模組
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedTable(null)
   }
 
   if (loading || isLoading) {
@@ -259,12 +296,19 @@ const TablesView: React.FC = () => {
 
               {/* 桌位信息 */}
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  桌號 {table.table_number}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  容量: {table.capacity} 人
-                </p>
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {table.table_name ? table.table_name : `桌號 ${table.table_number}`}
+                  </h3>
+                  <span className="text-sm text-gray-600 font-medium bg-gray-100 px-2 py-1 rounded">
+                    #{table.table_number}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600">
+                    容量: {table.capacity} 人
+                  </p>
+                </div>
                 <div className="mt-2">
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -301,23 +345,34 @@ const TablesView: React.FC = () => {
 
               {/* 操作按鈕 */}
               <div className="space-y-2">
-                {!isOccupied ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {!isOccupied ? (
+                    <Button
+                      onClick={() => handleTableStatusUpdate(table.id, 'occupied')}
+                      className="w-full"
+                      variant="primary"
+                    >
+                      標記為占用
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => handleTableStatusUpdate(table.id, 'available')}
+                      className="w-full"
+                      variant="outline"
+                    >
+                      標記為可用
+                    </Button>
+                  )}
+                  
+                  {/* 詳細資訊按鈕 */}
                   <Button
-                    onClick={() => handleTableStatusUpdate(table.id, 'occupied')}
-                    className="w-full"
-                    variant="primary"
-                  >
-                    標記為占用
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => handleTableStatusUpdate(table.id, 'available')}
+                    onClick={() => handleTableDetails(table)}
                     className="w-full"
                     variant="outline"
                   >
-                    標記為可用
+                    📊 詳細資訊
                   </Button>
-                )}
+                </div>
               </div>
             </div>
           )
@@ -374,6 +429,14 @@ const TablesView: React.FC = () => {
           </p>
         </div>
       )}
+
+      {/* 桌位詳細資訊模組 */}
+      <TableDetailsModal
+        table={selectedTable}
+        orders={orders}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   )
 }

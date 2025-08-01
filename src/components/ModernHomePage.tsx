@@ -14,9 +14,16 @@ const ModernHomePage: React.FC = () => {
       color: 'primary'
     },
     {
+      title: '行動點餐',
+      description: '專為手機設計的觸控點餐介面，支援多種視覺風格',
+      icon: '📱',
+      path: '/mobile',
+      color: 'success'
+    },
+    {
       title: '舊版點餐系統',
       description: '傳統的點餐介面，基本功能完整',
-      icon: '📱',
+      icon: '�',
       path: '/pos-old',
       color: 'secondary'
     },

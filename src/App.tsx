@@ -10,6 +10,7 @@ import { UIStyleProvider } from './contexts/UIStyleContext'
 // Layout Components
 import SimpleLayout from './components/layout/SimpleLayout'
 import ModernLayout from './components/layout/ModernLayout'
+import MobileLayout from './components/layout/MobileLayout'
 import SimpleDashboard from './components/layout/SimpleDashboard'
 import SimpleReports from './components/layout/SimpleReports'
 
@@ -26,6 +27,9 @@ import NewPOSPage from './components/pages/NewPOSPage'
 import SimplePOSPage from './components/pages/SimplePOSPage'
 import KDSView from './components/basic/KDSView'
 
+// Mobile Components
+import MobilePOSInterfaceFull from './components/mobile/MobilePOSInterfaceFull'
+
 // Advanced Components
 import OrderManagement from './components/advanced/OrderManagement'
 import TableManagement from './components/advanced/TableManagement'
@@ -40,6 +44,14 @@ import { AdminSystem } from './components/admin'
 // UI Components
 import NotificationProvider from './components/ui/NotificationSystem'
 import NotificationDemo from './components/ui/NotificationDemo'
+
+// ============================================================================
+// 裝置檢測功能
+// ============================================================================
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+         window.innerWidth <= 768
+}
 
 // ============================================================================
 // 導航包裝組件
@@ -80,6 +92,9 @@ const DashboardWrapper = () => {
 // 主應用程式組件
 // ============================================================================
 function App() {
+  const isMobile = isMobileDevice()
+  const LayoutComponent = isMobile ? MobileLayout : ModernLayout
+
   useEffect(() => {
     // 設置預設深色模式
     const savedTheme = localStorage.getItem('theme')
@@ -96,7 +111,7 @@ function App() {
       <NotificationProvider>
         <Router>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <ModernLayout>
+            <LayoutComponent>
               <Routes>
                 {/* 現代化主頁 */}
                 <Route path="/" element={<ModernHomePage />} />
@@ -122,6 +137,9 @@ function App() {
                 <Route path="/checkout" element={<CheckoutSystemAdvanced />} />
                 <Route path="/inventory" element={<InventoryManagement />} />
                 
+                {/* 行動裝置點餐介面 */}
+                <Route path="/mobile" element={<MobilePOSInterfaceFull />} />
+                
                 {/* 報告頁面 */}
                 <Route path="/reports" element={<SimpleReports />} />
                 
@@ -136,7 +154,7 @@ function App() {
                 {/* 重定向未知路由到主頁 */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
-            </ModernLayout>
+            </LayoutComponent>
           </div>
         </Router>
       </NotificationProvider>

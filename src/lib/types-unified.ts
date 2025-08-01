@@ -32,6 +32,7 @@ export interface Category {
 export interface Table {
   id: string
   table_number: number
+  table_name?: string
   capacity: number
   status: 'available' | 'occupied' | 'cleaning' | 'reserved' | 'out_of_order'
   current_order_id?: string
