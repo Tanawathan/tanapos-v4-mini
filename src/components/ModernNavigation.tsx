@@ -7,11 +7,14 @@ const ModernNavigation: React.FC = () => {
   const location = useLocation();
   const { currentStyle, styleConfig } = useUIStyle();
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
   // 檢測螢幕尺寸
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth <= 639);
+      const width = window.innerWidth;
+      setIsMobile(width <= 639);
+      setIsTablet(width >= 640 && width <= 1023);
     };
     
     checkScreenSize();
@@ -188,7 +191,8 @@ const ModernNavigation: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: '4rem'
+          height: isMobile ? '3rem' : isTablet ? '3.5rem' : '4rem', // 手機3rem，平板3.5rem，桌面4rem
+          minHeight: isMobile ? '3rem' : isTablet ? '3.5rem' : '4rem'
         }}>
           {/* Logo - 純裝飾性品牌標識 */}
           <div 
@@ -199,8 +203,8 @@ const ModernNavigation: React.FC = () => {
             }}
           >
             <div style={{
-              width: '2.5rem',
-              height: '2.5rem',
+              width: isMobile ? '2rem' : isTablet ? '2.25rem' : '2.5rem', // 響應式Logo尺寸
+              height: isMobile ? '2rem' : isTablet ? '2.25rem' : '2.5rem',
               background: themeColors.logoBg,
               borderRadius: currentStyle === 'brutalism' || currentStyle === 'dos' || currentStyle === 'bios' ? '0' :
                           currentStyle === 'kawaii' ? '50%' :
@@ -208,7 +212,7 @@ const ModernNavigation: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1.25rem',
+              fontSize: isMobile ? '1rem' : isTablet ? '1.125rem' : '1.25rem', // 響應式圖標尺寸
               boxShadow: currentStyle === 'brutalism' ? '3px 3px 0px #ffffff' :
                         currentStyle === 'cyberpunk' ? '0 0 10px rgba(0, 255, 255, 0.5)' :
                         currentStyle === 'kawaii' ? '0 4px 8px rgba(255, 105, 180, 0.3)' :
@@ -220,7 +224,7 @@ const ModernNavigation: React.FC = () => {
             </div>
             <span 
               style={{
-                fontSize: '1.25rem',
+                fontSize: isMobile ? '1rem' : isTablet ? '1.125rem' : '1.25rem', // 響應式文字尺寸
                 fontWeight: currentStyle === 'brutalism' || currentStyle === 'dos' ? '900' : '700',
                 color: themeColors.logoText,
                 display: isMobile ? 'none' : 'inline',
@@ -235,7 +239,7 @@ const ModernNavigation: React.FC = () => {
           </div>
 
           {/* Navigation Items */}
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', gap: isMobile ? '0.25rem' : isTablet ? '0.375rem' : '0.5rem' }}>
             {navigationItems.map((item) => {
               const isActive = isActivePath(item.path)
               return (
@@ -245,8 +249,8 @@ const ModernNavigation: React.FC = () => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.5rem 1rem',
+                    gap: isMobile ? '0.25rem' : isTablet ? '0.375rem' : '0.5rem',
+                    padding: isMobile ? '0.375rem 0.5rem' : isTablet ? '0.4rem 0.75rem' : '0.5rem 1rem', // 三級響應式內邊距
                     backgroundColor: isActive ? themeColors.activeBg : 'transparent',
                     color: isActive ? themeColors.activeText : themeColors.navText,
                     border: currentStyle === 'brutalism' ? `2px solid ${themeColors.navBorder}` :
@@ -255,7 +259,7 @@ const ModernNavigation: React.FC = () => {
                     borderRadius: currentStyle === 'brutalism' || currentStyle === 'dos' || currentStyle === 'bios' ? '0' :
                                  currentStyle === 'kawaii' ? '20px' :
                                  currentStyle === 'neumorphism' ? '12px' : '6px',
-                    fontSize: '14px',
+                    fontSize: isMobile ? '12px' : isTablet ? '13px' : '14px', // 三級響應式字體
                     fontWeight: currentStyle === 'brutalism' || currentStyle === 'dos' ? '900' : '500',
                     cursor: 'pointer',
                     textTransform: currentStyle === 'brutalism' || currentStyle === 'dos' ? 'uppercase' : 'none',
@@ -286,7 +290,7 @@ const ModernNavigation: React.FC = () => {
           </div>
 
           {/* User Actions */}
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: isMobile ? '0.25rem' : isTablet ? '0.375rem' : '0.5rem', alignItems: 'center' }}>
             {/* 風格切換器 */}
             <StyleSwitcher />
             

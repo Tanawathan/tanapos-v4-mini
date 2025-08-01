@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { usePOSStore } from '../../lib/store-complete'
+import { usePOSStore } from '../../lib/store-supabase'
 import { useUIStyle } from '../../contexts/UIStyleContext'
 import type { Order } from '../../lib/types-unified'
 
@@ -8,11 +8,26 @@ type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'served' | 
 
 // 訂單管理組件
 export default function OrderManagement() {
-  const { orders, updateOrderStatus } = usePOSStore()
+  const { orders, updateOrderStatus, loadOrders, loading } = usePOSStore()
   const { currentStyle } = useUIStyle()
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [activeTab, setActiveTab] = useState<'all' | OrderStatus>('all')
   const [searchTerm, setSearchTerm] = useState('')
+
+  // 組件掛載時載入訂單數據
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        console.log('📋 訂單管理: 載入訂單數據...')
+        await loadOrders()
+        console.log('✅ 訂單管理: 訂單數據載入完成')
+      } catch (error) {
+        console.error('❌ 訂單管理: 載入訂單數據失敗:', error)
+      }
+    }
+    
+    loadData()
+  }, [loadOrders])
 
   // 獲取主題顏色
   const getThemeColors = () => {
@@ -209,6 +224,40 @@ export default function OrderManagement() {
   }
 
   const themeColors = getThemeColors()
+
+  // 載入狀態檢查
+  if (loading && orders.length === 0) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: themeColors.bg,
+        color: themeColors.text,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontFamily: currentStyle === 'dos' || currentStyle === 'bios' ? 'monospace' : 'system-ui, sans-serif'
+      }}>
+        <div style={{
+          fontSize: '2rem',
+          marginBottom: '1rem'
+        }}>📋</div>
+        <div style={{
+          fontSize: '1.25rem',
+          color: themeColors.primary
+        }}>
+          載入訂單數據中...
+        </div>
+        <div style={{
+          fontSize: '0.875rem',
+          color: themeColors.subText,
+          marginTop: '0.5rem'
+        }}>
+          {orders.length > 0 ? `已載入 ${orders.length} 筆訂單` : '連接數據庫中...'}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{

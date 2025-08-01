@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { APP_CONFIG } from '../config';
 
 const ModernHomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,10 +22,17 @@ const ModernHomePage: React.FC = () => {
     },
     {
       title: '桌台管理',
-      description: '即時桌台狀態管理，支援預約與併桌功能',
-      icon: '🪑',
+      description: '現代化桌台狀態管理，支援多種 UI 風格與響應式設計',
+      icon: '🏢',
       path: '/tables',
       color: 'success'
+    },
+    {
+      title: '舊版桌台管理',
+      description: '傳統桌台管理介面，基本功能完整',
+      icon: '🪑',
+      path: '/tables-legacy',
+      color: 'secondary'
     },
     {
       title: '訂單管理',
@@ -53,7 +61,21 @@ const ModernHomePage: React.FC = () => {
       icon: '📊',
       path: '/reports',
       color: 'primary'
-    }
+    },
+    ...(APP_CONFIG.FEATURES.USER_GUIDE ? [{
+      title: '使用說明',
+      description: '系統基本使用指南與功能介紹',
+      icon: '📖',
+      path: '/admin?tab=userguide',
+      color: 'info'
+    }] : []),
+    ...(APP_CONFIG.FEATURES.OPERATION_GUIDE ? [{
+      title: '操作指南',
+      description: '詳細的操作步驟說明與最佳實踐',
+      icon: '🎯',
+      path: '/admin?tab=operationguide',
+      color: 'success'
+    }] : [])
   ];
 
   const stats = [

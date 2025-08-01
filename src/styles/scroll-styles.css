@@ -1,0 +1,286 @@
+/* 自定義滾動條樣式 - TanaPOS V4 Mini */
+
+/* Webkit 瀏覽器滾動條樣式 (Chrome, Safari, Edge) */
+.pos-main-scroll-area::-webkit-scrollbar,
+.pos-cart-scroll-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.pos-main-scroll-area::-webkit-scrollbar-track,
+.pos-cart-scroll-area::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin: 5px;
+}
+
+.pos-main-scroll-area::-webkit-scrollbar-thumb,
+.pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #007bff, #0056b3);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #0056b3, #004085);
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.pos-main-scroll-area::-webkit-scrollbar-thumb:active,
+.pos-cart-scroll-area::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #004085, #002752);
+}
+
+.pos-main-scroll-area::-webkit-scrollbar-corner,
+.pos-cart-scroll-area::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* 不同 UI 風格的滾動條變體 */
+
+/* 深色主題 */
+.dark .pos-main-scroll-area::-webkit-scrollbar-track,
+.dark .pos-cart-scroll-area::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .pos-main-scroll-area::-webkit-scrollbar-thumb,
+.dark .pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #6c757d, #495057);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.dark .pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.dark .pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #495057, #343a40);
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+/* Brutalism 風格 */
+.ui-brutalism .pos-main-scroll-area::-webkit-scrollbar,
+.ui-brutalism .pos-cart-scroll-area::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.ui-brutalism .pos-main-scroll-area::-webkit-scrollbar-track,
+.ui-brutalism .pos-cart-scroll-area::-webkit-scrollbar-track {
+  background: #000000;
+  border-radius: 0;
+  margin: 0;
+  border: 2px solid #ffffff;
+}
+
+.ui-brutalism .pos-main-scroll-area::-webkit-scrollbar-thumb,
+.ui-brutalism .pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: #ffffff;
+  border-radius: 0;
+  border: 2px solid #000000;
+  transition: none;
+}
+
+.ui-brutalism .pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.ui-brutalism .pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #ff0000;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+/* Cyberpunk 風格 */
+.ui-cyberpunk .pos-main-scroll-area::-webkit-scrollbar-track,
+.ui-cyberpunk .pos-cart-scroll-area::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.ui-cyberpunk .pos-main-scroll-area::-webkit-scrollbar-thumb,
+.ui-cyberpunk .pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00ffff, #0080ff);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.ui-cyberpunk .pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.ui-cyberpunk .pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ff00ff, #8000ff);
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.7);
+}
+
+/* Kawaii 風格 */
+.ui-kawaii .pos-main-scroll-area::-webkit-scrollbar-track,
+.ui-kawaii .pos-cart-scroll-area::-webkit-scrollbar-track {
+  background: rgba(255, 182, 193, 0.2);
+  border-radius: 15px;
+}
+
+.ui-kawaii .pos-main-scroll-area::-webkit-scrollbar-thumb,
+.ui-kawaii .pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FF69B4, #FFB6C1);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 105, 180, 0.3);
+}
+
+.ui-kawaii .pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.ui-kawaii .pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FF1493, #FF69B4);
+  box-shadow: 0 2px 8px rgba(255, 20, 147, 0.4);
+}
+
+/* Neumorphism 風格 */
+.ui-neumorphism .pos-main-scroll-area::-webkit-scrollbar-track,
+.ui-neumorphism .pos-cart-scroll-area::-webkit-scrollbar-track {
+  background: linear-gradient(145deg, #e6e6e6, #ffffff);
+  border-radius: 15px;
+  box-shadow: inset 5px 5px 10px #d9d9d9, inset -5px -5px 10px #ffffff;
+}
+
+.ui-neumorphism .pos-main-scroll-area::-webkit-scrollbar-thumb,
+.ui-neumorphism .pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+  border-radius: 15px;
+  box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+  border: none;
+}
+
+.ui-neumorphism .pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.ui-neumorphism .pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(145deg, #e8e8e8, #d8d8d8);
+  box-shadow: 3px 3px 6px #d1d1d1, -3px -3px 6px #ffffff;
+}
+
+/* Glassmorphism 風格 */
+.ui-glassmorphism .pos-main-scroll-area::-webkit-scrollbar-track,
+.ui-glassmorphism .pos-cart-scroll-area::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ui-glassmorphism .pos-main-scroll-area::-webkit-scrollbar-thumb,
+.ui-glassmorphism .pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.ui-glassmorphism .pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.ui-glassmorphism .pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 8px rgba(31, 38, 135, 0.3);
+}
+
+/* DOS 和 BIOS 風格 */
+.ui-dos .pos-main-scroll-area::-webkit-scrollbar,
+.ui-dos .pos-cart-scroll-area::-webkit-scrollbar,
+.ui-bios .pos-main-scroll-area::-webkit-scrollbar,
+.ui-bios .pos-cart-scroll-area::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.ui-dos .pos-main-scroll-area::-webkit-scrollbar-track,
+.ui-dos .pos-cart-scroll-area::-webkit-scrollbar-track,
+.ui-bios .pos-main-scroll-area::-webkit-scrollbar-track,
+.ui-bios .pos-cart-scroll-area::-webkit-scrollbar-track {
+  background: #000000;
+  border-radius: 0;
+  border: 1px solid #00ff00;
+}
+
+.ui-dos .pos-main-scroll-area::-webkit-scrollbar-thumb,
+.ui-dos .pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: #00ff00;
+  border-radius: 0;
+  border: 1px solid #ffffff;
+}
+
+.ui-bios .pos-main-scroll-area::-webkit-scrollbar-thumb,
+.ui-bios .pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: #0000ff;
+  border-radius: 0;
+  border: 1px solid #ffffff;
+}
+
+.ui-dos .pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.ui-dos .pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+  border: 1px solid #00ff00;
+}
+
+.ui-bios .pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.ui-bios .pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+  border: 1px solid #0000ff;
+}
+
+/* Code 風格 */
+.ui-code .pos-main-scroll-area::-webkit-scrollbar-track,
+.ui-code .pos-cart-scroll-area::-webkit-scrollbar-track {
+  background: #2d3748;
+  border-radius: 4px;
+}
+
+.ui-code .pos-main-scroll-area::-webkit-scrollbar-thumb,
+.ui-code .pos-cart-scroll-area::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+  border: 1px solid #2d3748;
+}
+
+.ui-code .pos-main-scroll-area::-webkit-scrollbar-thumb:hover,
+.ui-code .pos-cart-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+  box-shadow: 0 2px 4px rgba(74, 85, 104, 0.3);
+}
+
+/* 滾動行為增強 */
+.pos-main-scroll-area,
+.pos-cart-scroll-area {
+  scroll-behavior: smooth;
+}
+
+/* 滾動條漸入漸出效果 */
+.pos-main-scroll-area:not(:hover)::-webkit-scrollbar-thumb,
+.pos-cart-scroll-area:not(:hover)::-webkit-scrollbar-thumb {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.pos-main-scroll-area:hover::-webkit-scrollbar-thumb,
+.pos-cart-scroll-area:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+/* 響應式滾動條 */
+@media (max-width: 640px) {
+  .pos-main-scroll-area::-webkit-scrollbar,
+  .pos-cart-scroll-area::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pos-main-scroll-area::-webkit-scrollbar,
+  .pos-cart-scroll-area::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Firefox 滾動條樣式 */
+@supports (scrollbar-width: thin) {
+  .pos-main-scroll-area,
+  .pos-cart-scroll-area {
+    scrollbar-width: thin;
+    scrollbar-color: #007bff rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .pos-main-scroll-area,
+  .dark .pos-cart-scroll-area {
+    scrollbar-color: #6c757d rgba(255, 255, 255, 0.1);
+  }
+}

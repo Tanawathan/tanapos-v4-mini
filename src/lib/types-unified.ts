@@ -159,11 +159,12 @@ export interface TableSession {
 
 // 購物車項目類型
 export interface CartItem {
-  id: string
+  id: string          // 商品原始ID
+  instanceId: string  // 購物車項目唯一實例ID
   name: string
   price: number
   quantity: number
-  note?: string
+  note?: string       // 每個實例的獨立備註
 }
 
 // UI 相關類型

@@ -54,7 +54,7 @@ interface POSState {
   
   // 訂單操作
   loadOrders: () => Promise<void>
-  createOrder: (orderData: any) => Promise<void>
+  createOrder: (orderData: any) => Promise<Order | undefined>
   updateOrderStatus: (id: string, status: Order['status']) => Promise<void>
   getOrdersByStatus: (status: Order['status']) => Promise<void>
   getOrdersByTable: (tableId: number) => Promise<void>
@@ -63,9 +63,10 @@ interface POSState {
   // 購物車操作
   // ============================================================================
   
-  addToCart: (product: Product, quantity?: number) => void
-  removeFromCart: (productId: string) => void
-  updateCartQuantity: (productId: string, quantity: number) => void
+  addToCart: (product: Product, quantity?: number, note?: string) => void
+  removeFromCart: (instanceId: string) => void
+  updateCartQuantity: (instanceId: string, quantity: number) => void
+  updateCartNote: (instanceId: string, note: string) => void
   clearCart: () => void
   getCartTotal: () => number
   getCartItemCount: () => number
@@ -193,10 +194,12 @@ export const usePOSStore = create<POSState>()(
             orders: [...state.orders, newOrder],
             loading: false
           }))
+          return newOrder
         }
       } catch (error) {
         console.error('Error creating order:', error)
         set({ error: '建立訂單失敗', loading: false })
+        throw error
       }
     },
 
@@ -242,25 +245,33 @@ export const usePOSStore = create<POSState>()(
     // 購物車操作實作 (使用正確的CartItem類型)
     // ============================================================================
 
-    addToCart: (product, quantity = 1) => {
+    addToCart: (product, quantity = 1, note = '') => {
       set(state => {
-        const existingItem = state.cartItems.find(item => item.id === product.id)
+        // 為每個新的購物車項目創建唯一的實例ID
+        const instanceId = `${product.id}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
         
-        if (existingItem) {
+        // 如果有相同商品且相同備註的項目，增加數量
+        const existingItemIndex = state.cartItems.findIndex(item => 
+          item.id === product.id && item.note === note
+        )
+        
+        if (existingItemIndex >= 0) {
           return {
-            cartItems: state.cartItems.map(item =>
-              item.id === product.id
+            cartItems: state.cartItems.map((item, index) =>
+              index === existingItemIndex
                 ? { ...item, quantity: item.quantity + quantity }
                 : item
             )
           }
         } else {
+          // 創建新的購物車項目實例
           const newItem: CartItem = {
             id: product.id,
+            instanceId,
             name: product.name,
             price: product.price,
             quantity,
-            note: ''
+            note
           }
           return {
             cartItems: [...state.cartItems, newItem]
@@ -269,22 +280,32 @@ export const usePOSStore = create<POSState>()(
       })
     },
 
-    removeFromCart: (productId) => {
+    removeFromCart: (instanceId) => {
       set(state => ({
-        cartItems: state.cartItems.filter(item => item.id !== productId)
+        cartItems: state.cartItems.filter(item => item.instanceId !== instanceId)
       }))
     },
 
-    updateCartQuantity: (productId, quantity) => {
+    updateCartQuantity: (instanceId, quantity) => {
       if (quantity <= 0) {
-        get().removeFromCart(productId)
+        get().removeFromCart(instanceId)
         return
       }
       
       set(state => ({
         cartItems: state.cartItems.map(item =>
-          item.id === productId
+          item.instanceId === instanceId
             ? { ...item, quantity }
+            : item
+        )
+      }))
+    },
+
+    updateCartNote: (instanceId, note) => {
+      set(state => ({
+        cartItems: state.cartItems.map(item =>
+          item.instanceId === instanceId
+            ? { ...item, note }
             : item
         )
       }))

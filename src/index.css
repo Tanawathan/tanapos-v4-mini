@@ -20,6 +20,10 @@
 @import './styles/new-pos-system.css';
 /* 導入新 POS 系統 UI 適配器 */
 @import './styles/new-pos-ui-adapter.css';
+/* 導入自定義滾動條樣式 */
+@import './styles/scroll-styles.css';
+/* 導入滾動增強功能 */
+@import './styles/scroll-enhancements.css';
 
 @tailwind base;
 @tailwind components;

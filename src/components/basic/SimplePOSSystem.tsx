@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { usePOSStore } from '../../lib/store-complete'
+import React, { useEffect, useState, useRef } from 'react'
+import { usePOSStore } from '../../lib/store-supabase'
 import { useNotifications } from '../ui/NotificationSystem'
 import type { Product, CartItem, Category } from '../../lib/types-unified'
 
@@ -18,6 +18,7 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
     addToCart,
     removeFromCart,
     updateCartQuantity,
+    updateCartNote,
     clearCart,
     selectedTable,
     setSelectedTable,
@@ -31,6 +32,34 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [localSelectedTable, setLocalSelectedTable] = useState<number | null>(null)
+  const [showNoteModal, setShowNoteModal] = useState(false)
+  const [noteModalProduct, setNoteModalProduct] = useState<Product | null>(null)
+  const [editingInstanceId, setEditingInstanceId] = useState<string | null>(null)
+  const [customNote, setCustomNote] = useState('')
+  
+  // 響應式設計相關狀態
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
+
+  // 滾動相關狀態
+  const [mainScrollProgress, setMainScrollProgress] = useState(0)
+  const [cartScrollProgress, setCartScrollProgress] = useState(0)
+  const [showScrollButtons, setShowScrollButtons] = useState(false)
+  const mainScrollRef = useRef<HTMLDivElement>(null)
+  const cartScrollRef = useRef<HTMLDivElement>(null)
+
+  // 檢測螢幕大小
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const width = window.innerWidth
+      setIsMobile(width < 768)
+      setIsTablet(width >= 768 && width < 1024)
+    }
+
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
   // 初始化數據
   useEffect(() => {
@@ -156,14 +185,116 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
     notifications.success('成功', `已將 ${product.name} 加入購物車`)
   }
 
+  // 處理帶備註添加到購物車
+  const handleAddToCartWithNote = (product: Product, note?: string) => {
+    if (editingInstanceId) {
+      // 編輯現有商品的備註
+      updateCartNote(editingInstanceId, note || '')
+      notifications.success('成功', `已更新 ${product.name} 的備註`)
+    } else {
+      // 添加新商品到購物車
+      addToCart(product, 1, note)
+      notifications.success('成功', `已將 ${product.name} 加入購物車${note ? ' (含備註)' : ''}`)
+    }
+    setShowNoteModal(false)
+    setNoteModalProduct(null)
+    setEditingInstanceId(null)
+    setCustomNote('')
+  }
+
+  // 開啟備註對話框
+  const openNoteModal = (product: Product, instanceId?: string) => {
+    setNoteModalProduct(product)
+    setEditingInstanceId(instanceId || null)
+    setCustomNote('')
+    setShowNoteModal(true)
+  }
+
+  // 滾動處理函數
+  const handleMainScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement
+    const scrollTop = target.scrollTop
+    const scrollHeight = target.scrollHeight
+    const clientHeight = target.clientHeight
+    const scrollPercentage = scrollHeight > clientHeight ? 
+      (scrollTop / (scrollHeight - clientHeight)) * 100 : 0
+    
+    setMainScrollProgress(scrollPercentage)
+    setShowScrollButtons(scrollHeight > clientHeight && scrollTop > 100)
+  }
+
+  const handleCartScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement
+    const scrollTop = target.scrollTop
+    const scrollHeight = target.scrollHeight
+    const clientHeight = target.clientHeight
+    const scrollPercentage = scrollHeight > clientHeight ? 
+      (scrollTop / (scrollHeight - clientHeight)) * 100 : 0
+    
+    setCartScrollProgress(scrollPercentage)
+  }
+
+  // 滾動到頂部/底部
+  const scrollToTop = (element: HTMLDivElement | null) => {
+    if (element) {
+      element.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const scrollToBottom = (element: HTMLDivElement | null) => {
+    if (element) {
+      element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' })
+    }
+  }
+
+  // 快速備註選項
+  const getQuickNotes = (product: Product): string[] => {
+    const category = categories.find(c => c.id === product.category_id)
+    const categoryName = category?.name?.toLowerCase() || ''
+    
+    // 根據分類判斷商品類型
+    if (categoryName.includes('飲料') || categoryName.includes('咖啡') || categoryName.includes('茶') || categoryName.includes('果汁')) {
+      return [
+        '熱飲', '冰飲', '常溫',
+        '無糖', '少糖', '半糖', '正常糖',
+        '去冰', '少冰', '正常冰', '多冰'
+      ]
+    } else {
+      return [
+        '不辣', '小辣', '中辣', '大辣', '超辣',
+        '少油', '正常', '多蔥', '不加香菜'
+      ]
+    }
+  }
+
   // 處理數量更新
-  const handleUpdateQuantity = (productId: string, newQuantity: number) => {
+  const handleUpdateQuantity = (instanceId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      removeFromCart(productId)
+      removeFromCart(instanceId)
       notifications.info('提示', '已從購物車移除商品')
     } else {
-      updateCartQuantity(productId, newQuantity)
+      updateCartQuantity(instanceId, newQuantity)
     }
+  }
+
+  // 移除商品的最後一個實例
+  const handleRemoveLastInstance = (productId: string) => {
+    const productInstances = cartItems.filter(item => item.id === productId)
+    if (productInstances.length > 0) {
+      // 移除最後一個實例
+      const lastInstance = productInstances[productInstances.length - 1]
+      removeFromCart(lastInstance.instanceId)
+      notifications.info('提示', '已移除一份商品')
+    }
+  }
+
+  // 移除商品的所有實例
+  const handleRemoveAllInstances = (productId: string) => {
+    const productInstances = cartItems.filter(item => item.id === productId)
+    productInstances.forEach(instance => {
+      removeFromCart(instance.instanceId)
+    })
+    notifications.info('提示', '已移除所有相同商品')
   }
 
   // 處理結帳
@@ -179,6 +310,8 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
     }
 
     try {
+      notifications.info('處理中', '正在建立訂單...')
+
       const orderItems = cartItems.map(item => ({
         product_id: item.id,
         product_name: item.name,
@@ -189,7 +322,8 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
         status: 'pending' as const
       }))
 
-      await createOrder({
+      // 建立訂單
+      const newOrder = await createOrder({
         table_number: localSelectedTable,
         total_amount: cartTotal,
         subtotal: cartTotal,
@@ -198,8 +332,17 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
         order_items: orderItems
       })
 
+      // 更新桌台狀態為佔用
+      const { updateTableStatus } = usePOSStore.getState()
+      await updateTableStatus(localSelectedTable, 'occupied')
+
+      // 清空購物車
       clearCart()
-      notifications.success('成功', '訂單已建立！')
+      const currentTable = localSelectedTable
+      setLocalSelectedTable(null)
+      
+      const orderNumber = newOrder?.order_number || `ORD-${Date.now()}`
+      notifications.success('成功', `訂單 ${orderNumber} 已建立！桌號 ${currentTable} 已佔用`)
     } catch (error) {
       console.error('建立訂單失敗:', error)
       notifications.error('錯誤', '建立訂單失敗，請重試')
@@ -208,8 +351,10 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
 
   // 渲染產品卡片
   const renderProductCard = (product: Product) => {
-    const cartItem = cartItems.find(item => item.id === product.id)
-    const quantity = cartItem ? cartItem.quantity : 0
+    // 計算同一商品的所有實例總數量
+    const totalQuantity = cartItems
+      .filter(item => item.id === product.id)
+      .reduce((sum, item) => sum + item.quantity, 0)
 
     return (
       <div key={product.id} style={{
@@ -218,13 +363,13 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
                      uiStyle === 'neumorphism' ? '20px' :
                      uiStyle === 'kawaii' ? '25px' : 
                      uiStyle === 'skeuomorphism' ? '12px' : '8px',
-        padding: '16px',
-        margin: '8px',
+        padding: isMobile ? '12px' : '16px',
+        margin: isMobile ? '4px' : '8px',
         background: themeColors.cardBg,
         color: themeColors.text,
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '200px',
+        minHeight: isMobile ? '180px' : '200px',
         position: 'relative',
         boxShadow: uiStyle === 'neumorphism' ? '15px 15px 30px #bebebe, -15px -15px 30px #ffffff' :
                    uiStyle === 'glassmorphism' ? '0 8px 32px 0 rgba(31, 38, 135, 0.37)' :
@@ -239,7 +384,7 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
         backdropFilter: uiStyle === 'glassmorphism' ? 'blur(10px)' : 'none'
       }}>
         {/* 數量徽章 */}
-        {quantity > 0 && (
+        {totalQuantity > 0 && (
           <div style={{
             position: 'absolute',
             top: '-8px',
@@ -255,14 +400,14 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
             fontSize: '12px',
             fontWeight: 'bold'
           }}>
-            {quantity}
+            {totalQuantity}
           </div>
         )}
         
         {/* 產品信息 */}
-        <div style={{ flex: 1, marginBottom: '16px' }}>
+        <div style={{ flex: 1, marginBottom: isMobile ? '12px' : '16px' }}>
           <h3 style={{
-            fontSize: '18px',
+            fontSize: isMobile ? '16px' : '18px',
             fontWeight: 'bold',
             margin: '0 0 8px 0',
             color: themeColors.text,
@@ -276,7 +421,7 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
           </h3>
           
           <p style={{
-            fontSize: '14px',
+            fontSize: isMobile ? '12px' : '14px',
             color: uiStyle === 'glassmorphism' ? 'rgba(255, 255, 255, 0.8)' : 
                    uiStyle === 'brutalism' || uiStyle === 'cyberpunk' || uiStyle === 'dos' || uiStyle === 'bios' || uiStyle === 'code' ? themeColors.text : '#666',
             margin: '0 0 12px 0',
@@ -286,123 +431,63 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
           </p>
           
           <div style={{
-            fontSize: '20px',
+            fontSize: isMobile ? '16px' : '20px',
             fontWeight: 'bold',
             color: themeColors.primary,
-            margin: '0 0 16px 0',
+            margin: isMobile ? '0 0 12px 0' : '0 0 16px 0',
             textShadow: uiStyle === 'brutalism' ? '2px 2px 0px #00ffff' : 'none'
           }}>
             NT$ {product.price}
           </div>
         </div>
         
-        {/* 控制按鈕 */}
+        {/* 簡化控制按鈕 - 僅點擊加入購物車 */}
         <div style={{ marginTop: 'auto' }}>
-          {quantity > 0 ? (
+          <button
+            onClick={() => handleAddToCart(product)}
+            disabled={!product.is_available}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: 'none',
+              borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' :
+                           uiStyle === 'kawaii' ? '25px' :
+                           uiStyle === 'neumorphism' ? '15px' : '8px',
+              backgroundColor: !product.is_available ? '#ccc' : themeColors.primary,
+              color: !product.is_available ? '#666' : 
+                     (uiStyle === 'brutalism' ? '#000000' :
+                      uiStyle === 'kawaii' ? '#8B008B' :
+                      uiStyle === 'modern' || uiStyle === 'glassmorphism' ? 'white' : themeColors.cardBg),
+              cursor: !product.is_available ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              textTransform: uiStyle === 'brutalism' || uiStyle === 'dos' ? 'uppercase' : 'none',
+              transition: 'all 0.2s ease',
+              boxShadow: !product.is_available ? 'none' :
+                        (uiStyle === 'brutalism' ? '4px 4px 0px #000000' :
+                         uiStyle === 'neumorphism' ? '8px 8px 16px #bebebe, -8px -8px 16px #ffffff' :
+                         uiStyle === 'kawaii' ? '0 4px 8px rgba(255, 105, 180, 0.3)' : 
+                         '0 2px 8px rgba(0, 0, 0, 0.2)'),
+              backdropFilter: uiStyle === 'glassmorphism' ? 'blur(4px)' : 'none'
+            }}
+          >
+            {!product.is_available ? '缺貨' : '加入購物車'}
+          </button>
+          
+          {/* 顯示購物車中的數量 */}
+          {totalQuantity > 0 && (
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              marginBottom: '8px'
+              marginTop: '8px',
+              textAlign: 'center',
+              fontSize: '12px',
+              color: themeColors.primary,
+              fontWeight: 'bold',
+              padding: '4px 8px',
+              backgroundColor: 'rgba(0, 123, 255, 0.1)',
+              borderRadius: '12px'
             }}>
-              <button
-                onClick={() => handleUpdateQuantity(product.id, quantity - 1)}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  border: `1px solid ${themeColors.border}`,
-                  borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' :
-                               uiStyle === 'kawaii' ? '50%' : '4px',
-                  backgroundColor: themeColors.cardBg,
-                  color: themeColors.text,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'normal',
-                  textTransform: uiStyle === 'brutalism' || uiStyle === 'dos' ? 'uppercase' : 'none',
-                  boxShadow: uiStyle === 'brutalism' ? '4px 4px 0px #00ffff' :
-                            uiStyle === 'neumorphism' ? 'inset 3px 3px 6px #bebebe, inset -3px -3px 6px #ffffff' :
-                            uiStyle === 'kawaii' ? '0 4px 8px rgba(255, 105, 180, 0.3)' : 'none'
-                }}
-              >
-                -
-              </button>
-              
-              <span style={{
-                minWidth: '32px',
-                textAlign: 'center',
-                fontWeight: 'bold'
-              }}>
-                {quantity}
-              </span>
-              
-              <button
-                onClick={() => handleUpdateQuantity(product.id, quantity + 1)}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  border: `1px solid ${themeColors.border}`,
-                  borderRadius: '4px',
-                  backgroundColor: themeColors.cardBg,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                +
-              </button>
-              
-              <button
-                onClick={() => removeFromCart(product.id)}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: themeColors.secondary,
-                  color: themeColors.cardBg,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                ×
-              </button>
+              購物車中: {totalQuantity} 件
             </div>
-          ) : (
-            <button 
-              onClick={() => handleAddToCart(product)}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                backgroundColor: themeColors.primary,
-                color: uiStyle === 'brutalism' ? '#000000' :
-                       uiStyle === 'kawaii' ? '#8B008B' :
-                       uiStyle === 'modern' || uiStyle === 'glassmorphism' ? 'white' : themeColors.text,
-                border: uiStyle === 'brutalism' ? `3px solid ${themeColors.cardBg}` :
-                        uiStyle === 'kawaii' ? `2px solid ${themeColors.primary}` : 'none',
-                borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' :
-                             uiStyle === 'kawaii' ? '25px' :
-                             uiStyle === 'neumorphism' ? '15px' : 
-                             uiStyle === 'skeuomorphism' ? '8px' : '4px',
-                fontSize: '14px',
-                fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'bold',
-                cursor: 'pointer',
-                textTransform: uiStyle === 'brutalism' || uiStyle === 'dos' ? 'uppercase' : 'none',
-                boxShadow: uiStyle === 'brutalism' ? '4px 4px 0px #000000' :
-                          uiStyle === 'cyberpunk' ? '0 0 10px rgba(0, 255, 255, 0.3)' :
-                          uiStyle === 'kawaii' ? '0 6px 12px rgba(255, 105, 180, 0.4)' :
-                          uiStyle === 'neumorphism' ? '9px 9px 18px #bebebe, -9px -9px 18px #ffffff' : 
-                          uiStyle === 'skeuomorphism' ? '0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4)' : 'none',
-                transform: uiStyle === 'brutalism' ? 'rotate(-2deg)' :
-                          uiStyle === 'kawaii' ? 'rotate(1deg)' : 'none'
-              }}
-            >
-              加入購物車
-            </button>
           )}
         </div>
       </div>
@@ -411,7 +496,7 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
 
   // 渲染購物車項目
   const renderCartItem = (item: CartItem) => (
-    <div key={item.id} style={{
+    <div key={item.instanceId} style={{
       border: uiStyle === 'brutalism' ? `3px solid ${themeColors.border}` :
               uiStyle === 'kawaii' ? `2px solid ${themeColors.primary}` : 
               uiStyle === 'neumorphism' ? 'none' :
@@ -440,20 +525,71 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
         alignItems: 'center'
       }}>
         <div style={{ flex: 1 }}>
-          <h4 style={{
-            margin: '0 0 4px 0',
-            fontSize: '14px',
-            fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'bold',
-            color: themeColors.text,
-            textTransform: uiStyle === 'brutalism' || uiStyle === 'dos' ? 'uppercase' : 'none',
-            fontFamily: uiStyle === 'brutalism' ? 'Impact, "Arial Black", sans-serif' :
-                       uiStyle === 'dos' || uiStyle === 'bios' ? 'monospace' :
-                       uiStyle === 'code' ? 'Consolas, Monaco, "Courier New", monospace' :
-                       uiStyle === 'kawaii' ? '"Comic Sans MS", "Marker Felt", cursive' : 'inherit',
-            textShadow: uiStyle === 'cyberpunk' ? '0 0 5px rgba(0, 255, 255, 0.5)' : 'none'
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            marginBottom: '4px'
           }}>
-            {item.name}
-          </h4>
+            <h4 style={{
+              margin: '0',
+              fontSize: '14px',
+              fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'bold',
+              color: themeColors.text,
+              textTransform: uiStyle === 'brutalism' || uiStyle === 'dos' ? 'uppercase' : 'none',
+              fontFamily: uiStyle === 'brutalism' ? 'Impact, "Arial Black", sans-serif' :
+                         uiStyle === 'dos' || uiStyle === 'bios' ? 'monospace' :
+                         uiStyle === 'code' ? 'Consolas, Monaco, "Courier New", monospace' :
+                         uiStyle === 'kawaii' ? '"Comic Sans MS", "Marker Felt", cursive' : 'inherit',
+              textShadow: uiStyle === 'cyberpunk' ? '0 0 5px rgba(0, 255, 255, 0.5)' : 'none'
+            }}>
+              {item.name}
+            </h4>
+            
+            {/* 快速備註按鈕 */}
+            <button
+              onClick={() => {
+                const product = products.find(p => p.id === item.id);
+                if (product) {
+                  openNoteModal(product, item.instanceId);
+                }
+              }}
+              style={{
+                width: '20px',
+                height: '20px',
+                border: `1px solid ${themeColors.primary}`,
+                borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' :
+                             uiStyle === 'kawaii' ? '50%' : '3px',
+                backgroundColor: item.note ? themeColors.primary : 'transparent',
+                color: item.note ? (uiStyle === 'brutalism' ? '#000000' : 'white') : themeColors.primary,
+                cursor: 'pointer',
+                fontSize: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                boxShadow: uiStyle === 'brutalism' ? '1px 1px 0px #000000' :
+                          uiStyle === 'neumorphism' ? '2px 2px 4px #bebebe, -2px -2px 4px #ffffff' : 'none'
+              }}
+              title={item.note ? `已有備註: ${item.note}` : '新增備註'}
+            >
+              📝
+            </button>
+          </div>
+          {item.note && (
+            <p style={{
+              margin: '0 0 4px 0',
+              fontSize: '11px',
+              color: themeColors.primary,
+              fontStyle: 'italic',
+              backgroundColor: 'rgba(0, 0, 0, 0.05)',
+              padding: '2px 6px',
+              borderRadius: '3px',
+              display: 'inline-block'
+            }}>
+              📝 {item.note}
+            </p>
+          )}
           <p style={{
             margin: '0',
             fontSize: '12px',
@@ -474,39 +610,43 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '4px'
+          gap: '8px',
+          justifyContent: 'center'
         }}>
           <button
-            onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+            onClick={() => handleUpdateQuantity(item.instanceId, item.quantity - 1)}
             style={{
-              width: '24px',
-              height: '24px',
+              width: '28px',
+              height: '28px',
               border: uiStyle === 'brutalism' ? `2px solid ${themeColors.border}` :
                      uiStyle === 'kawaii' ? `1px solid ${themeColors.primary}` : 
                      `1px solid ${themeColors.secondary}`,
               borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' :
                            uiStyle === 'kawaii' ? '50%' :
-                           uiStyle === 'neumorphism' ? '6px' : '2px',
+                           uiStyle === 'neumorphism' ? '6px' : '4px',
               backgroundColor: uiStyle === 'glassmorphism' ? 'rgba(255, 255, 255, 0.1)' :
                               uiStyle === 'neumorphism' ? 'linear-gradient(145deg, #f0f0f3, #cacdd1)' :
                               themeColors.cardBg,
               color: themeColors.text,
               cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'normal',
+              fontSize: '14px',
+              fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               boxShadow: uiStyle === 'brutalism' ? '1px 1px 0px #000000' :
                         uiStyle === 'neumorphism' ? '3px 3px 6px #bebebe, -3px -3px 6px #ffffff' : 'none',
               backdropFilter: uiStyle === 'glassmorphism' ? 'blur(4px)' : 'none'
             }}
           >
-            -
+            −
           </button>
           <span style={{ 
-            fontSize: '12px', 
-            minWidth: '20px', 
+            fontSize: '14px', 
+            minWidth: '24px', 
             textAlign: 'center',
             color: themeColors.text,
-            fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'normal',
+            fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'bold',
             fontFamily: uiStyle === 'brutalism' ? 'Impact, "Arial Black", sans-serif' :
                        uiStyle === 'dos' || uiStyle === 'bios' ? 'monospace' :
                        uiStyle === 'code' ? 'Consolas, Monaco, "Courier New", monospace' :
@@ -515,23 +655,26 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
             {item.quantity}
           </span>
           <button
-            onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+            onClick={() => handleUpdateQuantity(item.instanceId, item.quantity + 1)}
             style={{
-              width: '24px',
-              height: '24px',
+              width: '28px',
+              height: '28px',
               border: uiStyle === 'brutalism' ? `2px solid ${themeColors.border}` :
                      uiStyle === 'kawaii' ? `1px solid ${themeColors.primary}` : 
                      `1px solid ${themeColors.secondary}`,
               borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' :
                            uiStyle === 'kawaii' ? '50%' :
-                           uiStyle === 'neumorphism' ? '6px' : '2px',
+                           uiStyle === 'neumorphism' ? '6px' : '4px',
               backgroundColor: uiStyle === 'glassmorphism' ? 'rgba(255, 255, 255, 0.1)' :
                               uiStyle === 'neumorphism' ? 'linear-gradient(145deg, #f0f0f3, #cacdd1)' :
                               themeColors.cardBg,
               color: themeColors.text,
               cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'normal',
+              fontSize: '14px',
+              fontWeight: uiStyle === 'brutalism' || uiStyle === 'dos' ? '900' : 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               boxShadow: uiStyle === 'brutalism' ? '1px 1px 0px #000000' :
                         uiStyle === 'neumorphism' ? '3px 3px 6px #bebebe, -3px -3px 6px #ffffff' : 'none',
               backdropFilter: uiStyle === 'glassmorphism' ? 'blur(4px)' : 'none'
@@ -559,34 +702,72 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      minHeight: '100vh',
-      fontFamily: uiStyle === 'code' ? '"Fira Code", "JetBrains Mono", monospace' : 
-                  uiStyle === 'brutalism' ? 'Impact, "Arial Black", sans-serif' :
-                  uiStyle === 'dos' || uiStyle === 'bios' ? '"Courier New", monospace' : 
-                  'Arial, sans-serif',
-      background: themeColors.mainBg,
-      color: themeColors.text
-    }}>
-      {/* 主要內容區域 */}
-      <div style={{
-        flex: 1,
-        padding: '20px',
-        overflow: 'auto'
+    <div 
+      className={`pos-system-container ui-${uiStyle}`}
+      style={{
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        height: '100vh', // 使用固定視窗高度
+        fontFamily: uiStyle === 'code' ? '"Fira Code", "JetBrains Mono", monospace' : 
+                    uiStyle === 'brutalism' ? 'Impact, "Arial Black", sans-serif' :
+                    uiStyle === 'dos' || uiStyle === 'bios' ? '"Courier New", monospace' : 
+                    'Arial, sans-serif',
+        background: themeColors.mainBg,
+        color: themeColors.text
       }}>
-        {/* 標題 */}
-        <h1 style={{
-          fontSize: '24px',
-          fontWeight: 'bold',
-          marginBottom: '20px',
-          color: themeColors.text
-        }}>
-          點餐系統 (無樣式版本)
-        </h1>
+      {/* 主要內容區域 */}
+      <div 
+        ref={mainScrollRef}
+        className="pos-main-scroll-area scroll-progress-container"
+        style={{
+          flex: 1,
+          padding: isMobile ? '10px' : isTablet ? '15px' : '20px',
+          overflow: 'auto', // 獨立滾動
+          height: '100vh', // 設定固定高度讓滾動生效
+          position: 'relative',
+          // 自定義滾動條樣式
+          scrollbarWidth: 'thin',
+          scrollbarColor: `${themeColors.primary} ${themeColors.border}`,
+        }}
+        onScroll={handleMainScroll}
+      >
+        {/* 滾動進度條 */}
+        <div 
+          className="scroll-progress-bar"
+          style={{ width: `${mainScrollProgress}%` }}
+        />
+        
+        {/* 滾動陰影效果 */}
+        <div 
+          className="scroll-shadow-top"
+          style={{ opacity: mainScrollProgress > 5 ? 1 : 0 }}
+        />
+        <div 
+          className="scroll-shadow-bottom"
+          style={{ opacity: mainScrollProgress < 95 ? 1 : 0 }}
+        />
 
+        {/* 滾動按鈕 */}
+        {showScrollButtons && (
+          <>
+            <button
+              className="scroll-to-top visible"
+              onClick={() => scrollToTop(mainScrollRef.current)}
+              title="回到頂部"
+            >
+              ↑
+            </button>
+            <button
+              className="scroll-to-bottom visible"
+              onClick={() => scrollToBottom(mainScrollRef.current)}
+              title="滾動到底部"
+            >
+              ↓
+            </button>
+          </>
+        )}
         {/* 搜尋區域 */}
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{ marginBottom: isMobile ? '15px' : '20px' }}>
           <input
             type="text"
             placeholder="搜尋商品..."
@@ -594,8 +775,8 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               width: '100%',
-              maxWidth: '400px',
-              padding: '12px',
+              maxWidth: isMobile ? '100%' : '400px',
+              padding: isMobile ? '14px' : '12px',
               border: uiStyle === 'brutalism' ? `3px solid ${themeColors.text}` :
                       uiStyle === 'kawaii' ? `2px solid ${themeColors.primary}` : 
                       `1px solid ${themeColors.secondary}`,
@@ -627,12 +808,13 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
           <div style={{
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '8px'
+            gap: isMobile ? '6px' : '8px',
+            marginBottom: isMobile ? '4px' : '0'
           }}>
             <button
               onClick={() => setSelectedCategory(null)}
               style={{
-                padding: '8px 16px',
+                padding: isMobile ? '10px 14px' : '8px 16px',
                 border: uiStyle === 'brutalism' ? `3px solid ${themeColors.text}` :
                         uiStyle === 'kawaii' ? `2px solid ${themeColors.primary}` : 
                         `1px solid ${themeColors.secondary}`,
@@ -696,8 +878,10 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
         {/* 產品網格 */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '16px'
+          gridTemplateColumns: isMobile ? 'repeat(auto-fill, minmax(150px, 1fr))' : 
+                              isTablet ? 'repeat(auto-fill, minmax(220px, 1fr))' :
+                              'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: isMobile ? '12px' : '16px'
         }}>
           {filteredProducts.length === 0 ? (
             <div style={{
@@ -719,15 +903,23 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
 
       {/* 購物車側邊欄 */}
       <div style={{
-        width: '350px',
+        width: isMobile ? '100%' : isTablet ? '300px' : '350px',
         backgroundColor: uiStyle === 'glassmorphism' ? 'rgba(255, 255, 255, 0.1)' :
                         uiStyle === 'neumorphism' ? 'linear-gradient(145deg, #f0f0f3, #cacdd1)' :
                         themeColors.cardBg,
-        padding: '20px',
-        borderLeft: uiStyle === 'brutalism' ? `5px solid ${themeColors.text}` :
+        padding: isMobile ? '15px' : '20px',
+        borderLeft: isMobile ? 'none' : 
+                   (uiStyle === 'brutalism' ? `5px solid ${themeColors.text}` :
                    uiStyle === 'kawaii' ? `3px solid ${themeColors.primary}` : 
-                   `1px solid ${themeColors.border}`,
-        overflow: 'auto',
+                   `1px solid ${themeColors.border}`),
+        borderTop: isMobile ? 
+                  (uiStyle === 'brutalism' ? `5px solid ${themeColors.text}` :
+                   uiStyle === 'kawaii' ? `3px solid ${themeColors.primary}` : 
+                   `1px solid ${themeColors.border}`) : 'none',
+        overflow: 'hidden', // 父容器不滾動
+        height: '100vh', // 設定固定高度
+        display: 'flex', // 使用flexbox佈局
+        flexDirection: 'column', // 垂直排列
         boxShadow: uiStyle === 'brutalism' ? '8px 0px 0px #000000' :
                   uiStyle === 'cyberpunk' ? '-4px 0 15px rgba(0, 255, 255, 0.2)' :
                   uiStyle === 'kawaii' ? '-4px 0 15px rgba(255, 105, 180, 0.3)' :
@@ -826,7 +1018,50 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
         </div>
 
         {/* 購物車項目 */}
-        <div style={{ marginBottom: '20px' }}>
+        <div 
+          ref={cartScrollRef}
+          className="pos-cart-scroll-area scroll-progress-container"
+          style={{ 
+            marginBottom: '20px',
+            flex: 1, // 讓項目區域佔用可用空間
+            overflow: 'auto', // 獨立滾動
+            maxHeight: '40vh', // 限制最大高度
+            position: 'relative',
+            // 自定義滾動條樣式
+            scrollbarWidth: 'thin',
+            scrollbarColor: `${themeColors.secondary} ${themeColors.border}`,
+            // 滾動區域邊框
+            border: `1px solid ${themeColors.border}`,
+            borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' :
+                         uiStyle === 'kawaii' ? '15px' :
+                         uiStyle === 'neumorphism' ? '15px' : '8px',
+            // 滾動區域背景
+            backgroundColor: uiStyle === 'glassmorphism' ? 'rgba(255, 255, 255, 0.05)' :
+                            uiStyle === 'neumorphism' ? 'linear-gradient(145deg, #f0f0f3, #e6e6e9)' :
+                            'transparent',
+            // 滾動動畫
+            transition: 'all 0.3s ease'
+          }}
+          onScroll={handleCartScroll}
+        >
+          {/* 購物車滾動進度條 */}
+          <div 
+            className="scroll-progress-bar"
+            style={{ 
+              width: `${cartScrollProgress}%`,
+              background: themeColors.secondary
+            }}
+          />
+          
+          {/* 滾動陰影效果 */}
+          <div 
+            className="scroll-shadow-top"
+            style={{ opacity: cartScrollProgress > 5 ? 1 : 0 }}
+          />
+          <div 
+            className="scroll-shadow-bottom"
+            style={{ opacity: cartScrollProgress < 95 ? 1 : 0 }}
+          />
           {cartItems.length === 0 ? (
             <p style={{
               textAlign: 'center',
@@ -934,6 +1169,173 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
           </div>
         )}
       </div>
+      
+      {/* 備註對話框 */}
+      {showNoteModal && noteModalProduct && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: themeColors.cardBg,
+            padding: isMobile ? '16px' : '24px',
+            borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' : '12px',
+            border: uiStyle === 'brutalism' ? `3px solid ${themeColors.text}` : 'none',
+            boxShadow: uiStyle === 'brutalism' ? '8px 8px 0px #000000' :
+                      '0 4px 20px rgba(0, 0, 0, 0.15)',
+            maxWidth: isMobile ? '95%' : '400px',
+            width: isMobile ? '95%' : '90%',
+            maxHeight: isMobile ? '90vh' : '80vh',
+            overflow: 'auto'
+          }}>
+            <h3 style={{
+              margin: '0 0 16px 0',
+              color: themeColors.text,
+              fontSize: isMobile ? '16px' : '18px',
+              fontWeight: 'bold'
+            }}>
+              {noteModalProduct.name} - {editingInstanceId ? '編輯備註' : '快速備註'}
+            </h3>
+            
+            {/* 快速選項 */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? 'repeat(auto-fit, minmax(65px, 1fr))' : 'repeat(auto-fit, minmax(80px, 1fr))',
+              gap: isMobile ? '6px' : '8px',
+              marginBottom: '16px'
+            }}>
+              {getQuickNotes(noteModalProduct).map((note, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleAddToCartWithNote(noteModalProduct, note)}
+                  style={{
+                    padding: isMobile ? '6px 8px' : '8px 12px',
+                    backgroundColor: themeColors.secondary,
+                    color: themeColors.text,
+                    border: `1px solid ${themeColors.border}`,
+                    borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' :
+                                 uiStyle === 'kawaii' ? '20px' : '6px',
+                    fontSize: isMobile ? '10px' : '12px',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = themeColors.primary
+                    e.currentTarget.style.color = 'white'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = themeColors.secondary
+                    e.currentTarget.style.color = themeColors.text
+                  }}
+                >
+                  {note}
+                </button>
+              ))}
+            </div>
+            
+            {/* 自訂備註 */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                color: themeColors.text,
+                fontSize: '14px',
+                fontWeight: 'bold'
+              }}>
+                自訂備註:
+              </label>
+              <textarea
+                value={customNote}
+                onChange={(e) => setCustomNote(e.target.value)}
+                placeholder="輸入特殊要求..."
+                style={{
+                  width: '100%',
+                  height: '60px',
+                  padding: '8px',
+                  border: `1px solid ${themeColors.border}`,
+                  borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' : '4px',
+                  backgroundColor: themeColors.mainBg,
+                  color: themeColors.text,
+                  fontSize: '14px',
+                  resize: 'vertical'
+                }}
+              />
+            </div>
+            
+            {/* 操作按鈕 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? '8px' : '8px',
+              justifyContent: 'flex-end'
+            }}>
+              <button
+                onClick={() => {
+                  setShowNoteModal(false)
+                  setNoteModalProduct(null)
+                  setEditingInstanceId(null)
+                  setCustomNote('')
+                }}
+                style={{
+                  padding: isMobile ? '12px 16px' : '8px 16px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' : '4px',
+                  fontSize: isMobile ? '13px' : '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                取消
+              </button>
+              
+              <button
+                onClick={() => handleAddToCartWithNote(noteModalProduct)}
+                style={{
+                  padding: isMobile ? '12px 16px' : '8px 16px',
+                  backgroundColor: themeColors.secondary,
+                  color: themeColors.text,
+                  border: `1px solid ${themeColors.border}`,
+                  borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' : '4px',
+                  fontSize: isMobile ? '13px' : '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                {editingInstanceId ? '移除備註' : '無備註加入'}
+              </button>
+              
+              {customNote && (
+                <button
+                  onClick={() => handleAddToCartWithNote(noteModalProduct, customNote)}
+                  style={{
+                    padding: isMobile ? '12px 16px' : '8px 16px',
+                    backgroundColor: themeColors.primary,
+                    color: uiStyle === 'brutalism' ? '#000000' :
+                           uiStyle === 'kawaii' ? '#8B008B' :
+                           uiStyle === 'modern' || uiStyle === 'glassmorphism' ? 'white' : themeColors.text,
+                    border: 'none',
+                    borderRadius: uiStyle === 'brutalism' || uiStyle === 'dos' || uiStyle === 'bios' ? '0' : '4px',
+                    fontSize: isMobile ? '13px' : '14px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {editingInstanceId ? '更新備註' : '加入購物車'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

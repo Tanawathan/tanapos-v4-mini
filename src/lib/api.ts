@@ -135,11 +135,15 @@ export const categoriesService = {
 export const ordersService = {
   async create(orderData: any): Promise<Order | null> {
     try {
+      // 生成訂單號碼（如果沒有提供）
+      const orderNumber = orderData.order_number || `ORD-${Date.now()}`
+      
       const { data, error } = await supabase
         .from('orders')
         .insert({
-          order_number: orderData.order_number,
+          order_number: orderNumber,
           table_id: orderData.table_id,
+          table_number: orderData.table_number,
           status: orderData.status,
           subtotal: orderData.subtotal || 0,
           total_amount: orderData.total_amount,
@@ -152,6 +156,31 @@ export const ordersService = {
       if (error) {
         console.error('Error creating order:', error)
         throw new Error('Failed to create order')
+      }
+
+      // 如果有訂單項目，創建它們
+      if (orderData.order_items && orderData.order_items.length > 0) {
+        const orderItems = orderData.order_items.map((item: any) => ({
+          order_id: data.id,
+          product_id: item.product_id,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          total_price: item.total_price,
+          special_instructions: item.special_instructions,
+          status: item.status || 'pending'
+        }))
+
+        const { error: itemsError } = await supabase
+          .from('order_items')
+          .insert(orderItems)
+
+        if (itemsError) {
+          console.error('Error creating order items:', itemsError)
+          // 如果創建訂單項目失敗，刪除已創建的訂單
+          await supabase.from('orders').delete().eq('id', data.id)
+          throw new Error('Failed to create order items')
+        }
       }
 
       return data as Order
@@ -169,6 +198,7 @@ export const ordersService = {
           id,
           order_number,
           table_id,
+          table_number,
           status,
           subtotal,
           total_amount,
@@ -180,10 +210,12 @@ export const ordersService = {
           order_items (
             id,
             product_id,
+            product_name,
             quantity,
             unit_price,
-            subtotal,
-            notes
+            total_price,
+            special_instructions,
+            status
           )
         `)
         .order('created_at', { ascending: false })
@@ -320,17 +352,16 @@ export const tablesService = {
       }
 
       // Transform the data to match our interface
-      // @ts-ignore - Table structure mapping
       return (data || []).map(table => ({
-        id: table.table_number,
+        id: table.id.toString(),
+        table_number: table.table_number,
         name: `桌號 ${table.table_number}`,
         capacity: table.capacity,
-        occupied: table.status === 'occupied',
-        created_at: table.created_at,
-        updated_at: table.updated_at,
-        table_number: table.table_number,
         status: table.status || 'available',
-        is_active: true
+        occupied: table.status === 'occupied',
+        is_active: table.is_active,
+        created_at: table.created_at,
+        updated_at: table.updated_at
       }))
     } catch (error) {
       console.error('Service error fetching tables:', error)

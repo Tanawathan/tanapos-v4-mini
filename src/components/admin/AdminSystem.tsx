@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { APP_CONFIG, RESTAURANT_INFO } from '../../config'
 
@@ -105,7 +106,9 @@ function DangerConfirmModal({
 
 // 系統設定管理組件
 export default function AdminSystem() {
-  const [activeTab, setActiveTab] = useState<'general' | 'database' | 'features' | 'layout' | 'reports' | 'dataexport' | 'backup' | 'dbeditor'>('general')
+  const [searchParams] = useSearchParams()
+  const defaultTab = searchParams.get('tab') || 'general'
+  const [activeTab, setActiveTab] = useState<'general' | 'database' | 'features' | 'layout' | 'reports' | 'dataexport' | 'backup' | 'dbeditor' | 'userguide' | 'operationguide'>(defaultTab as any)
   const [systemConfig, setSystemConfig] = useState(APP_CONFIG)
   const [restaurantInfo, setRestaurantInfo] = useState(RESTAURANT_INFO)
   const [loading, setLoading] = useState(false)
@@ -381,8 +384,10 @@ export default function AdminSystem() {
                   { id: 'layout', label: '佈局管理', icon: '🏗️' },
                   { id: 'reports', label: '報表設定', icon: '📊' },
                   { id: 'dataexport', label: '資料匯出入', icon: '📁' },
-                  { id: 'backup', label: '備份與還原', icon: '💾' }
-                ].map((tab) => (
+                  { id: 'backup', label: '備份與還原', icon: '💾' },
+                  { id: 'userguide', label: '使用說明', icon: '📖', condition: systemConfig.FEATURES?.USER_GUIDE },
+                  { id: 'operationguide', label: '操作指南', icon: '🎯', condition: systemConfig.FEATURES?.OPERATION_GUIDE }
+                ].filter(tab => tab.condition !== false).map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
@@ -467,6 +472,14 @@ export default function AdminSystem() {
                   loading={loading}
                   onDangerousOperation={handleDangerousOperation}
                 />
+              )}
+
+              {activeTab === 'userguide' && (
+                <UserGuide />
+              )}
+
+              {activeTab === 'operationguide' && (
+                <OperationGuide />
               )}
             </div>
           </div>
@@ -1946,7 +1959,498 @@ function getFeatureDescription(feature: string): string {
     INVENTORY: '庫存管理系統',
     TABLE_MANAGEMENT: '桌位管理功能',
     SETTINGS: '系統設定功能',
-    STAFF_MANAGEMENT: '員工管理系統'
+    STAFF_MANAGEMENT: '員工管理系統',
+    TUTORIAL_MODE: '教學模式開關，控制是否顯示教學標籤',
+    USER_GUIDE: '使用說明頁面，提供系統基本使用指南',
+    OPERATION_GUIDE: '操作指南頁面，提供詳細操作步驟說明'
   }
   return descriptions[feature] || '系統功能'
+}
+
+// 使用說明組件
+function UserGuide() {
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">📖 使用說明</h3>
+        <p className="text-gray-600 dark:text-gray-400">
+          歡迎使用 TanaPOS V4-Mini 餐廳管理系統！以下是系統的基本使用說明。
+        </p>
+      </div>
+
+      <div className="space-y-6">
+        {/* 系統概述 */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6">
+          <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-3">🏠 系統概述</h4>
+          <p className="text-blue-800 dark:text-blue-200 mb-4">
+            TanaPOS V4-Mini 是一套專為中小型餐廳設計的現代化管理系統，提供點餐、庫存、報表等完整功能。
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+              <h5 className="font-semibold text-gray-900 dark:text-white mb-2">✨ 主要特色</h5>
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li>• 直觀的觸控式介面</li>
+                <li>• 即時庫存管理</li>
+                <li>• 多樣化報表分析</li>
+                <li>• 響應式設計支援</li>
+              </ul>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+              <h5 className="font-semibold text-gray-900 dark:text-white mb-2">🎯 適用場景</h5>
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li>• 小型咖啡廳</li>
+                <li>• 中型餐廳</li>
+                <li>• 快餐店</li>
+                <li>• 飲料店</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* 快速入門 */}
+        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-6">
+          <h4 className="text-lg font-semibold text-green-900 dark:text-green-300 mb-3">🚀 快速入門</h4>
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+              <div>
+                <h5 className="font-semibold text-green-900 dark:text-green-300">登入系統</h5>
+                <p className="text-green-800 dark:text-green-200 text-sm">使用您的帳號密碼登入系統，首次使用請聯繫管理員。</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+              <div>
+                <h5 className="font-semibold text-green-900 dark:text-green-300">基本設定</h5>
+                <p className="text-green-800 dark:text-green-200 text-sm">在「基本設定」中設定餐廳資訊、菜單內容等基礎資料。</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+              <div>
+                <h5 className="font-semibold text-green-900 dark:text-green-300">開始營業</h5>
+                <p className="text-green-800 dark:text-green-200 text-sm">回到主頁面開始使用點餐、桌位管理等核心功能。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 主要功能 */}
+        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6">
+          <h4 className="text-lg font-semibold text-purple-900 dark:text-purple-300 mb-3">🎛️ 主要功能</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+              <div className="text-2xl mb-2">🍽️</div>
+              <h5 className="font-semibold text-gray-900 dark:text-white mb-2">點餐系統</h5>
+              <p className="text-sm text-gray-600 dark:text-gray-400">快速點餐、修改訂單、計算總價</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+              <div className="text-2xl mb-2">🪑</div>
+              <h5 className="font-semibold text-gray-900 dark:text-white mb-2">桌位管理</h5>
+              <p className="text-sm text-gray-600 dark:text-gray-400">管理桌位狀態、預約、清潔</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+              <div className="text-2xl mb-2">📦</div>
+              <h5 className="font-semibold text-gray-900 dark:text-white mb-2">庫存管理</h5>
+              <p className="text-sm text-gray-600 dark:text-gray-400">追蹤庫存、進貨、耗材管理</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+              <div className="text-2xl mb-2">📊</div>
+              <h5 className="font-semibold text-gray-900 dark:text-white mb-2">報表分析</h5>
+              <p className="text-sm text-gray-600 dark:text-gray-400">營收統計、熱銷商品分析</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+              <div className="text-2xl mb-2">🔧</div>
+              <h5 className="font-semibold text-gray-900 dark:text-white mb-2">系統設定</h5>
+              <p className="text-sm text-gray-600 dark:text-gray-400">功能開關、佈局管理、備份還原</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+              <div className="text-2xl mb-2">👥</div>
+              <h5 className="font-semibold text-gray-900 dark:text-white mb-2">員工管理</h5>
+              <p className="text-sm text-gray-600 dark:text-gray-400">帳號管理、權限設定、排班</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 常見問題 */}
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-6">
+          <h4 className="text-lg font-semibold text-yellow-900 dark:text-yellow-300 mb-3">❓ 常見問題</h4>
+          <div className="space-y-4">
+            <div>
+              <h5 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-1">Q: 如何新增菜單項目？</h5>
+              <p className="text-yellow-800 dark:text-yellow-200 text-sm">A: 進入「基本設定」→「餐廳資訊」→「菜單管理」，點擊「新增商品」按鈕。</p>
+            </div>
+            <div>
+              <h5 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-1">Q: 如何查看今日營收？</h5>
+              <p className="text-yellow-800 dark:text-yellow-200 text-sm">A: 在主頁面的統計卡片中可以看到今日營收，或進入「報表分析」查看詳細數據。</p>
+            </div>
+            <div>
+              <h5 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-1">Q: 系統支援多少個桌位？</h5>
+              <p className="text-yellow-800 dark:text-yellow-200 text-sm">A: 系統可支援無限數量的桌位，可在「桌位管理」中新增和管理。</p>
+            </div>
+            <div>
+              <h5 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-1">Q: 如何備份資料？</h5>
+              <p className="text-yellow-800 dark:text-yellow-200 text-sm">A: 進入「備份與還原」功能，點擊「立即備份」可下載系統資料備份檔案。</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 聯絡支援 */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📞 技術支援</h4>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            如果您在使用過程中遇到任何問題，請隨時聯繫我們的技術支援團隊。
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="text-xl">📧</div>
+              <div>
+                <div className="font-semibold text-gray-900 dark:text-white">電子郵件</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">support@tanapos.com</div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="text-xl">📱</div>
+              <div>
+                <div className="font-semibold text-gray-900 dark:text-white">客服專線</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">02-1234-5678</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// 操作指南組件
+function OperationGuide() {
+  const [activeSection, setActiveSection] = useState<'pos' | 'table' | 'inventory' | 'reports' | 'admin'>('pos')
+
+  const sections = [
+    { id: 'pos', label: '點餐操作', icon: '🍽️' },
+    { id: 'table', label: '桌位管理', icon: '🪑' },
+    { id: 'inventory', label: '庫存操作', icon: '📦' },
+    { id: 'reports', label: '報表使用', icon: '📊' },
+    { id: 'admin', label: '系統管理', icon: '⚙️' }
+  ]
+
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">🎯 操作指南</h3>
+        <p className="text-gray-600 dark:text-gray-400">
+          詳細的系統操作步驟說明，幫助您快速上手各項功能。
+        </p>
+      </div>
+
+      {/* 分類標籤 */}
+      <div className="mb-6">
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <nav className="-mb-px flex space-x-8 overflow-x-auto">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id as any)}
+                className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeSection === section.id
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400'
+                }`}
+              >
+                <span className="mr-2">{section.icon}</span>
+                {section.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* 內容區域 */}
+      <div className="space-y-6">
+        {activeSection === 'pos' && (
+          <div className="space-y-6">
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-4">🍽️ 點餐系統操作</h4>
+              
+              <div className="space-y-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">📋 建立新訂單</h5>
+                  <ol className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">1</span>
+                      <span>點擊主頁面的「點餐系統」或直接進入 POS 介面</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">2</span>
+                      <span>選擇桌號或外帶選項</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">3</span>
+                      <span>瀏覽分類或使用搜尋功能找到商品</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">4</span>
+                      <span>點擊商品加入購物車，調整數量和備註</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">5</span>
+                      <span>確認訂單內容無誤後點擊「結帳」</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">6</span>
+                      <span>選擇付款方式並完成交易</span>
+                    </li>
+                  </ol>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">✏️ 修改訂單</h5>
+                  <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li>• 在購物車中點擊「編輯」按鈕修改商品數量</li>
+                    <li>• 點擊「刪除」按鈕移除不需要的商品</li>
+                    <li>• 在商品詳情中添加特殊要求或備註</li>
+                    <li>• 已送出的訂單需要到「訂單管理」中進行修改</li>
+                  </ul>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">💳 結帳流程</h5>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <p><strong>現金結帳：</strong>輸入收款金額，系統自動計算找零</p>
+                    <p><strong>信用卡結帳：</strong>選擇信用卡付款，等待刷卡確認</p>
+                    <p><strong>電子支付：</strong>顯示 QR Code 供客人掃描付款</p>
+                    <p><strong>混合付款：</strong>可以組合多種付款方式</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'table' && (
+          <div className="space-y-6">
+            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-green-900 dark:text-green-300 mb-4">🪑 桌位管理操作</h4>
+              
+              <div className="space-y-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">🆕 新增桌位</h5>
+                  <ol className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">1</span>
+                      <span>進入「桌位管理」頁面</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">2</span>
+                      <span>點擊「新增桌位」按鈕</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">3</span>
+                      <span>輸入桌號、容納人數等資訊</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">4</span>
+                      <span>設定桌位在平面圖上的位置</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs mr-3 mt-0.5">5</span>
+                      <span>儲存設定，桌位立即生效</span>
+                    </li>
+                  </ol>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">🔄 桌位狀態管理</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h6 className="font-medium text-gray-900 dark:text-white mb-2">狀態類型：</h6>
+                      <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                        <li>• <span className="text-green-500">●</span> 空閒 - 可使用狀態</li>
+                        <li>• <span className="text-red-500">●</span> 使用中 - 客人用餐中</li>
+                        <li>• <span className="text-yellow-500">●</span> 已預約 - 已被預約</li>
+                        <li>• <span className="text-gray-500">●</span> 清潔中 - 正在整理</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h6 className="font-medium text-gray-900 dark:text-white mb-2">快速操作：</h6>
+                      <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                        <li>• 點擊桌位快速開台</li>
+                        <li>• 長按顯示更多選項</li>
+                        <li>• 拖拽調整桌位位置</li>
+                        <li>• 右鍵選單進階功能</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">📅 預約管理</h5>
+                  <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li>• 點擊「新增預約」建立客人預約</li>
+                    <li>• 輸入客人資訊、預約時間、人數</li>
+                    <li>• 系統自動推薦合適的桌位</li>
+                    <li>• 預約時間到達時會自動提醒</li>
+                    <li>• 可以修改或取消既有預約</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'inventory' && (
+          <div className="space-y-6">
+            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-purple-900 dark:text-purple-300 mb-4">📦 庫存管理操作</h4>
+              
+              <div className="space-y-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">➕ 新增庫存項目</h5>
+                  <ol className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li>• 進入「庫存管理」頁面</li>
+                    <li>• 選擇適當的分類（原物料/半成品/成品）</li>
+                    <li>• 點擊「新增項目」按鈕</li>
+                    <li>• 填寫品名、單位、安全庫存量等資訊</li>
+                    <li>• 設定供應商資訊和採購價格</li>
+                    <li>• 上傳商品圖片（可選）</li>
+                  </ol>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">📋 進貨作業</h5>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <p><strong>手動進貨：</strong></p>
+                    <ul className="ml-4 space-y-1">
+                      <li>• 選擇庫存項目點擊「進貨」</li>
+                      <li>• 輸入進貨數量和採購價格</li>
+                      <li>• 填寫供應商和發票資訊</li>
+                      <li>• 確認進貨，系統自動更新庫存</li>
+                    </ul>
+                    <p className="mt-3"><strong>批量進貨：</strong></p>
+                    <ul className="ml-4 space-y-1">
+                      <li>• 使用 Excel 模板批量匯入</li>
+                      <li>• 掃描條碼快速進貨</li>
+                      <li>• 設定自動採購規則</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">⚠️ 庫存監控</h5>
+                  <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li>• 設定安全庫存量，低於標準時自動提醒</li>
+                    <li>• 查看庫存變動歷史記錄</li>
+                    <li>• 定期盤點確保數據準確性</li>
+                    <li>• 產生庫存報表分析使用趨勢</li>
+                    <li>• 設定過期提醒避免食材浪費</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'reports' && (
+          <div className="space-y-6">
+            <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-orange-900 dark:text-orange-300 mb-4">📊 報表使用操作</h4>
+              
+              <div className="space-y-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">📈 營收報表</h5>
+                  <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li>• 選擇報表時間範圍（今日/本週/本月/自訂）</li>
+                    <li>• 查看總營收、訂單數量、平均客單價</li>
+                    <li>• 分析不同時段的營收分佈</li>
+                    <li>• 比較不同期間的營收成長</li>
+                    <li>• 匯出 PDF 或 Excel 檔案</li>
+                  </ul>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">🏆 商品分析</h5>
+                  <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li>• 熱銷商品排行榜</li>
+                    <li>• 商品銷售趨勢分析</li>
+                    <li>• 分類銷售佔比統計</li>
+                    <li>• 利潤率分析</li>
+                    <li>• 季節性商品表現</li>
+                  </ul>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">📅 自動報表</h5>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <p>設定自動產生報表：</p>
+                    <ul className="ml-4 space-y-1">
+                      <li>• 每日營收摘要</li>
+                      <li>• 週報表（週一自動產生）</li>
+                      <li>• 月報表（月初自動產生）</li>
+                      <li>• 庫存警示報表</li>
+                      <li>• 設定郵件自動寄送</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'admin' && (
+          <div className="space-y-6">
+            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-red-900 dark:text-red-300 mb-4">⚙️ 系統管理操作</h4>
+              
+              <div className="space-y-4">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">🔧 功能開關</h5>
+                  <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li>• 控制各模組的啟用狀態</li>
+                    <li>• 教學模式開關控制導覽顯示</li>
+                    <li>• 根據餐廳需求啟用適當功能</li>
+                    <li>• 關閉不需要的功能簡化介面</li>
+                  </ul>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">💾 備份與還原</h5>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <p><strong>建立備份：</strong></p>
+                    <ul className="ml-4 space-y-1">
+                      <li>• 點擊「立即備份」下載完整數據</li>
+                      <li>• 設定自動備份時間</li>
+                      <li>• 選擇備份範圍（全部/部分資料）</li>
+                    </ul>
+                    <p className="mt-3"><strong>還原資料：</strong></p>
+                    <ul className="ml-4 space-y-1">
+                      <li>• 上傳備份檔案</li>
+                      <li>• 確認還原範圍</li>
+                      <li>• ⚠️ 還原會覆蓋現有資料，請謹慎操作</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-900 dark:text-white mb-3">📝 資料庫編輯</h5>
+                  <div className="bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded p-3 mb-3">
+                    <p className="text-yellow-800 dark:text-yellow-300 text-sm font-medium">
+                      ⚠️ 注意：直接編輯資料庫需要謹慎操作，建議先備份資料
+                    </p>
+                  </div>
+                  <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <li>• 選擇要編輯的資料表</li>
+                    <li>• 點擊「編輯」修改特定欄位</li>
+                    <li>• 使用「新增」按鈕建立新記錄</li>
+                    <li>• 危險操作需要輸入確認文字</li>
+                    <li>• 修改後重新整理前台查看效果</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }

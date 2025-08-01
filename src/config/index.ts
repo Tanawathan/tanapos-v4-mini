@@ -69,7 +69,10 @@ export const APP_CONFIG = {
     REPORTS: true,
     INVENTORY: false, // 開發中
     SETTINGS: false, // 開發中
-    STAFF_MANAGEMENT: false // 開發中
+    STAFF_MANAGEMENT: false, // 開發中
+    TUTORIAL_MODE: true, // 教學模式
+    USER_GUIDE: true, // 使用說明
+    OPERATION_GUIDE: true // 操作指南
   },
   
   // 開發設定
