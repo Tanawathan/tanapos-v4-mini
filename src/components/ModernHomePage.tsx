@@ -116,7 +116,13 @@ const ModernHomePage: React.FC = () => {
   ];
 
   return (
-    <div className="modern-container" style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+    <div className="modern-container" style={{ 
+      paddingTop: '2rem', 
+      paddingBottom: '2rem',
+      width: '100%',
+      maxWidth: '100%',
+      overflowX: 'hidden'
+    }}>
       {/* 頁面標題區 */}
       <div className="modern-page-header">
         <h1 className="modern-page-title">TanaPOS 餐廳管理系統</h1>
@@ -125,82 +131,13 @@ const ModernHomePage: React.FC = () => {
         </p>
       </div>
 
-      {/* 數據統計區 */}
-      <div className="modern-grid modern-grid-4" style={{ marginBottom: '3rem' }}>
-        {stats.map((stat, index) => (
-          <div key={index} className="modern-card">
-            <div className="modern-card-header" style={{ marginBottom: '1rem', paddingBottom: '0.5rem' }}>
-              <h3 className="modern-card-title" style={{ fontSize: '0.875rem', fontWeight: '500' }}>
-                {stat.label}
-              </h3>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-900)' }}>
-                {stat.value}
-              </span>
-              <span 
-                className={`modern-badge ${stat.positive ? 'modern-badge-success' : 'modern-badge-danger'}`}
-              >
-                {stat.change}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 功能區塊 */}
-      <div className="modern-grid modern-grid-3">
-        {features.map((feature, index) => (
-          <div 
-            key={index} 
-            className="modern-card modern-interactive"
-            onClick={() => navigate(feature.path)}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="modern-card-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div 
-                  style={{ 
-                    fontSize: '2rem',
-                    width: '3rem',
-                    height: '3rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'var(--color-gray-50)',
-                    borderRadius: 'var(--radius-xl)'
-                  }}
-                >
-                  {feature.icon}
-                </div>
-                <div>
-                  <h3 className="modern-card-title">{feature.title}</h3>
-                </div>
-              </div>
-            </div>
-            <p style={{ 
-              color: 'var(--color-gray-600)', 
-              margin: '0',
-              lineHeight: '1.5'
-            }}>
-              {feature.description}
-            </p>
-            <div style={{ marginTop: '1.5rem' }}>
-              <button className={`modern-btn modern-btn-${feature.color}`}>
-                開始使用
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 快速操作區 */}
-      <div className="modern-card" style={{ marginTop: '3rem' }}>
+      {/* 快速操作區 - 置頂 */}
+      <div className="modern-card" style={{ marginBottom: '3rem' }}>
         <div className="modern-card-header">
           <h3 className="modern-card-title">快速操作</h3>
           <p className="modern-card-subtitle">常用功能快速入口</p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        <div className="modern-grid modern-grid-4">
           <button 
             className="modern-btn modern-btn-primary"
             onClick={() => navigate('/pos')}
@@ -228,44 +165,195 @@ const ModernHomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* 系統狀態 */}
-      <div className="modern-grid modern-grid-2" style={{ marginTop: '3rem' }}>
-        <div className="modern-card">
-          <div className="modern-card-header">
-            <h3 className="modern-card-title">系統狀態</h3>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>資料庫連線</span>
-              <span className="modern-badge modern-badge-success">正常</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>支付系統</span>
-              <span className="modern-badge modern-badge-success">正常</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>印表機狀態</span>
-              <span className="modern-badge modern-badge-warning">離線</span>
-            </div>
+      {/* 主要內容區 - 使用 Flex 左右佈局 */}
+      <div className="homepage-main-content" style={{ 
+        display: 'flex', 
+        gap: '2rem', 
+        alignItems: 'flex-start',
+        flexWrap: 'wrap',
+        width: '100%'
+      }}>
+        {/* 左側 - 功能區塊 */}
+        <div className="homepage-left-section" style={{ 
+          flex: '2', 
+          minWidth: '0',
+          width: '100%'
+        }}>
+          <h2 style={{ 
+            marginBottom: '1.5rem', 
+            fontSize: '1.25rem', 
+            fontWeight: '600',
+            color: 'var(--color-gray-900)'
+          }}>
+            系統功能
+          </h2>
+          <div className="modern-grid modern-grid-3" style={{ 
+            gap: '1.5rem',
+            alignItems: 'stretch',
+            width: '100%'
+          }}>
+            {features.map((feature, index) => (
+              <div 
+                key={index} 
+                className="modern-card modern-interactive"
+                onClick={() => navigate(feature.path)}
+                style={{ 
+                  cursor: 'pointer',
+                  height: 'auto',
+                  minHeight: '200px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div>
+                  <div className="modern-card-header" style={{ marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div 
+                        style={{ 
+                          fontSize: '1.5rem',
+                          width: '2.5rem',
+                          height: '2.5rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'var(--color-gray-50)',
+                          borderRadius: 'var(--radius-xl)'
+                        }}
+                      >
+                        {feature.icon}
+                      </div>
+                      <div>
+                        <h3 className="modern-card-title" style={{ fontSize: '1rem', marginBottom: '0' }}>
+                          {feature.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                  <p style={{ 
+                    color: 'var(--color-gray-600)', 
+                    margin: '0',
+                    lineHeight: '1.5',
+                    fontSize: '0.875rem'
+                  }}>
+                    {feature.description}
+                  </p>
+                </div>
+                <div style={{ marginTop: '1.5rem' }}>
+                  <button className={`modern-btn modern-btn-${feature.color}`} style={{ width: '100%' }}>
+                    開始使用
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="modern-card">
-          <div className="modern-card-header">
-            <h3 className="modern-card-title">最新活動</h3>
+        {/* 右側 - 統計數據和系統狀態 */}
+        <div className="homepage-right-section" style={{ 
+          flex: '1', 
+          minWidth: '280px',
+          width: '100%',
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '2rem'
+        }}>
+          {/* 數據統計區 */}
+          <div>
+            <h2 style={{ 
+              marginBottom: '1.5rem', 
+              fontSize: '1.25rem', 
+              fontWeight: '600',
+              color: 'var(--color-gray-900)'
+            }}>
+              營運數據
+            </h2>
+            <div className="modern-grid modern-grid-2" style={{ 
+              gap: '1rem',
+              gridTemplateColumns: 'repeat(2, 1fr)' 
+            }}>
+              {stats.map((stat, index) => (
+                <div key={index} className="modern-card" style={{ textAlign: 'center' }}>
+                  <div className="modern-card-header" style={{ marginBottom: '0.5rem', paddingBottom: '0' }}>
+                    <h3 className="modern-card-title" style={{ 
+                      fontSize: '0.75rem', 
+                      fontWeight: '500',
+                      marginBottom: '0.5rem'
+                    }}>
+                      {stat.label}
+                    </h3>
+                  </div>
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <span style={{ 
+                      fontSize: '1.25rem', 
+                      fontWeight: '700', 
+                      color: 'var(--color-gray-900)',
+                      display: 'block'
+                    }}>
+                      {stat.value}
+                    </span>
+                  </div>
+                  <span 
+                    className={`modern-badge ${stat.positive ? 'modern-badge-success' : 'modern-badge-danger'}`}
+                    style={{ fontSize: '0.75rem' }}
+                  >
+                    {stat.change}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <div style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)' }}>
-              • 桌號 A1 新增訂單 #1001
-            </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)' }}>
-              • 桌號 B3 完成結帳
-            </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)' }}>
-              • 廚房完成訂單 #998
-            </div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)' }}>
-              • 新增桌台預約 (19:30)
+
+          {/* 系統狀態 */}
+          <div>
+            <h2 style={{ 
+              marginBottom: '1.5rem', 
+              fontSize: '1.25rem', 
+              fontWeight: '600',
+              color: 'var(--color-gray-900)'
+            }}>
+              系統監控
+            </h2>
+            <div className="modern-grid modern-grid-1" style={{ gap: '1rem' }}>
+              <div className="modern-card">
+                <div className="modern-card-header" style={{ marginBottom: '1rem' }}>
+                  <h3 className="modern-card-title" style={{ fontSize: '1rem' }}>系統狀態</h3>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.875rem' }}>資料庫連線</span>
+                    <span className="modern-badge modern-badge-success" style={{ fontSize: '0.75rem' }}>正常</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.875rem' }}>支付系統</span>
+                    <span className="modern-badge modern-badge-success" style={{ fontSize: '0.75rem' }}>正常</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.875rem' }}>印表機狀態</span>
+                    <span className="modern-badge modern-badge-warning" style={{ fontSize: '0.75rem' }}>離線</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modern-card">
+                <div className="modern-card-header" style={{ marginBottom: '1rem' }}>
+                  <h3 className="modern-card-title" style={{ fontSize: '1rem' }}>最新活動</h3>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-gray-600)', padding: '0.25rem 0' }}>
+                    • 桌號 A1 新增訂單 #1001
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-gray-600)', padding: '0.25rem 0' }}>
+                    • 桌號 B3 完成結帳
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-gray-600)', padding: '0.25rem 0' }}>
+                    • 廚房完成訂單 #998
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-gray-600)', padding: '0.25rem 0' }}>
+                    • 新增桌台預約 (19:30)
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

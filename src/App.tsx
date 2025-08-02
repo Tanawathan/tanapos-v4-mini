@@ -42,7 +42,7 @@ import TablesView from './components/basic/TablesView'
 import NewTablesView from './components/basic/NewTablesView'
 import NewTablesViewRedesigned from './components/basic/NewTablesViewRedesigned'
 import ModernTablesManagement from './components/advanced/ModernTablesManagement'
-import CheckoutSystemAdvanced from './components/advanced/CheckoutSystemAdvanced'
+import CheckoutSystemNew from './components/advanced/CheckoutSystemNew'
 import PostMealCheckout from './components/advanced/PostMealCheckout'
 import InventoryManagement from './components/advanced/InventoryManagement'
 
@@ -128,7 +128,7 @@ function App() {
     <UIStyleProvider defaultStyle="modern">
       <NotificationProvider>
         <Router>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <div className="min-h-screen">
             <LayoutComponent>
               <Routes>
                 {/* 現代化主頁 */}
@@ -155,7 +155,7 @@ function App() {
                 <Route path="/tables-old" element={<NewTablesView />} />
                 <Route path="/tables-legacy" element={<TablesView />} />
                 <Route path="/tables-modern" element={<ModernTablesManagement />} />
-                <Route path="/checkout" element={<CheckoutSystemAdvanced />} />
+                <Route path="/checkout" element={<CheckoutSystemNew />} />
                 <Route path="/checkout-post-meal" element={<PostMealCheckout />} />
                 <Route path="/inventory" element={<InventoryManagement />} />
                 

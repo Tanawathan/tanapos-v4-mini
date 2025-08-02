@@ -466,32 +466,30 @@ const NewPOSSystem: React.FC = () => {
         justifyContent: 'center',
         padding: '20px'
       }}>
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '12px',
-          padding: '30px',
+        <div className="modern-card" style={{
           maxWidth: '800px',
           maxHeight: '80vh',
           overflow: 'auto',
-          width: '100%'
+          width: '100%',
+          padding: '2rem'
         }}>
-          <h2 style={{ marginBottom: '20px', color: '#333' }}>
+          <h2 className="modern-card-title" style={{ marginBottom: '1.25rem' }}>
             選擇套餐內容：{selectedCombo.name}
           </h2>
-          <p style={{ marginBottom: '20px', color: '#666' }}>
+          <p className="modern-card-subtitle" style={{ marginBottom: '1.25rem' }}>
             套餐價格：NT$ {selectedCombo.price}
           </p>
 
           {comboChoices.map(choice => (
-            <div key={choice.id} style={{ marginBottom: '30px' }}>
-              <h3 style={{ marginBottom: '15px', color: '#555' }}>
+            <div key={choice.id} style={{ marginBottom: '2rem' }}>
+              <h3 className="modern-card-title" style={{ marginBottom: '1rem' }}>
                 {choice.category_name} 
-                <span style={{ fontSize: '14px', color: '#999', marginLeft: '10px' }}>
+                <span className="modern-card-subtitle" style={{ fontSize: '14px', marginLeft: '10px' }}>
                   (請選擇 {choice.min_selections}-{choice.max_selections} 項)
                 </span>
               </h3>
               
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
+              <div className="modern-grid modern-grid-3" style={{ gap: '0.75rem' }}>
                 {products
                   .filter(p => p.category_id === choice.category_id)
                   .map(product => {
@@ -500,19 +498,17 @@ const NewPOSSystem: React.FC = () => {
                       <div
                         key={product.id}
                         onClick={() => handleSelectionToggle(choice.category_id, product)}
+                        className={`modern-card modern-interactive ${isSelected ? 'modern-btn-primary' : ''}`}
                         style={{
-                          padding: '15px',
-                          border: isSelected ? '2px solid #007bff' : '1px solid #ddd',
-                          borderRadius: '8px',
                           cursor: 'pointer',
-                          backgroundColor: isSelected ? '#e3f2fd' : 'white',
-                          transition: 'all 0.2s'
+                          border: isSelected ? '2px solid var(--modern-dark-primary)' : '1px solid var(--modern-dark-border)',
+                          backgroundColor: isSelected ? 'var(--modern-dark-primary)' : 'transparent'
                         }}
                       >
-                        <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                        <div className="modern-card-title" style={{ marginBottom: '0.5rem' }}>
                           {product.name}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#666' }}>
+                        <div className="modern-card-subtitle" style={{ fontSize: '12px' }}>
                           原價: NT$ {product.price}
                         </div>
                       </div>
@@ -522,20 +518,16 @@ const NewPOSSystem: React.FC = () => {
             </div>
           ))}
 
-          <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
+          <div className="modern-grid modern-grid-2" style={{ gap: '1rem', marginTop: '2rem' }}>
             <button
               onClick={() => {
                 setShowComboSelector(false)
                 setSelectedCombo(null)
                 setComboSelections({})
               }}
+              className="modern-btn modern-btn-secondary"
               style={{
-                flex: 1,
                 padding: '15px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                backgroundColor: '#f8f9fa',
-                cursor: 'pointer',
                 fontSize: '16px'
               }}
             >
@@ -544,15 +536,11 @@ const NewPOSSystem: React.FC = () => {
             <button
               onClick={() => addComboToCart(selectedCombo, comboSelections)}
               disabled={!canConfirm()}
+              className={`modern-btn ${canConfirm() ? 'modern-btn-primary' : 'modern-btn-secondary'}`}
               style={{
-                flex: 1,
                 padding: '15px',
-                border: 'none',
-                borderRadius: '8px',
-                backgroundColor: canConfirm() ? '#007bff' : '#ccc',
-                color: 'white',
-                cursor: canConfirm() ? 'pointer' : 'not-allowed',
-                fontSize: '16px'
+                fontSize: '16px',
+                cursor: canConfirm() ? 'pointer' : 'not-allowed'
               }}
             >
               確認加入購物車
@@ -565,59 +553,52 @@ const NewPOSSystem: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{
+      <div className="modern-container" style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100vh',
-        fontSize: '18px'
+        height: '100vh'
       }}>
-        載入中...
+        <div className="modern-card" style={{ padding: '2rem', textAlign: 'center' }}>
+          <h3 className="modern-card-title">載入中...</h3>
+        </div>
       </div>
     )
   }
 
   return (
-    <div style={{
+    <div className="modern-container" style={{
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
       height: isMobile ? 'auto' : '100vh',
       minHeight: isMobile ? '100vh' : 'auto',
-      fontFamily: 'Arial, sans-serif',
-      backgroundColor: '#f5f5f5'
+      gap: '1rem'
     }}>
       {/* 左側 - 產品區域 */}
-      <div style={{
+      <div className="modern-card" style={{
         flex: isMobile ? 'none' : 2,
         width: isMobile ? '100%' : 'auto',
-        padding: isMobile ? '10px' : '20px',
+        padding: isMobile ? '1rem' : '1.5rem',
         overflow: 'auto',
         order: isMobile ? 2 : 1
       }}>
-        <h1 style={{ 
-          marginBottom: '20px', 
-          color: '#333',
+        <h1 className="modern-page-title" style={{ 
+          marginBottom: '1.5rem',
           fontSize: isMobile ? '20px' : '24px',
           textAlign: isMobile ? 'center' : 'left'
         }}>TanaPOS 點餐系統</h1>
 
         {/* 分類選擇 */}
-        <div style={{ 
-          marginBottom: '20px',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: isMobile ? '8px' : '10px',
+        <div className="modern-grid modern-grid-4" style={{ 
+          marginBottom: '1.5rem',
+          gap: isMobile ? '0.5rem' : '0.75rem',
           justifyContent: isMobile ? 'center' : 'flex-start'
         }}>
           <button
             onClick={() => setSelectedCategory('all')}
+            className={`modern-btn ${selectedCategory === 'all' ? 'modern-btn-primary' : 'modern-btn-secondary'}`}
             style={{
               padding: isMobile ? '8px 12px' : '10px 15px',
-              border: 'none',
-              borderRadius: '25px',
-              backgroundColor: selectedCategory === 'all' ? '#007bff' : '#e9ecef',
-              color: selectedCategory === 'all' ? 'white' : '#333',
-              cursor: 'pointer',
               fontSize: isMobile ? '14px' : '16px',
               whiteSpace: 'nowrap'
             }}
@@ -626,13 +607,9 @@ const NewPOSSystem: React.FC = () => {
           </button>
           <button
             onClick={() => setSelectedCategory('combo')}
+            className={`modern-btn ${selectedCategory === 'combo' ? 'modern-btn-primary' : 'modern-btn-secondary'}`}
             style={{
               padding: isMobile ? '8px 12px' : '10px 15px',
-              border: 'none',
-              borderRadius: '25px',
-              backgroundColor: selectedCategory === 'combo' ? '#007bff' : '#e9ecef',
-              color: selectedCategory === 'combo' ? 'white' : '#333',
-              cursor: 'pointer',
               fontSize: isMobile ? '14px' : '16px',
               whiteSpace: 'nowrap'
             }}
@@ -643,13 +620,9 @@ const NewPOSSystem: React.FC = () => {
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
+              className={`modern-btn ${selectedCategory === category.id ? 'modern-btn-primary' : 'modern-btn-secondary'}`}
               style={{
                 padding: isMobile ? '8px 12px' : '10px 15px',
-                border: 'none',
-                borderRadius: '25px',
-                backgroundColor: selectedCategory === category.id ? '#007bff' : '#e9ecef',
-                color: selectedCategory === category.id ? 'white' : '#333',
-                cursor: 'pointer',
                 fontSize: isMobile ? '14px' : '16px',
                 whiteSpace: 'nowrap'
               }}
@@ -660,12 +633,8 @@ const NewPOSSystem: React.FC = () => {
         </div>
 
         {/* 產品列表 */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile 
-            ? 'repeat(auto-fit, minmax(160px, 1fr))' 
-            : 'repeat(auto-fill, minmax(250px, 1fr))',
-          gap: isMobile ? '12px' : '20px'
+        <div className="modern-grid modern-grid-3" style={{
+          gap: isMobile ? '0.75rem' : '1.25rem'
         }}>
           {/* 套餐產品 */}
           {(selectedCategory === 'all' || selectedCategory === 'combo') &&
@@ -673,63 +642,43 @@ const NewPOSSystem: React.FC = () => {
               <div
                 key={combo.id}
                 onClick={() => handleComboClick(combo)}
+                className="modern-card modern-interactive"
                 style={{
-                  backgroundColor: 'white',
-                  borderRadius: isMobile ? '8px' : '12px',
-                  padding: isMobile ? '12px' : '20px',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  border: '2px solid #ff6b6b',
+                  border: '2px solid var(--modern-dark-warning)',
                   minHeight: isMobile ? '140px' : 'auto'
                 }}
-                onMouseEnter={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'
-                  }
-                }}
               >
-                <h3 style={{ 
-                  margin: '0 0 8px 0', 
-                  color: '#ff6b6b',
+                <h3 className="modern-card-title" style={{ 
                   fontSize: isMobile ? '14px' : '16px',
-                  lineHeight: '1.3'
+                  lineHeight: '1.3',
+                  color: 'var(--modern-dark-warning)'
                 }}>
                   🍽️ {combo.name}
                 </h3>
-                <p style={{ 
-                  margin: '0 0 10px 0', 
-                  color: '#666', 
+                <p className="modern-card-subtitle" style={{ 
                   fontSize: isMobile ? '12px' : '14px',
                   lineHeight: '1.4',
                   display: isMobile ? '-webkit-box' : 'block',
                   WebkitLineClamp: isMobile ? 2 : 'none',
                   WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  marginBottom: '0.75rem'
                 }}>
                   {combo.description}
                 </p>
                 <div style={{ 
                   fontSize: isMobile ? '16px' : '18px', 
-                  fontWeight: 'bold', 
-                  color: '#333',
+                  fontWeight: 'bold',
                   marginBottom: '4px'
                 }}>
                   NT$ {combo.price}
                 </div>
-                <div style={{ 
-                  fontSize: isMobile ? '10px' : '12px', 
-                  color: '#ff6b6b'
+                <span className="modern-badge modern-badge-warning" style={{ 
+                  fontSize: isMobile ? '10px' : '12px'
                 }}>
                   {combo.combo_type === 'fixed' ? '固定套餐' : '可選套餐'}
-                </div>
+                </span>
               </div>
             ))}
 
@@ -743,52 +692,33 @@ const NewPOSSystem: React.FC = () => {
               <div
                 key={product.id}
                 onClick={() => addToCart(product)}
+                className="modern-card modern-interactive"
                 style={{
-                  backgroundColor: 'white',
-                  borderRadius: isMobile ? '8px' : '12px',
-                  padding: isMobile ? '12px' : '20px',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
                   minHeight: isMobile ? '140px' : 'auto'
                 }}
-                onMouseEnter={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'
-                  }
-                }}
               >
-                <h3 style={{ 
-                  margin: '0 0 8px 0', 
-                  color: '#333',
+                <h3 className="modern-card-title" style={{ 
                   fontSize: isMobile ? '14px' : '16px',
                   lineHeight: '1.3'
                 }}>
                   {product.name}
                 </h3>
-                <p style={{ 
-                  margin: '0 0 10px 0', 
-                  color: '#666', 
+                <p className="modern-card-subtitle" style={{ 
                   fontSize: isMobile ? '12px' : '14px',
                   lineHeight: '1.4',
                   display: isMobile ? '-webkit-box' : 'block',
                   WebkitLineClamp: isMobile ? 2 : 'none',
                   WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  marginBottom: '0.75rem'
                 }}>
                   {product.description}
                 </p>
                 <div style={{ 
                   fontSize: isMobile ? '16px' : '18px', 
-                  fontWeight: 'bold', 
-                  color: '#007bff'
+                  fontWeight: 'bold',
+                  color: 'var(--modern-dark-primary)'
                 }}>
                   NT$ {product.price}
                 </div>
@@ -798,13 +728,10 @@ const NewPOSSystem: React.FC = () => {
       </div>
 
       {/* 右側 - 購物車 */}
-      <div style={{
+      <div className="modern-card" style={{
         flex: isMobile ? 'none' : 1,
         width: isMobile ? '100%' : 'auto',
-        backgroundColor: 'white',
-        padding: isMobile ? '15px' : '20px',
-        borderLeft: isMobile ? 'none' : '1px solid #ddd',
-        borderBottom: isMobile ? '1px solid #ddd' : 'none',
+        padding: isMobile ? '1rem' : '1.25rem',
         display: 'flex',
         flexDirection: 'column',
         order: isMobile ? 1 : 2,
@@ -813,19 +740,17 @@ const NewPOSSystem: React.FC = () => {
         top: isMobile ? '0' : 'auto',
         zIndex: isMobile ? 10 : 'auto'
       }}>
-        <h2 style={{ 
-          marginBottom: isMobile ? '15px' : '20px', 
-          color: '#333',
+        <h2 className="modern-card-title" style={{ 
+          marginBottom: isMobile ? '1rem' : '1.25rem',
           fontSize: isMobile ? '18px' : '20px',
           textAlign: isMobile ? 'center' : 'left'
         }}>購物車</h2>
 
         {/* 桌號選擇 */}
-        <div style={{ marginBottom: isMobile ? '15px' : '20px' }}>
-          <label style={{ 
+        <div style={{ marginBottom: isMobile ? '1rem' : '1.25rem' }}>
+          <label className="modern-card-subtitle" style={{ 
             display: 'block', 
-            marginBottom: '10px', 
-            color: '#333',
+            marginBottom: '0.75rem',
             fontSize: isMobile ? '14px' : '16px'
           }}>
             選擇桌號:
@@ -833,12 +758,12 @@ const NewPOSSystem: React.FC = () => {
           <select
             value={selectedTable || ''}
             onChange={(e) => setSelectedTable(e.target.value)}
+            className="modern-btn modern-btn-secondary"
             style={{
               width: '100%',
               padding: isMobile ? '8px' : '10px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: isMobile ? '14px' : '16px'
+              fontSize: isMobile ? '14px' : '16px',
+              textAlign: 'left'
             }}
           >
             <option value="">請選擇桌號</option>
@@ -857,12 +782,11 @@ const NewPOSSystem: React.FC = () => {
         <div style={{ 
           flex: 1, 
           overflow: 'auto', 
-          marginBottom: isMobile ? '15px' : '20px',
+          marginBottom: isMobile ? '1rem' : '1.25rem',
           maxHeight: isMobile ? '25vh' : 'none'
         }}>
           {cartItems.length === 0 ? (
-            <p style={{ 
-              color: '#666', 
+            <p className="modern-card-subtitle" style={{ 
               textAlign: 'center',
               fontSize: isMobile ? '14px' : '16px'
             }}>購物車是空的</p>
@@ -870,12 +794,12 @@ const NewPOSSystem: React.FC = () => {
             cartItems.map(item => (
               <div
                 key={item.instanceId}
+                className="modern-card"
                 style={{
-                  padding: isMobile ? '10px' : '15px',
-                  border: '1px solid #eee',
-                  borderRadius: '8px',
-                  marginBottom: isMobile ? '8px' : '10px',
-                  backgroundColor: item.type === 'combo' ? '#fff8e1' : '#f8f9fa'
+                  padding: isMobile ? '0.75rem' : '1rem',
+                  marginBottom: isMobile ? '0.5rem' : '0.75rem',
+                  backgroundColor: item.type === 'combo' ? 'var(--modern-dark-warning)' : 'var(--modern-dark-surface)',
+                  border: item.type === 'combo' ? '1px solid var(--modern-dark-warning)' : 'none'
                 }}
               >
                 <div style={{ 
@@ -962,14 +886,13 @@ const NewPOSSystem: React.FC = () => {
 
         {/* 總金額和結帳 */}
         <div style={{ 
-          borderTop: '2px solid #eee', 
-          paddingTop: isMobile ? '15px' : '20px'
+          borderTop: '2px solid var(--modern-dark-border)', 
+          paddingTop: isMobile ? '1rem' : '1.25rem'
         }}>
-          <div style={{ 
+          <div className="modern-card-title" style={{ 
             fontSize: isMobile ? '18px' : '20px', 
             fontWeight: 'bold', 
-            marginBottom: isMobile ? '15px' : '20px', 
-            color: '#333',
+            marginBottom: isMobile ? '1rem' : '1.25rem',
             textAlign: isMobile ? 'center' : 'left'
           }}>
             總金額: NT$ {getTotalAmount()}
@@ -977,16 +900,13 @@ const NewPOSSystem: React.FC = () => {
           <button
             onClick={handleCheckout}
             disabled={cartItems.length === 0 || !selectedTable}
+            className={`modern-btn ${(cartItems.length > 0 && selectedTable) ? 'modern-btn-success' : 'modern-btn-secondary'}`}
             style={{
               width: '100%',
               padding: isMobile ? '12px' : '15px',
-              border: 'none',
-              borderRadius: '8px',
-              backgroundColor: (cartItems.length > 0 && selectedTable) ? '#28a745' : '#ccc',
-              color: 'white',
-              cursor: (cartItems.length > 0 && selectedTable) ? 'pointer' : 'not-allowed',
               fontSize: isMobile ? '16px' : '18px',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              cursor: (cartItems.length > 0 && selectedTable) ? 'pointer' : 'not-allowed'
             }}
           >
             {isMobile ? '下單' : '結帳'}

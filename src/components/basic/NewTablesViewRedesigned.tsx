@@ -59,91 +59,120 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
   ].slice(0, Math.floor(Math.random() * 3) + 1) : []
 
   const modalContent = (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modern-card" style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      zIndex: 1000,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px'
+    }} onClick={onClose}>
+      <div className="modern-card" style={{
+        maxWidth: '800px',
+        maxHeight: '80vh',
+        overflow: 'auto',
+        width: '100%',
+        padding: '2rem'
+      }} onClick={(e) => e.stopPropagation()}>
         {/* 模組標題欄 */}
-        <div className="modal-header">
-          <h2 className="modal-title">
+        <div className="modern-card-header" style={{ marginBottom: '1.5rem' }}>
+          <h2 className="modern-card-title">
             {table.name || `桌號 ${table.table_number}`} - 詳細資訊
           </h2>
-          <button className="modal-close" onClick={onClose}>
+          <button 
+            className="modern-btn modern-btn-secondary" 
+            onClick={onClose}
+            style={{
+              position: 'absolute',
+              top: '1rem',
+              right: '1rem',
+              width: '40px',
+              height: '40px',
+              padding: '0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px'
+            }}
+          >
             ×
           </button>
         </div>
 
         {/* 模組內容 */}
-        <div className="modal-body">
+        <div style={{ marginBottom: '2rem' }}>
           {/* 基本資訊區塊 */}
-          <div className="detail-grid">
-            <div className="detail-card">
-              <h3>基本資訊</h3>
-              <p><strong>容量:</strong> {table.capacity} 人</p>
-              <p><strong>狀態:</strong> {
-                table.status === 'occupied' ? '使用中' : 
-                table.status === 'available' ? '可使用' :
-                table.status === 'cleaning' ? '清潔中' :
-                table.status === 'reserved' ? '已預約' : '維修中'
-              }</p>
-              <p><strong>活動中訂單:</strong> {tableOrders.length} 筆</p>
+          <div className="modern-grid modern-grid-2" style={{ gap: '1rem', marginBottom: '2rem' }}>
+            <div className="modern-card">
+              <h3 className="modern-card-title">基本資訊</h3>
+              <div className="modern-card-subtitle">
+                <p><strong>容量:</strong> {table.capacity} 人</p>
+                <p><strong>狀態:</strong> {
+                  table.status === 'occupied' ? '使用中' : 
+                  table.status === 'available' ? '可使用' :
+                  table.status === 'cleaning' ? '清潔中' :
+                  table.status === 'reserved' ? '已預約' : '維修中'
+                }</p>
+                <p><strong>活動中訂單:</strong> {tableOrders.length} 筆</p>
+              </div>
             </div>
 
-            <div className="detail-card">
-              <h3>時間資訊</h3>
-              <p><strong>最後更新:</strong> {new Date().toLocaleString('zh-TW')}</p>
-              <p><strong>使用時長:</strong> {Math.floor(Math.random() * 120)} 分鐘</p>
-              <p><strong>預計清理:</strong> 15 分鐘</p>
+            <div className="modern-card">
+              <h3 className="modern-card-title">時間資訊</h3>
+              <div className="modern-card-subtitle">
+                <p><strong>最後更新:</strong> {new Date().toLocaleString('zh-TW')}</p>
+                <p><strong>使用時長:</strong> {Math.floor(Math.random() * 120)} 分鐘</p>
+                <p><strong>預計清理:</strong> 15 分鐘</p>
+              </div>
             </div>
 
-            <div className="detail-card">
-              <h3>營收資訊</h3>
-              <p><strong>今日營收:</strong> NT$ {(Math.random() * 5000 + 1000).toFixed(0)}</p>
-              <p><strong>本週營收:</strong> NT$ {(Math.random() * 20000 + 5000).toFixed(0)}</p>
-              <p><strong>翻桌率:</strong> {(Math.random() * 3 + 1).toFixed(1)} 次/日</p>
+            <div className="modern-card">
+              <h3 className="modern-card-title">營收資訊</h3>
+              <div className="modern-card-subtitle">
+                <p><strong>今日營收:</strong> NT$ {(Math.random() * 5000 + 1000).toFixed(0)}</p>
+                <p><strong>本週營收:</strong> NT$ {(Math.random() * 20000 + 5000).toFixed(0)}</p>
+                <p><strong>翻桌率:</strong> {(Math.random() * 3 + 1).toFixed(1)} 次/日</p>
+              </div>
             </div>
 
-            <div className="detail-card">
-              <h3>服務資訊</h3>
-              <p><strong>負責服務員:</strong> 張小明</p>
-              <p><strong>特殊需求:</strong> 無</p>
-              <p><strong>服務次數:</strong> {Math.floor(Math.random() * 10 + 1)} 次</p>
+            <div className="modern-card">
+              <h3 className="modern-card-title">服務資訊</h3>
+              <div className="modern-card-subtitle">
+                <p><strong>負責服務員:</strong> 張小明</p>
+                <p><strong>特殊需求:</strong> 無</p>
+                <p><strong>服務次數:</strong> {Math.floor(Math.random() * 10 + 1)} 次</p>
+              </div>
             </div>
           </div>
 
           {/* 目前訂單 */}
           {tableOrders.length > 0 && (
-            <div style={{ marginBottom: '30px' }}>
-              <h3 style={{ fontWeight: '600', color: '#4a5568', marginBottom: '15px' }}>進行中的訂單</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <h3 className="modern-card-title" style={{ marginBottom: '1rem' }}>進行中的訂單</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {tableOrders.map((order) => (
-                  <div key={order.id} style={{ 
-                    border: '1px solid #e2e8f0', 
-                    borderRadius: '10px', 
-                    padding: '20px',
-                    background: '#f7fafc'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ fontWeight: '600' }}>訂單 #{order.order_number}</span>
-                      <span style={{
-                        padding: '4px 12px',
-                        borderRadius: '20px',
-                        fontSize: '0.8rem',
-                        fontWeight: '600',
-                        background: order.status === 'pending' ? '#fef3cd' :
-                                   order.status === 'preparing' ? '#cce7ff' :
-                                   order.status === 'ready' ? '#d4edda' : '#f8f9fa',
-                        color: order.status === 'pending' ? '#856404' :
-                               order.status === 'preparing' ? '#0c5aa6' :
-                               order.status === 'ready' ? '#155724' : '#6c757d'
-                      }}>
+                  <div key={order.id} className="modern-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                      <span className="modern-card-title">訂單 #{order.order_number}</span>
+                      <span className={`modern-badge ${
+                        order.status === 'pending' ? 'modern-badge-warning' :
+                        order.status === 'preparing' ? 'modern-badge-primary' :
+                        order.status === 'ready' ? 'modern-badge-success' : 'modern-badge-secondary'
+                      }`}>
                         {order.status === 'pending' ? '待處理' :
                          order.status === 'preparing' ? '製作中' :
                          order.status === 'ready' ? '已完成' : order.status}
                       </span>
                     </div>
-                    <p style={{ fontSize: '0.9rem', color: '#6c757d', margin: '5px 0' }}>
+                    <p className="modern-card-subtitle">
                       總金額: NT$ {order.total_amount?.toLocaleString() || '0'}
                     </p>
-                    <p style={{ fontSize: '0.9rem', color: '#6c757d', margin: '5px 0' }}>
+                    <p className="modern-card-subtitle">
                       下單時間: {new Date(order.created_at).toLocaleString('zh-TW')}
                     </p>
                   </div>
@@ -154,37 +183,26 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
 
           {/* 餐點詳情 */}
           {mockMenuItems.length > 0 && (
-            <div style={{ marginBottom: '30px' }}>
-              <h3 style={{ fontWeight: '600', color: '#4a5568', marginBottom: '15px' }}>餐點詳情</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <h3 className="modern-card-title" style={{ marginBottom: '1rem' }}>餐點詳情</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {mockMenuItems.map((item, index) => (
-                  <div key={index} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '15px',
-                    background: '#f7fafc',
-                    borderRadius: '10px'
-                  }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: '600' }}>{item.name}</span>
-                        <span style={{
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '0.8rem',
-                          fontWeight: '600',
-                          background: item.status === '製作中' ? '#cce7ff' :
-                                     item.status === '已完成' ? '#d4edda' : '#fef3cd',
-                          color: item.status === '製作中' ? '#0c5aa6' :
-                                 item.status === '已完成' ? '#155724' : '#856404'
-                        }}>
-                          {item.status}
-                        </span>
+                  <div key={index} className="modern-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span className="modern-card-title">{item.name}</span>
+                          <span className={`modern-badge ${
+                            item.status === '製作中' ? 'modern-badge-primary' :
+                            item.status === '已完成' ? 'modern-badge-success' : 'modern-badge-warning'
+                          }`}>
+                            {item.status}
+                          </span>
+                        </div>
+                        <p className="modern-card-subtitle">
+                          數量: {item.quantity} | 單價: NT$ {item.price}
+                        </p>
                       </div>
-                      <p style={{ fontSize: '0.9rem', color: '#6c757d', margin: '5px 0' }}>
-                        數量: {item.quantity} | 單價: NT$ {item.price}
-                      </p>
                     </div>
                   </div>
                 ))}
@@ -193,18 +211,10 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
           )}
 
           {/* 操作按鈕 */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+          <div className="modern-grid modern-grid-3" style={{ gap: '1rem' }}>
             <button
               onClick={onClose}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '10px',
-                border: '2px solid #e2e8f0',
-                background: 'white',
-                color: '#4a5568',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
+              className="modern-btn modern-btn-secondary"
             >
               關閉
             </button>
@@ -214,15 +224,7 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
                 onUpdateStatus(table.id, newStatus)
                 onClose()
               }}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '10px',
-                border: 'none',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
+              className="modern-btn modern-btn-primary"
             >
               {table.status === 'occupied' ? '設為可用' : '設為占用'}
             </button>
@@ -231,15 +233,7 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
                 onUpdateStatus(table.id, 'cleaning')
                 onClose()
               }}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '10px',
-                border: '2px solid #e2e8f0',
-                background: 'white',
-                color: '#4a5568',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
+              className="modern-btn modern-btn-warning"
             >
               🧽 清理中
             </button>
@@ -404,63 +398,67 @@ const NewTablesViewRedesigned: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="tables-management">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <span className="loading-text">載入桌台數據中...</span>
+      <div className="modern-container" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
+      }}>
+        <div className="modern-card" style={{ padding: '2rem', textAlign: 'center' }}>
+          <h3 className="modern-card-title">載入桌台數據中...</h3>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="tables-management">
+    <div className="modern-container" style={{ padding: '1.5rem', minHeight: '100vh' }}>
       {/* 頭部區域 */}
-      <div className="tables-header">
-        <h1 className="tables-title">🍽️ 桌台管理中心</h1>
+      <div className="modern-card" style={{ marginBottom: '2rem', padding: '2rem' }}>
+        <h1 className="modern-page-title" style={{ textAlign: 'center', marginBottom: '2rem' }}>🍽️ 桌台管理中心</h1>
         
         {/* 統計卡片 */}
-        <div className="tables-stats">
-          <div className="stat-card">
-            <span className="stat-number">{tables.length}</span>
-            <span className="stat-label">總桌台數</span>
+        <div className="modern-grid modern-grid-4" style={{ gap: '1.5rem', marginBottom: '2rem' }}>
+          <div className="modern-card modern-interactive" style={{ textAlign: 'center' }}>
+            <div className="modern-card-title" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{tables.length}</div>
+            <div className="modern-card-subtitle">總桌台數</div>
           </div>
-          <div className="stat-card">
-            <span className="stat-number">{tables.filter(t => t.status === 'available').length}</span>
-            <span className="stat-label">可用桌台</span>
+          <div className="modern-card modern-interactive" style={{ textAlign: 'center' }}>
+            <div className="modern-card-title" style={{ fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--modern-dark-accent)' }}>{tables.filter(t => t.status === 'available').length}</div>
+            <div className="modern-card-subtitle">可用桌台</div>
           </div>
-          <div className="stat-card">
-            <span className="stat-number">{tables.filter(t => t.status === 'occupied').length}</span>
-            <span className="stat-label">使用中</span>
+          <div className="modern-card modern-interactive" style={{ textAlign: 'center' }}>
+            <div className="modern-card-title" style={{ fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--modern-dark-danger)' }}>{tables.filter(t => t.status === 'occupied').length}</div>
+            <div className="modern-card-subtitle">使用中</div>
           </div>
-          <div className="stat-card">
-            <span className="stat-number">{orders.length}</span>
-            <span className="stat-label">進行中訂單</span>
+          <div className="modern-card modern-interactive" style={{ textAlign: 'center' }}>
+            <div className="modern-card-title" style={{ fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--modern-dark-primary)' }}>{orders.length}</div>
+            <div className="modern-card-subtitle">進行中訂單</div>
           </div>
         </div>
 
         {/* 篩選按鈕 */}
-        <div className="tables-filters">
+        <div className="modern-grid modern-grid-4" style={{ gap: '1rem', justifyContent: 'center' }}>
           <button
-            className={`filter-btn ${selectedFilter === 'all' ? 'active' : ''}`}
+            className={`modern-btn ${selectedFilter === 'all' ? 'modern-btn-primary' : 'modern-btn-secondary'}`}
             onClick={() => setSelectedFilter('all')}
           >
             🏠 全部 ({tables.length})
           </button>
           <button
-            className={`filter-btn ${selectedFilter === 'available' ? 'active' : ''}`}
+            className={`modern-btn ${selectedFilter === 'available' ? 'modern-btn-primary' : 'modern-btn-secondary'}`}
             onClick={() => setSelectedFilter('available')}
           >
             ✅ 可用 ({tables.filter(t => t.status === 'available').length})
           </button>
           <button
-            className={`filter-btn ${selectedFilter === 'occupied' ? 'active' : ''}`}
+            className={`modern-btn ${selectedFilter === 'occupied' ? 'modern-btn-primary' : 'modern-btn-secondary'}`}
             onClick={() => setSelectedFilter('occupied')}
           >
             🔴 使用中 ({tables.filter(t => t.status === 'occupied').length})
           </button>
           <button
-            className={`filter-btn ${selectedFilter === 'cleaning' ? 'active' : ''}`}
+            className={`modern-btn ${selectedFilter === 'cleaning' ? 'modern-btn-primary' : 'modern-btn-secondary'}`}
             onClick={() => setSelectedFilter('cleaning')}
           >
             🧽 清潔中 ({tables.filter(t => t.status === 'cleaning').length})
@@ -470,35 +468,35 @@ const NewTablesViewRedesigned: React.FC = () => {
 
       {/* 桌台網格 */}
       {filteredTables.length > 0 ? (
-        <div className="tables-grid">
+        <div className="modern-grid modern-grid-3" style={{ gap: '1.5rem' }}>
           {filteredTables.map((table) => {
             const tableOrders = orders.filter(order => order.table_id === table.id)
             
             return (
-              <div key={table.id} className="table-card">
-                <div className="table-header">
-                  <h3 className="table-name">{table.name || `桌號 ${table.table_number}`}</h3>
-                  <span className="table-number">#{table.table_number}</span>
+              <div key={table.id} className="modern-card modern-interactive">
+                <div className="modern-card-header" style={{ marginBottom: '1rem' }}>
+                  <h3 className="modern-card-title">{table.name || `桌號 ${table.table_number}`}</h3>
+                  <span className="modern-badge modern-badge-secondary">#{table.table_number}</span>
                 </div>
 
-                <div className="table-info">
-                  <div className="info-item">
-                    <div className="info-label">容量</div>
-                    <div className="info-value">{table.capacity} 人</div>
+                <div className="modern-grid modern-grid-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div className="modern-card-subtitle">容量</div>
+                    <div className="modern-card-title">{table.capacity} 人</div>
                   </div>
-                  <div className="info-item">
-                    <div className="info-label">訂單數</div>
-                    <div className="info-value">{tableOrders.length}</div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div className="modern-card-subtitle">訂單數</div>
+                    <div className="modern-card-title">{tableOrders.length}</div>
                   </div>
                 </div>
 
-                <div className={`table-status ${
-                  table.status === 'available' ? 'status-available' :
-                  table.status === 'occupied' ? 'status-occupied' :
-                  table.status === 'cleaning' ? 'status-cleaning' :
-                  'status-reserved'
-                }`}>
-                  <span>
+                <div style={{ marginBottom: '1rem', textAlign: 'center' }}>
+                  <span className={`modern-badge ${
+                    table.status === 'available' ? 'modern-badge-success' :
+                    table.status === 'occupied' ? 'modern-badge-danger' :
+                    table.status === 'cleaning' ? 'modern-badge-warning' :
+                    'modern-badge-primary'
+                  }`}>
                     {table.status === 'available' ? '✅ 可使用' :
                      table.status === 'occupied' ? '🔴 使用中' :
                      table.status === 'cleaning' ? '🧽 清潔中' :
@@ -506,24 +504,24 @@ const NewTablesViewRedesigned: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="table-actions">
+                <div className="modern-grid modern-grid-2" style={{ gap: '0.75rem' }}>
                   {table.status === 'available' ? (
                     <button
-                      className="action-btn btn-secondary"
+                      className="modern-btn modern-btn-secondary"
                       onClick={() => updateTableStatus(table.id, 'occupied')}
                     >
                       🪑 入座
                     </button>
                   ) : table.status === 'occupied' ? (
                     <button
-                      className="action-btn btn-secondary"
+                      className="modern-btn modern-btn-warning"
                       onClick={() => updateTableStatus(table.id, 'cleaning')}
                     >
                       🧽 清理
                     </button>
                   ) : (
                     <button
-                      className="action-btn btn-secondary"
+                      className="modern-btn modern-btn-success"
                       onClick={() => updateTableStatus(table.id, 'available')}
                     >
                       ✅ 完成
@@ -531,7 +529,7 @@ const NewTablesViewRedesigned: React.FC = () => {
                   )}
                   
                   <button
-                    className="action-btn btn-primary"
+                    className="modern-btn modern-btn-primary"
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
@@ -550,10 +548,13 @@ const NewTablesViewRedesigned: React.FC = () => {
           })}
         </div>
       ) : (
-        <div className="empty-state">
-          <div className="empty-icon">🪑</div>
-          <h3 className="empty-title">沒有符合篩選條件的桌位</h3>
-          <p className="empty-description">請嘗試更換篩選條件或重新載入資料</p>
+        <div className="modern-card" style={{ 
+          padding: '3rem', 
+          textAlign: 'center' 
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🪑</div>
+          <h3 className="modern-card-title" style={{ marginBottom: '1rem' }}>沒有符合篩選條件的桌位</h3>
+          <p className="modern-card-subtitle">請嘗試更換篩選條件或重新載入資料</p>
         </div>
       )}
 

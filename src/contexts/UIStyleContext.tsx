@@ -30,8 +30,9 @@ export const STYLE_CONFIGS: Record<UIStyle, StyleConfig> = {
     name: 'modern',
     displayName: '極簡現代',
     icon: '🎯',
-    description: '簡潔、專業、符合現代設計趨勢',
+    description: '簡潔、專業、符合現代設計趨勢 (深色主題)',
     cssClass: 'ui-style-modern',
+    bodyClass: 'modern-body-dark',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   },
   neumorphism: {

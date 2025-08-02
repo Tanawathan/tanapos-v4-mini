@@ -328,7 +328,7 @@ body {
 }
 
 .modern-grid-3 {
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .modern-grid-4 {
@@ -372,7 +372,53 @@ body {
   .modern-grid-2,
   .modern-grid-3,
   .modern-grid-4 {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+  }
+  
+  .homepage-main-content {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .homepage-left-section,
+  .homepage-right-section {
+    min-width: 100% !important;
+    width: 100% !important;
+    flex: none !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  /* 在中等螢幕下，主要內容區改為垂直排列 */
+  .homepage-main-content {
+    flex-direction: column !important;
+    gap: 2rem !important;
+  }
+  
+  .homepage-left-section {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+  
+  .homepage-right-section {
+    min-width: 100% !important;
+    width: 100% !important;
+    position: static !important;
+  }
+  
+  /* 在中螢幕下grid-3改為2列 */
+  .modern-grid-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .homepage-main-content {
+    gap: 1.5rem !important;
+  }
+  
+  .modern-grid-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
@@ -438,4 +484,26 @@ body {
 
 .modern-notification-danger::before {
   background: var(--color-danger);
+}
+
+/* 首頁佈局優化 */
+.homepage-main-content {
+  width: 100%;
+  max-width: 100%;
+}
+
+.homepage-left-section,
+.homepage-right-section {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* 確保網格不會溢出 */
+.modern-grid {
+  width: 100%;
+  max-width: 100%;
+}
+
+.modern-grid-3 {
+  width: 100%;
 }

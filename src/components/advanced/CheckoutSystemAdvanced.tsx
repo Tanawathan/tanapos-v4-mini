@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { useUIStyle } from '../../contexts/UIStyleContext'
 
 // 付款方式定義
 export type PaymentMethod = 'cash' | 'card' | 'mobile' | 'voucher' | 'points'
@@ -80,7 +79,6 @@ interface CheckoutOrder {
 }
 
 export default function CheckoutSystem() {
-  const { currentStyle, styleConfig } = useUIStyle()
   const [orders, setOrders] = useState<CheckoutOrder[]>([])
   const [selectedOrder, setSelectedOrder] = useState<CheckoutOrder | null>(null)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -144,65 +142,92 @@ export default function CheckoutSystem() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2">載入訂單中...</span>
+      <div className="modern-container" style={{ 
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center'
+      }}>
+        <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>💰</div>
+        <div className="modern-card-title" style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+          載入結帳系統中...
+        </div>
+        <div className="modern-card-subtitle">
+          正在載入待結帳訂單...
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+    <div className="modern-container" style={{ minHeight: '100vh', padding: '1.5rem' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 className="modern-page-title">
           💰 完整結帳系統
         </h1>
         
         {/* 統計資訊 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">
-              {orders.length}
+        <div style={{ 
+          display: 'flex', 
+          gap: '0.75rem', 
+          marginBottom: '1.5rem',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between'
+        }}>
+          {[
+            { label: '待結帳訂單', count: orders.length, color: 'var(--modern-warning)' },
+            { label: '待收金額', amount: orders.reduce((sum, order) => sum + order.total_amount, 0), color: 'var(--modern-success)' },
+            { label: '營業額', amount: orders.reduce((sum, order) => sum + order.subtotal, 0), color: 'var(--modern-primary)' },
+            { label: '稅額', amount: orders.reduce((sum, order) => sum + order.tax_amount, 0), color: 'var(--modern-warning)' }
+          ].map((stat, index) => (
+            <div key={index} className="modern-card" style={{ 
+              textAlign: 'center', 
+              padding: '0.75rem',
+              flex: '1',
+              minWidth: '120px'
+            }}>
+              <div className="modern-card-title" style={{ 
+                fontSize: '1.5rem', 
+                marginBottom: '0.25rem',
+                color: stat.color
+              }}>
+                {stat.count !== undefined ? stat.count : `$${stat.amount!.toFixed(2)}`}
+              </div>
+              <div className="modern-card-subtitle" style={{ fontSize: '0.75rem' }}>
+                {stat.label}
+              </div>
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">待結帳訂單</div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-2xl font-bold text-green-600">
-              ${orders.reduce((sum, order) => sum + order.total_amount, 0).toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">待收金額</div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-2xl font-bold text-blue-600">
-              ${orders.reduce((sum, order) => sum + order.subtotal, 0).toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">營業額</div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div className="text-2xl font-bold text-orange-600">
-              ${orders.reduce((sum, order) => sum + order.tax_amount, 0).toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">稅額</div>
-          </div>
-        </div>
+          ))}
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-200 rounded">
-          {error}
+        <div className="modern-card" style={{ 
+          marginBottom: '1rem', 
+          padding: '1rem', 
+          backgroundColor: 'var(--modern-danger-light)', 
+          border: '1px solid var(--modern-danger)' 
+        }}>
+          <div style={{ color: 'var(--modern-danger)' }}>{error}</div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: '1.5fr 1fr', 
+        gap: '1.5rem', 
+        minHeight: '600px' 
+      }}>
         {/* 訂單列表 */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="modern-card" style={{ overflow: 'hidden', height: 'fit-content' }}>
+          <div className="modern-card-header">
+            <h2 className="modern-card-title">
               待結帳訂單 ({orders.length})
             </h2>
           </div>
           
-          <div className="max-h-[600px] overflow-y-auto">
+          <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
             {orders.map(order => (
               <div
                 key={order.id}

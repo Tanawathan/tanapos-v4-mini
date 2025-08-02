@@ -26,18 +26,483 @@
   background: var(--color-white);
   font-size: 0.875rem;
   min-width: 150px;
+  color: var(--color-gray-900);
+}
+
+/* 風格選擇器深色主題 */
+.ui-style-modern .style-select {
+  background: var(--modern-dark-surface);
+  border-color: var(--modern-dark-border);
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .style-select:focus {
+  outline: none;
+  border-color: var(--modern-dark-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
 /* ========================================
-   1. 極簡現代風格 (預設)
+   1. 極簡現代風格 (深色主題)
    ======================================== */
+.ui-style-modern {
+  --modern-dark-bg: #1a1a1a;
+  --modern-dark-surface: #2d2d2d;
+  --modern-dark-card: #333333;
+  --modern-dark-primary: #3b82f6;
+  --modern-dark-primary-hover: #2563eb;
+  --modern-dark-text: #f5f5f5;
+  --modern-dark-text-secondary: #a1a1aa;
+  --modern-dark-border: #404040;
+  --modern-dark-accent: #10b981;
+  --modern-dark-danger: #ef4444;
+  --modern-dark-warning: #f59e0b;
+  --modern-dark-shadow: rgba(0, 0, 0, 0.5);
+  
+  /* 覆蓋全局顏色變數以支援深色主題 */
+  --color-white: var(--modern-dark-card);
+  --color-gray-50: var(--modern-dark-surface);
+  --color-gray-100: var(--modern-dark-surface);
+  --color-gray-200: var(--modern-dark-border);
+  --color-gray-300: var(--modern-dark-border);
+  --color-gray-400: var(--modern-dark-text-secondary);
+  --color-gray-500: var(--modern-dark-text-secondary);
+  --color-gray-600: var(--modern-dark-text-secondary);
+  --color-gray-700: var(--modern-dark-text);
+  --color-gray-800: var(--modern-dark-text);
+  --color-gray-900: var(--modern-dark-text);
+  --color-black: var(--modern-dark-text);
+  
+  /* 覆蓋主要顏色變數 */
+  --color-primary: var(--modern-dark-primary);
+  --color-primary-hover: var(--modern-dark-primary-hover);
+  --color-primary-light: rgba(59, 130, 246, 0.1);
+  --color-secondary: var(--modern-dark-surface);
+  --color-secondary-hover: var(--modern-dark-border);
+  --color-accent: var(--modern-dark-accent);
+  --color-accent-hover: #059669;
+  --color-warning: var(--modern-dark-warning);
+  --color-danger: var(--modern-dark-danger);
+  
+  /* 覆蓋陰影系統為深色版本 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+}
+
+.modern-body-dark {
+  background: var(--modern-dark-bg) !important;
+  color: var(--modern-dark-text) !important;
+}
+
 .ui-style-modern nav,
-.ui-style-modern .modern-card,
+.ui-style-modern .modern-card {
+  background: var(--modern-dark-card);
+  border: 1px solid var(--modern-dark-border);
+  color: var(--modern-dark-text);
+  box-shadow: 0 4px 6px var(--modern-dark-shadow);
+}
+
 .ui-style-modern .modern-btn {
-  /* 使用現有的 modern-design.css 樣式 */
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-200);
-  color: var(--color-gray-900);
+  background: var(--modern-dark-surface);
+  border: 1px solid var(--modern-dark-border);
+  color: var(--modern-dark-text);
+  transition: all 0.2s ease;
+}
+
+.ui-style-modern .modern-btn:hover {
+  background: var(--modern-dark-border);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--modern-dark-shadow);
+}
+
+.ui-style-modern .modern-btn-primary {
+  background: var(--modern-dark-primary);
+  border-color: var(--modern-dark-primary);
+  color: white;
+}
+
+.ui-style-modern .modern-btn-primary:hover {
+  background: var(--modern-dark-primary-hover);
+  border-color: var(--modern-dark-primary-hover);
+}
+
+.ui-style-modern .modern-btn-success {
+  background: var(--modern-dark-accent);
+  border-color: var(--modern-dark-accent);
+  color: white;
+}
+
+.ui-style-modern .modern-btn-warning {
+  background: var(--modern-dark-warning);
+  border-color: var(--modern-dark-warning);
+  color: white;
+}
+
+.ui-style-modern .modern-btn-danger {
+  background: var(--modern-dark-danger);
+  border-color: var(--modern-dark-danger);
+  color: white;
+}
+
+.ui-style-modern .modern-btn-secondary {
+  background: var(--modern-dark-surface);
+  border-color: var(--modern-dark-border);
+  color: var(--modern-dark-text-secondary);
+}
+
+.ui-style-modern .modern-btn-ghost {
+  background: transparent;
+  border-color: var(--modern-dark-border);
+  color: var(--modern-dark-text-secondary);
+}
+
+.ui-style-modern .modern-card-title {
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .modern-card-subtitle {
+  color: var(--modern-dark-text-secondary);
+}
+
+.ui-style-modern .modern-page-title {
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .modern-page-subtitle {
+  color: var(--modern-dark-text-secondary);
+}
+
+.ui-style-modern .modern-badge-success {
+  background: var(--modern-dark-accent);
+  color: white;
+}
+
+.ui-style-modern .modern-badge-danger {
+  background: var(--modern-dark-danger);
+  color: white;
+}
+
+.ui-style-modern .modern-badge-warning {
+  background: var(--modern-dark-warning);
+  color: white;
+}
+
+.ui-style-modern .modern-interactive:hover {
+  background: var(--modern-dark-surface);
+  border-color: var(--modern-dark-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px var(--modern-dark-shadow);
+}
+
+/* 深色主題特殊效果 */
+.ui-style-modern .modern-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--modern-dark-primary), var(--modern-dark-accent));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ui-style-modern .modern-card:hover::before {
+  opacity: 1;
+}
+
+/* POS系統深色主題支援 */
+.ui-style-modern .pos-product-card {
+  background: var(--modern-dark-card);
+  border: 1px solid var(--modern-dark-border);
+  color: var(--modern-dark-text);
+  box-shadow: 0 2px 8px var(--modern-dark-shadow);
+}
+
+.ui-style-modern .pos-product-card:hover {
+  background: var(--modern-dark-surface);
+  border-color: var(--modern-dark-primary);
+  box-shadow: 0 4px 12px var(--modern-dark-shadow);
+}
+
+.ui-style-modern .pos-product-card h3 {
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .pos-product-card p {
+  color: var(--modern-dark-text-secondary);
+}
+
+.ui-style-modern .pos-product-card .price {
+  color: var(--modern-dark-accent);
+}
+
+.ui-style-modern .pos-cart {
+  background: var(--modern-dark-card);
+  border: 1px solid var(--modern-dark-border);
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .pos-cart h3 {
+  color: var(--modern-dark-text);
+  border-bottom-color: var(--modern-dark-border);
+}
+
+.ui-style-modern .pos-cart-item {
+  background: var(--modern-dark-surface);
+  border: 1px solid var(--modern-dark-border);
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .pos-cart-total {
+  background: var(--modern-dark-primary);
+  color: white;
+  border-color: var(--modern-dark-primary);
+}
+
+.ui-style-modern input[type="text"],
+.ui-style-modern input[type="number"],
+.ui-style-modern select,
+.ui-style-modern textarea {
+  background: var(--modern-dark-surface);
+  border: 1px solid var(--modern-dark-border);
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern input[type="text"]:focus,
+.ui-style-modern input[type="number"]:focus,
+.ui-style-modern select:focus,
+.ui-style-modern textarea:focus {
+  border-color: var(--modern-dark-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  outline: none;
+}
+
+/* 表格深色主題 */
+.ui-style-modern table {
+  background: var(--modern-dark-card);
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern th {
+  background: var(--modern-dark-surface);
+  color: var(--modern-dark-text);
+  border-bottom-color: var(--modern-dark-border);
+}
+
+.ui-style-modern td {
+  border-bottom-color: var(--modern-dark-border);
+  color: var(--modern-dark-text);
+}
+
+/* 導航欄深色主題 */
+.ui-style-modern nav {
+  background: var(--modern-dark-surface);
+  border-bottom-color: var(--modern-dark-border);
+}
+
+.ui-style-modern nav a {
+  color: var(--modern-dark-text-secondary);
+}
+
+.ui-style-modern nav a:hover,
+.ui-style-modern nav a.active {
+  color: var(--modern-dark-primary);
+}
+
+/* 滾動條深色主題 */
+.ui-style-modern ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.ui-style-modern ::-webkit-scrollbar-track {
+  background: var(--modern-dark-surface);
+}
+
+.ui-style-modern ::-webkit-scrollbar-thumb {
+  background: var(--modern-dark-border);
+  border-radius: 4px;
+}
+
+.ui-style-modern ::-webkit-scrollbar-thumb:hover {
+  background: var(--modern-dark-text-secondary);
+}
+
+/* 深色主題頁面結構樣式 */
+.ui-style-modern .modern-container {
+  background: transparent;
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .modern-page-header {
+  background: transparent;
+  color: var(--modern-dark-text);
+  border-bottom: 1px solid var(--modern-dark-border);
+}
+
+.ui-style-modern .modern-card-header {
+  background: transparent;
+  color: var(--modern-dark-text);
+  border-bottom: 1px solid var(--modern-dark-border);
+}
+
+.ui-style-modern .modern-grid,
+.ui-style-modern .modern-grid-2,
+.ui-style-modern .modern-grid-3,
+.ui-style-modern .modern-grid-4 {
+  gap: 1rem;
+}
+
+/* 深色主題文字顏色 */
+.ui-style-modern h1,
+.ui-style-modern h2,
+.ui-style-modern h3,
+.ui-style-modern h4,
+.ui-style-modern h5,
+.ui-style-modern h6 {
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern p,
+.ui-style-modern span,
+.ui-style-modern div {
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .text-secondary,
+.ui-style-modern .text-muted {
+  color: var(--modern-dark-text-secondary) !important;
+}
+
+/* 深色主題統計數據樣式 */
+.ui-style-modern .stat-card {
+  background: var(--modern-dark-card);
+  border: 1px solid var(--modern-dark-border);
+  color: var(--modern-dark-text);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px var(--modern-dark-shadow);
+}
+
+.ui-style-modern .stat-value {
+  color: var(--modern-dark-text);
+  font-weight: bold;
+}
+
+.ui-style-modern .stat-change.positive {
+  color: var(--modern-dark-accent);
+}
+
+.ui-style-modern .stat-change.negative {
+  color: var(--modern-dark-danger);
+}
+
+/* 深色主題功能列表樣式 */
+.ui-style-modern .feature-list {
+  background: var(--modern-dark-card);
+  border: 1px solid var(--modern-dark-border);
+  border-radius: 8px;
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .feature-item {
+  border-bottom: 1px solid var(--modern-dark-border);
+  color: var(--modern-dark-text);
+}
+
+.ui-style-modern .feature-item:last-child {
+  border-bottom: none;
+}
+
+/* 深色主題圖標和徽章 */
+.ui-style-modern .icon {
+  color: var(--modern-dark-text-secondary);
+}
+
+.ui-style-modern .badge {
+  background: var(--modern-dark-surface);
+  color: var(--modern-dark-text);
+  border: 1px solid var(--modern-dark-border);
+}
+
+/* 深色主題活動日誌和小字體文字 */
+.ui-style-modern .activity-log,
+.ui-style-modern .small-text,
+.ui-style-modern [style*="font-size: 0.75rem"],
+.ui-style-modern [style*="font-size: 0.875rem"] {
+  color: var(--modern-dark-text-secondary) !important;
+}
+
+/* 深色主題徽章間距和佈局 */
+.ui-style-modern .status-row {
+  border-bottom: 1px solid var(--modern-dark-border);
+  padding: 0.5rem 0;
+}
+
+.ui-style-modern .status-row:last-child {
+  border-bottom: none;
+}
+
+/* 深色主題按鈕懸停效果增強 */
+.ui-style-modern .modern-btn-info {
+  background: var(--modern-dark-primary);
+  border-color: var(--modern-dark-primary);
+  color: white;
+}
+
+.ui-style-modern .modern-btn-info:hover {
+  background: var(--modern-dark-primary-hover);
+  border-color: var(--modern-dark-primary-hover);
+}
+
+/* 深色主題卡片內容間距 */
+.ui-style-modern .modern-card .flex {
+  gap: 0.5rem;
+}
+
+.ui-style-modern .modern-card .flex-column {
+  gap: 0.75rem;
+}
+
+/* NewPOSSystem 特殊樣式 */
+.ui-style-modern .pos-category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.ui-style-modern .pos-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.ui-style-modern .pos-cart-item {
+  background: var(--modern-dark-surface);
+  border: 1px solid var(--modern-dark-border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.ui-style-modern .pos-combo-item {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--modern-dark-warning);
+}
+
+/* 套餐選擇器樣式 */
+.ui-style-modern .combo-selector-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.ui-style-modern .combo-selector-content {
+  background: var(--modern-dark-card);
+  border: 1px solid var(--modern-dark-border);
+  box-shadow: 0 20px 40px var(--modern-dark-shadow);
 }
 
 /* ========================================
@@ -2023,4 +2488,207 @@ body {
 .modern-card,
 nav {
   transition: all 0.3s ease;
+}
+
+/* ========================================
+   通用網格佈局支援 - 適用於所有 UI 風格
+   ======================================== */
+
+/* 為所有UI風格確保網格正確顯示 */
+.ui-style-modern .modern-grid-3,
+.ui-style-neumorphism .modern-grid-3,
+.ui-style-glassmorphism .modern-grid-3,
+.ui-style-brutalism .modern-grid-3,
+.ui-style-cyberpunk .modern-grid-3,
+.ui-style-skeuomorphism .modern-grid-3,
+.ui-style-dos .modern-grid-3,
+.ui-style-bios .modern-grid-3,
+.ui-style-kawaii .modern-grid-3,
+.ui-style-code .modern-grid-3 {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: var(--space-lg) !important;
+}
+
+.ui-style-modern .modern-grid,
+.ui-style-neumorphism .modern-grid,
+.ui-style-glassmorphism .modern-grid,
+.ui-style-brutalism .modern-grid,
+.ui-style-cyberpunk .modern-grid,
+.ui-style-skeuomorphism .modern-grid,
+.ui-style-dos .modern-grid,
+.ui-style-bios .modern-grid,
+.ui-style-kawaii .modern-grid,
+.ui-style-code .modern-grid {
+  display: grid !important;
+  gap: var(--space-lg) !important;
+}
+
+/* 為所有UI風格確保網格4和網格2正確顯示 */
+.ui-style-modern .modern-grid-4,
+.ui-style-neumorphism .modern-grid-4,
+.ui-style-glassmorphism .modern-grid-4,
+.ui-style-brutalism .modern-grid-4,
+.ui-style-cyberpunk .modern-grid-4,
+.ui-style-skeuomorphism .modern-grid-4,
+.ui-style-dos .modern-grid-4,
+.ui-style-bios .modern-grid-4,
+.ui-style-kawaii .modern-grid-4,
+.ui-style-code .modern-grid-4 {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: var(--space-lg) !important;
+}
+
+.ui-style-modern .modern-grid-2,
+.ui-style-neumorphism .modern-grid-2,
+.ui-style-glassmorphism .modern-grid-2,
+.ui-style-brutalism .modern-grid-2,
+.ui-style-cyberpunk .modern-grid-2,
+.ui-style-skeuomorphism .modern-grid-2,
+.ui-style-dos .modern-grid-2,
+.ui-style-bios .modern-grid-2,
+.ui-style-kawaii .modern-grid-2,
+.ui-style-code .modern-grid-2 {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  gap: var(--space-lg) !important;
+}
+
+/* 首頁佈局支援 - 適用於所有 UI 風格 */
+.ui-style-modern .homepage-main-content,
+.ui-style-neumorphism .homepage-main-content,
+.ui-style-glassmorphism .homepage-main-content,
+.ui-style-brutalism .homepage-main-content,
+.ui-style-cyberpunk .homepage-main-content,
+.ui-style-skeuomorphism .homepage-main-content,
+.ui-style-dos .homepage-main-content,
+.ui-style-bios .homepage-main-content,
+.ui-style-kawaii .homepage-main-content,
+.ui-style-code .homepage-main-content {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.ui-style-modern .homepage-left-section,
+.ui-style-neumorphism .homepage-left-section,
+.ui-style-glassmorphism .homepage-left-section,
+.ui-style-brutalism .homepage-left-section,
+.ui-style-cyberpunk .homepage-left-section,
+.ui-style-skeuomorphism .homepage-left-section,
+.ui-style-dos .homepage-left-section,
+.ui-style-bios .homepage-left-section,
+.ui-style-kawaii .homepage-left-section,
+.ui-style-code .homepage-left-section,
+.ui-style-modern .homepage-right-section,
+.ui-style-neumorphism .homepage-right-section,
+.ui-style-glassmorphism .homepage-right-section,
+.ui-style-brutalism .homepage-right-section,
+.ui-style-cyberpunk .homepage-right-section,
+.ui-style-skeuomorphism .homepage-right-section,
+.ui-style-dos .homepage-right-section,
+.ui-style-bios .homepage-right-section,
+.ui-style-kawaii .homepage-right-section,
+.ui-style-code .homepage-right-section {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* ========================================
+   Modal 和彈窗樣式
+   ======================================== */
+
+/* Modal 覆蓋層 */
+.modern-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+/* Modal 主體 */
+.modern-modal {
+  background: var(--modern-bg);
+  border: 1px solid var(--modern-border);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 500px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 不同風格的 modal 樣式 */
+.ui-style-neumorphism .modern-modal {
+  background: linear-gradient(145deg, #f0f0f3, #cacdd1);
+  border: none;
+  box-shadow: 20px 20px 40px #bebebe, -20px -20px 40px #ffffff;
+}
+
+.ui-style-glassmorphism .modern-modal {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+}
+
+.ui-style-brutalism .modern-modal {
+  background: var(--brutal-bg);
+  border: 4px solid var(--brutal-border);
+  border-radius: 0;
+  box-shadow: 8px 8px 0 var(--brutal-primary);
+  transform: rotate(-1deg);
+}
+
+.ui-style-cyberpunk .modern-modal {
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #00ffff;
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.5),
+    inset 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+.ui-style-dos .modern-modal {
+  background: #000080;
+  border: 2px solid #c0c0c0;
+  border-radius: 0;
+  color: #ffffff;
+  box-shadow: 2px 2px 0 #404040;
+}
+
+.ui-style-kawaii .modern-modal {
+  background: linear-gradient(135deg, #fff0f5, #ffe4e6);
+  border: 3px solid #ff69b4;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(255, 105, 180, 0.3);
+}
+
+/* 禁用按鈕樣式 */
+.modern-btn-disabled {
+  background: var(--modern-muted) !important;
+  color: var(--modern-text-muted) !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.modern-btn-disabled:hover {
+  background: var(--modern-muted) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .modern-modal {
+    width: 95vw;
+    margin: 1rem;
+  }
 }
