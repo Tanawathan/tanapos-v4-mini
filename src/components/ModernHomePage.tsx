@@ -79,6 +79,13 @@ const ModernHomePage: React.FC = () => {
       color: 'secondary'
     },
     {
+      title: '餐後結帳',
+      description: '完整的餐後結帳系統，支援多種支付方式與手續費計算',
+      icon: '💰',
+      path: '/checkout-post-meal',
+      color: 'warning'
+    },
+    {
       title: '報表分析',
       description: '營業數據分析與報表生成',
       icon: '📊',

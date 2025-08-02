@@ -314,7 +314,7 @@ const NewPOSSystem: React.FC<NewPOSSystemProps> = ({ uiStyle = 'modern' }) => {
                   className="btn-pos-primary checkout-btn"
                   disabled={cartItems.length === 0 || !selectedTable}
                 >
-                  結帳
+                  下單
                 </button>
               </div>
             </div>

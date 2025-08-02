@@ -43,6 +43,7 @@ import NewTablesView from './components/basic/NewTablesView'
 import NewTablesViewRedesigned from './components/basic/NewTablesViewRedesigned'
 import ModernTablesManagement from './components/advanced/ModernTablesManagement'
 import CheckoutSystemAdvanced from './components/advanced/CheckoutSystemAdvanced'
+import PostMealCheckout from './components/advanced/PostMealCheckout'
 import InventoryManagement from './components/advanced/InventoryManagement'
 
 // Admin Components
@@ -151,6 +152,7 @@ function App() {
                 <Route path="/tables-legacy" element={<TablesView />} />
                 <Route path="/tables-modern" element={<ModernTablesManagement />} />
                 <Route path="/checkout" element={<CheckoutSystemAdvanced />} />
+                <Route path="/checkout-post-meal" element={<PostMealCheckout />} />
                 <Route path="/inventory" element={<InventoryManagement />} />
                 
                 {/* 行動裝置點餐介面 */}

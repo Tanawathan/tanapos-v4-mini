@@ -45,10 +45,11 @@ interface CartItem {
 
 interface Table {
   id: string
-  number: number
-  name: string
-  status: 'available' | 'occupied' | 'reserved' | 'cleaning'
+  table_number: number
+  table_name?: string
+  status: 'available' | 'occupied' | 'reserved' | 'cleaning' | 'maintenance'
   capacity: number
+  location?: string
 }
 
 interface Category {
@@ -58,6 +59,9 @@ interface Category {
 
 const NewPOSSystem: React.FC = () => {
   const { currentStyle, styleConfig } = useUIStyle()
+  
+  // 響應式狀態
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   
   // 狀態管理
   const [products, setProducts] = useState<Product[]>([])
@@ -74,6 +78,16 @@ const NewPOSSystem: React.FC = () => {
   const [selectedCombo, setSelectedCombo] = useState<ComboProduct | null>(null)
   const [comboChoices, setComboChoices] = useState<ComboChoice[]>([])
   const [comboSelections, setComboSelections] = useState<{[categoryId: string]: Product[]}>({})
+
+  // 響應式監聽器
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // 載入數據
   useEffect(() => {
@@ -92,19 +106,48 @@ const NewPOSSystem: React.FC = () => {
         .select('*')
         .order('name')
 
-      // 創建靜態桌台數據（不依賴資料庫）
-      const staticTables: Table[] = [
-        { id: 'table-1', number: 1, name: '桌號 1', status: 'available', capacity: 4 },
-        { id: 'table-2', number: 2, name: '桌號 2', status: 'available', capacity: 4 },
-        { id: 'table-3', number: 3, name: '桌號 3', status: 'available', capacity: 6 },
-        { id: 'table-4', number: 4, name: '桌號 4', status: 'available', capacity: 4 },
-        { id: 'table-5', number: 5, name: '桌號 5', status: 'available', capacity: 2 },
-        { id: 'table-6', number: 6, name: '桌號 6', status: 'available', capacity: 4 },
-        { id: 'table-7', number: 7, name: '桌號 7', status: 'available', capacity: 6 },
-        { id: 'table-8', number: 8, name: '桌號 8', status: 'available', capacity: 4 },
-        { id: 'table-9', number: 9, name: '桌號 9', status: 'available', capacity: 8 },
-        { id: 'table-10', number: 10, name: '桌號 10', status: 'available', capacity: 4 }
-      ]
+      // 載入桌台數據（從資料庫）
+      let tablesData: Table[] = []
+      try {
+        const { data: dbTables, error: tablesError } = await supabase
+          .from('tables')
+          .select('*')
+          .order('table_number')
+
+        if (tablesError) {
+          console.warn('無法載入桌台資料，使用靜態資料:', tablesError.message)
+          // 如果資料庫中沒有桌台資料，創建靜態桌台數據作為備用
+          tablesData = [
+            { id: 'table-1', table_number: 1, table_name: '桌號 1', status: 'available', capacity: 4 },
+            { id: 'table-2', table_number: 2, table_name: '桌號 2', status: 'available', capacity: 4 },
+            { id: 'table-3', table_number: 3, table_name: '桌號 3', status: 'available', capacity: 6 },
+            { id: 'table-4', table_number: 4, table_name: '桌號 4', status: 'available', capacity: 4 },
+            { id: 'table-5', table_number: 5, table_name: '桌號 5', status: 'available', capacity: 2 },
+            { id: 'table-6', table_number: 6, table_name: '桌號 6', status: 'available', capacity: 4 },
+            { id: 'table-7', table_number: 7, table_name: '桌號 7', status: 'available', capacity: 6 },
+            { id: 'table-8', table_number: 8, table_name: '桌號 8', status: 'available', capacity: 4 },
+            { id: 'table-9', table_number: 9, table_name: '桌號 9', status: 'available', capacity: 8 },
+            { id: 'table-10', table_number: 10, table_name: '桌號 10', status: 'available', capacity: 4 }
+          ]
+        } else {
+          tablesData = dbTables || []
+        }
+      } catch (tablesError) {
+        console.warn('載入桌台資料時發生錯誤，使用靜態資料:', tablesError)
+        // 使用靜態資料作為備用
+        tablesData = [
+          { id: 'table-1', table_number: 1, table_name: '桌號 1', status: 'available', capacity: 4 },
+          { id: 'table-2', table_number: 2, table_name: '桌號 2', status: 'available', capacity: 4 },
+          { id: 'table-3', table_number: 3, table_name: '桌號 3', status: 'available', capacity: 6 },
+          { id: 'table-4', table_number: 4, table_name: '桌號 4', status: 'available', capacity: 4 },
+          { id: 'table-5', table_number: 5, table_name: '桌號 5', status: 'available', capacity: 2 },
+          { id: 'table-6', table_number: 6, table_name: '桌號 6', status: 'available', capacity: 4 },
+          { id: 'table-7', table_number: 7, table_name: '桌號 7', status: 'available', capacity: 6 },
+          { id: 'table-8', table_number: 8, table_name: '桌號 8', status: 'available', capacity: 4 },
+          { id: 'table-9', table_number: 9, table_name: '桌號 9', status: 'available', capacity: 8 },
+          { id: 'table-10', table_number: 10, table_name: '桌號 10', status: 'available', capacity: 4 }
+        ]
+      }
 
       // 載入一般產品
       const { data: productsData } = await supabase
@@ -121,7 +164,7 @@ const NewPOSSystem: React.FC = () => {
         .order('name')
 
       setCategories(categoriesData || [])
-      setTables(staticTables)
+      setTables(tablesData)
       setProducts(productsData || [])
       setCombos(combosData || [])
     } catch (error) {
@@ -309,7 +352,7 @@ const NewPOSSystem: React.FC = () => {
       // 創建訂單
       const orderData = {
         order_number: orderNumber,
-        table_number: selectedTableInfo.number,
+        table_number: selectedTableInfo.table_number,
         table_id: selectedTable, // 使用 UUID
         total_amount: totalAmount,
         subtotal: totalAmount,
@@ -537,30 +580,46 @@ const NewPOSSystem: React.FC = () => {
   return (
     <div style={{
       display: 'flex',
-      height: '100vh',
+      flexDirection: isMobile ? 'column' : 'row',
+      height: isMobile ? 'auto' : '100vh',
+      minHeight: isMobile ? '100vh' : 'auto',
       fontFamily: 'Arial, sans-serif',
       backgroundColor: '#f5f5f5'
     }}>
       {/* 左側 - 產品區域 */}
       <div style={{
-        flex: 2,
-        padding: '20px',
-        overflow: 'auto'
+        flex: isMobile ? 'none' : 2,
+        width: isMobile ? '100%' : 'auto',
+        padding: isMobile ? '10px' : '20px',
+        overflow: 'auto',
+        order: isMobile ? 2 : 1
       }}>
-        <h1 style={{ marginBottom: '20px', color: '#333' }}>TanaPOS 點餐系統</h1>
+        <h1 style={{ 
+          marginBottom: '20px', 
+          color: '#333',
+          fontSize: isMobile ? '20px' : '24px',
+          textAlign: isMobile ? 'center' : 'left'
+        }}>TanaPOS 點餐系統</h1>
 
         {/* 分類選擇 */}
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{ 
+          marginBottom: '20px',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: isMobile ? '8px' : '10px',
+          justifyContent: isMobile ? 'center' : 'flex-start'
+        }}>
           <button
             onClick={() => setSelectedCategory('all')}
             style={{
-              marginRight: '10px',
-              padding: '10px 15px',
+              padding: isMobile ? '8px 12px' : '10px 15px',
               border: 'none',
               borderRadius: '25px',
               backgroundColor: selectedCategory === 'all' ? '#007bff' : '#e9ecef',
               color: selectedCategory === 'all' ? 'white' : '#333',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontSize: isMobile ? '14px' : '16px',
+              whiteSpace: 'nowrap'
             }}
           >
             全部
@@ -568,13 +627,14 @@ const NewPOSSystem: React.FC = () => {
           <button
             onClick={() => setSelectedCategory('combo')}
             style={{
-              marginRight: '10px',
-              padding: '10px 15px',
+              padding: isMobile ? '8px 12px' : '10px 15px',
               border: 'none',
               borderRadius: '25px',
               backgroundColor: selectedCategory === 'combo' ? '#007bff' : '#e9ecef',
               color: selectedCategory === 'combo' ? 'white' : '#333',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontSize: isMobile ? '14px' : '16px',
+              whiteSpace: 'nowrap'
             }}
           >
             套餐
@@ -584,14 +644,14 @@ const NewPOSSystem: React.FC = () => {
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
               style={{
-                marginRight: '10px',
-                marginBottom: '10px',
-                padding: '10px 15px',
+                padding: isMobile ? '8px 12px' : '10px 15px',
                 border: 'none',
                 borderRadius: '25px',
                 backgroundColor: selectedCategory === category.id ? '#007bff' : '#e9ecef',
                 color: selectedCategory === category.id ? 'white' : '#333',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: isMobile ? '14px' : '16px',
+                whiteSpace: 'nowrap'
               }}
             >
               {category.name}
@@ -602,8 +662,10 @@ const NewPOSSystem: React.FC = () => {
         {/* 產品列表 */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-          gap: '20px'
+          gridTemplateColumns: isMobile 
+            ? 'repeat(auto-fit, minmax(160px, 1fr))' 
+            : 'repeat(auto-fill, minmax(250px, 1fr))',
+          gap: isMobile ? '12px' : '20px'
         }}>
           {/* 套餐產品 */}
           {(selectedCategory === 'all' || selectedCategory === 'combo') &&
@@ -613,32 +675,59 @@ const NewPOSSystem: React.FC = () => {
                 onClick={() => handleComboClick(combo)}
                 style={{
                   backgroundColor: 'white',
-                  borderRadius: '12px',
-                  padding: '20px',
+                  borderRadius: isMobile ? '8px' : '12px',
+                  padding: isMobile ? '12px' : '20px',
                   cursor: 'pointer',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
-                  border: '2px solid #ff6b6b'
+                  border: '2px solid #ff6b6b',
+                  minHeight: isMobile ? '140px' : 'auto'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'
+                  }
                 }}
               >
-                <h3 style={{ margin: '0 0 10px 0', color: '#ff6b6b' }}>
+                <h3 style={{ 
+                  margin: '0 0 8px 0', 
+                  color: '#ff6b6b',
+                  fontSize: isMobile ? '14px' : '16px',
+                  lineHeight: '1.3'
+                }}>
                   🍽️ {combo.name}
                 </h3>
-                <p style={{ margin: '0 0 15px 0', color: '#666', fontSize: '14px' }}>
+                <p style={{ 
+                  margin: '0 0 10px 0', 
+                  color: '#666', 
+                  fontSize: isMobile ? '12px' : '14px',
+                  lineHeight: '1.4',
+                  display: isMobile ? '-webkit-box' : 'block',
+                  WebkitLineClamp: isMobile ? 2 : 'none',
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden'
+                }}>
                   {combo.description}
                 </p>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#333' }}>
+                <div style={{ 
+                  fontSize: isMobile ? '16px' : '18px', 
+                  fontWeight: 'bold', 
+                  color: '#333',
+                  marginBottom: '4px'
+                }}>
                   NT$ {combo.price}
                 </div>
-                <div style={{ fontSize: '12px', color: '#ff6b6b', marginTop: '5px' }}>
+                <div style={{ 
+                  fontSize: isMobile ? '10px' : '12px', 
+                  color: '#ff6b6b'
+                }}>
                   {combo.combo_type === 'fixed' ? '固定套餐' : '可選套餐'}
                 </div>
               </div>
@@ -656,28 +745,51 @@ const NewPOSSystem: React.FC = () => {
                 onClick={() => addToCart(product)}
                 style={{
                   backgroundColor: 'white',
-                  borderRadius: '12px',
-                  padding: '20px',
+                  borderRadius: isMobile ? '8px' : '12px',
+                  padding: isMobile ? '12px' : '20px',
                   cursor: 'pointer',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  transition: 'transform 0.2s, box-shadow 0.2s'
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  minHeight: isMobile ? '140px' : 'auto'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'
+                  }
                 }}
               >
-                <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>
+                <h3 style={{ 
+                  margin: '0 0 8px 0', 
+                  color: '#333',
+                  fontSize: isMobile ? '14px' : '16px',
+                  lineHeight: '1.3'
+                }}>
                   {product.name}
                 </h3>
-                <p style={{ margin: '0 0 15px 0', color: '#666', fontSize: '14px' }}>
+                <p style={{ 
+                  margin: '0 0 10px 0', 
+                  color: '#666', 
+                  fontSize: isMobile ? '12px' : '14px',
+                  lineHeight: '1.4',
+                  display: isMobile ? '-webkit-box' : 'block',
+                  WebkitLineClamp: isMobile ? 2 : 'none',
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden'
+                }}>
                   {product.description}
                 </p>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#007bff' }}>
+                <div style={{ 
+                  fontSize: isMobile ? '16px' : '18px', 
+                  fontWeight: 'bold', 
+                  color: '#007bff'
+                }}>
                   NT$ {product.price}
                 </div>
               </div>
@@ -687,18 +799,35 @@ const NewPOSSystem: React.FC = () => {
 
       {/* 右側 - 購物車 */}
       <div style={{
-        flex: 1,
+        flex: isMobile ? 'none' : 1,
+        width: isMobile ? '100%' : 'auto',
         backgroundColor: 'white',
-        padding: '20px',
-        borderLeft: '1px solid #ddd',
+        padding: isMobile ? '15px' : '20px',
+        borderLeft: isMobile ? 'none' : '1px solid #ddd',
+        borderBottom: isMobile ? '1px solid #ddd' : 'none',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        order: isMobile ? 1 : 2,
+        maxHeight: isMobile ? '50vh' : 'none',
+        position: isMobile ? 'sticky' : 'static',
+        top: isMobile ? '0' : 'auto',
+        zIndex: isMobile ? 10 : 'auto'
       }}>
-        <h2 style={{ marginBottom: '20px', color: '#333' }}>購物車</h2>
+        <h2 style={{ 
+          marginBottom: isMobile ? '15px' : '20px', 
+          color: '#333',
+          fontSize: isMobile ? '18px' : '20px',
+          textAlign: isMobile ? 'center' : 'left'
+        }}>購物車</h2>
 
         {/* 桌號選擇 */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '10px', color: '#333' }}>
+        <div style={{ marginBottom: isMobile ? '15px' : '20px' }}>
+          <label style={{ 
+            display: 'block', 
+            marginBottom: '10px', 
+            color: '#333',
+            fontSize: isMobile ? '14px' : '16px'
+          }}>
             選擇桌號:
           </label>
           <select
@@ -706,79 +835,124 @@ const NewPOSSystem: React.FC = () => {
             onChange={(e) => setSelectedTable(e.target.value)}
             style={{
               width: '100%',
-              padding: '10px',
+              padding: isMobile ? '8px' : '10px',
               border: '1px solid #ddd',
               borderRadius: '8px',
-              fontSize: '16px'
+              fontSize: isMobile ? '14px' : '16px'
             }}
           >
             <option value="">請選擇桌號</option>
             {tables.map(table => (
               <option key={table.id} value={table.id}>
-                {table.name} (容納 {table.capacity} 人) - {table.status === 'available' ? '可用' : '佔用'}
+                {isMobile 
+                  ? `桌號 ${table.table_number}` 
+                  : `${table.table_name || `桌號 ${table.table_number}`} (容納 ${table.capacity} 人) - ${table.status === 'available' ? '可用' : table.status === 'occupied' ? '佔用' : table.status}`
+                }
               </option>
             ))}
           </select>
         </div>
 
         {/* 購物車項目 */}
-        <div style={{ flex: 1, overflow: 'auto', marginBottom: '20px' }}>
+        <div style={{ 
+          flex: 1, 
+          overflow: 'auto', 
+          marginBottom: isMobile ? '15px' : '20px',
+          maxHeight: isMobile ? '25vh' : 'none'
+        }}>
           {cartItems.length === 0 ? (
-            <p style={{ color: '#666', textAlign: 'center' }}>購物車是空的</p>
+            <p style={{ 
+              color: '#666', 
+              textAlign: 'center',
+              fontSize: isMobile ? '14px' : '16px'
+            }}>購物車是空的</p>
           ) : (
             cartItems.map(item => (
               <div
                 key={item.instanceId}
                 style={{
-                  padding: '15px',
+                  padding: isMobile ? '10px' : '15px',
                   border: '1px solid #eee',
                   borderRadius: '8px',
-                  marginBottom: '10px',
+                  marginBottom: isMobile ? '8px' : '10px',
                   backgroundColor: item.type === 'combo' ? '#fff8e1' : '#f8f9fa'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  flexWrap: isMobile ? 'wrap' : 'nowrap',
+                  gap: isMobile ? '8px' : '0'
+                }}>
+                  <div style={{ 
+                    flex: isMobile ? '1 1 100%' : '1',
+                    minWidth: isMobile ? '100%' : 'auto'
+                  }}>
+                    <h4 style={{ 
+                      margin: '0 0 5px 0', 
+                      color: '#333',
+                      fontSize: isMobile ? '14px' : '16px'
+                    }}>
                       {item.type === 'combo' ? '🍽️ ' : ''}{item.name}
                     </h4>
-                    <div style={{ fontSize: '14px', color: '#666' }}>
+                    <div style={{ 
+                      fontSize: isMobile ? '12px' : '14px', 
+                      color: '#666' 
+                    }}>
                       NT$ {item.price} x {item.quantity}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: isMobile ? '8px' : '10px',
+                    flex: isMobile ? '0 0 auto' : 'none'
+                  }}>
                     <button
                       onClick={() => updateQuantity(item.instanceId, item.quantity - 1)}
                       style={{
-                        width: '30px',
-                        height: '30px',
+                        width: isMobile ? '28px' : '30px',
+                        height: isMobile ? '28px' : '30px',
                         border: '1px solid #ddd',
                         borderRadius: '4px',
                         backgroundColor: 'white',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        fontSize: isMobile ? '14px' : '16px'
                       }}
                     >
                       -
                     </button>
-                    <span style={{ minWidth: '20px', textAlign: 'center' }}>
+                    <span style={{ 
+                      minWidth: '20px', 
+                      textAlign: 'center',
+                      fontSize: isMobile ? '14px' : '16px'
+                    }}>
                       {item.quantity}
                     </span>
                     <button
                       onClick={() => updateQuantity(item.instanceId, item.quantity + 1)}
                       style={{
-                        width: '30px',
-                        height: '30px',
+                        width: isMobile ? '28px' : '30px',
+                        height: isMobile ? '28px' : '30px',
                         border: '1px solid #ddd',
                         borderRadius: '4px',
                         backgroundColor: 'white',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        fontSize: isMobile ? '14px' : '16px'
                       }}
                     >
                       +
                     </button>
                   </div>
                 </div>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#007bff', marginTop: '10px' }}>
+                <div style={{ 
+                  fontSize: isMobile ? '14px' : '16px', 
+                  fontWeight: 'bold', 
+                  color: '#007bff', 
+                  marginTop: '8px',
+                  textAlign: isMobile ? 'right' : 'left'
+                }}>
                   小計: NT$ {item.price * item.quantity}
                 </div>
               </div>
@@ -787,8 +961,17 @@ const NewPOSSystem: React.FC = () => {
         </div>
 
         {/* 總金額和結帳 */}
-        <div style={{ borderTop: '2px solid #eee', paddingTop: '20px' }}>
-          <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', color: '#333' }}>
+        <div style={{ 
+          borderTop: '2px solid #eee', 
+          paddingTop: isMobile ? '15px' : '20px'
+        }}>
+          <div style={{ 
+            fontSize: isMobile ? '18px' : '20px', 
+            fontWeight: 'bold', 
+            marginBottom: isMobile ? '15px' : '20px', 
+            color: '#333',
+            textAlign: isMobile ? 'center' : 'left'
+          }}>
             總金額: NT$ {getTotalAmount()}
           </div>
           <button
@@ -796,17 +979,17 @@ const NewPOSSystem: React.FC = () => {
             disabled={cartItems.length === 0 || !selectedTable}
             style={{
               width: '100%',
-              padding: '15px',
+              padding: isMobile ? '12px' : '15px',
               border: 'none',
               borderRadius: '8px',
               backgroundColor: (cartItems.length > 0 && selectedTable) ? '#28a745' : '#ccc',
               color: 'white',
               cursor: (cartItems.length > 0 && selectedTable) ? 'pointer' : 'not-allowed',
-              fontSize: '18px',
+              fontSize: isMobile ? '16px' : '18px',
               fontWeight: 'bold'
             }}
           >
-            結帳
+            {isMobile ? '下單' : '結帳'}
           </button>
         </div>
       </div>

@@ -22,6 +22,41 @@ const KDSView: React.FC = () => {
   // 追蹤每個訂單項目的完成狀態
   const [itemStatuses, setItemStatuses] = useState<Map<string, boolean>>(new Map())
 
+  // 檢查是否為套餐
+  const isMealSet = (productName: string): boolean => {
+    return productName?.includes('套餐') || false
+  }
+  
+  // 處理套餐的特殊說明顯示
+  const formatMealSetInstructions = (productName: string, specialInstructions: string): string => {
+    if (!isMealSet(productName) || !specialInstructions) {
+      return specialInstructions || ''
+    }
+    
+    try {
+      // 嘗試解析 JSON 格式的套餐組合
+      const mealSetData = JSON.parse(specialInstructions)
+      const items: string[] = []
+      
+      // 遍歷每個類別的選擇
+      Object.keys(mealSetData).forEach(categoryId => {
+        const categoryItems = mealSetData[categoryId]
+        if (Array.isArray(categoryItems) && categoryItems.length > 0) {
+          categoryItems.forEach(item => {
+            if (item.name) {
+              items.push(item.name)
+            }
+          })
+        }
+      })
+      
+      return items.length > 0 ? `套餐組合: ${items.join(', ')}` : '套餐商品'
+    } catch (error) {
+      // 如果不是 JSON 格式，直接返回原始文字
+      return specialInstructions
+    }
+  }
+
   // 組件掛載時載入訂單數據和分類數據
   useEffect(() => {
     const loadData = async () => {
@@ -552,6 +587,19 @@ const KDSView: React.FC = () => {
                                               </span>
                                             )}
                                             {item.product_name || '未知商品'}
+                                            {isMealSet(item.product_name || '') && (
+                                              <span style={{
+                                                marginLeft: '0.5rem',
+                                                padding: '0.125rem 0.375rem',
+                                                backgroundColor: '#f97316',
+                                                color: 'white',
+                                                borderRadius: '0.375rem',
+                                                fontSize: '0.6rem',
+                                                fontWeight: 'bold'
+                                              }}>
+                                                🍽️ 套餐
+                                              </span>
+                                            )}
                                           </span>
                                           {item.special_instructions && (
                                             <div style={{
@@ -561,7 +609,7 @@ const KDSView: React.FC = () => {
                                               textDecoration: isCompleted ? 'line-through' : 'none',
                                               opacity: isCompleted ? 0.6 : 1
                                             }}>
-                                              {item.special_instructions}
+                                              {formatMealSetInstructions(item.product_name || '', item.special_instructions)}
                                             </div>
                                           )}
                                         </div>
@@ -666,6 +714,19 @@ const KDSView: React.FC = () => {
                                               </span>
                                             )}
                                             {item.product_name || '未知商品'}
+                                            {isMealSet(item.product_name || '') && (
+                                              <span style={{
+                                                marginLeft: '0.5rem',
+                                                padding: '0.125rem 0.375rem',
+                                                backgroundColor: '#f97316',
+                                                color: 'white',
+                                                borderRadius: '0.375rem',
+                                                fontSize: '0.6rem',
+                                                fontWeight: 'bold'
+                                              }}>
+                                                🍽️ 套餐
+                                              </span>
+                                            )}
                                           </span>
                                           {item.special_instructions && (
                                             <div style={{
@@ -675,7 +736,7 @@ const KDSView: React.FC = () => {
                                               textDecoration: isCompleted ? 'line-through' : 'none',
                                               opacity: isCompleted ? 0.6 : 1
                                             }}>
-                                              {item.special_instructions}
+                                              {formatMealSetInstructions(item.product_name || '', item.special_instructions)}
                                             </div>
                                           )}
                                         </div>

@@ -1,5 +1,5 @@
 import React from 'react'
-import SimplePOSSystem from '../basic/SimplePOSSystem'
+import NewPOSSystem from '../NewPOSSystem'
 import { NotificationProvider } from '../ui/NotificationSystem'
 import { useUIStyle } from '../../contexts/UIStyleContext'
 
@@ -9,7 +9,7 @@ const SimplePOSPage: React.FC = () => {
   return (
     <NotificationProvider>
       <div className={`min-h-screen ${styleConfig.bodyClass || ''} ${styleConfig.cssClass}`}>
-        <SimplePOSSystem uiStyle={currentStyle} />
+        <NewPOSSystem />
       </div>
     </NotificationProvider>
   )

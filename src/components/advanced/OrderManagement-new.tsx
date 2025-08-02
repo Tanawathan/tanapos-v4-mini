@@ -14,6 +14,42 @@ export default function OrderManagement() {
   const [activeTab, setActiveTab] = useState<'all' | OrderStatus>('all')
   const [searchTerm, setSearchTerm] = useState('')
 
+  // 檢查是否為套餐的輔助函數
+  const isMealSet = (productName: string): boolean => {
+    return productName?.includes('套餐') || false
+  }
+  
+  // 格式化套餐特殊說明的輔助函數
+  const formatMealSetInstructions = (productName: string, instructions: string): string => {
+    if (!isMealSet(productName)) {
+      return instructions
+    }
+    
+    try {
+      const data = JSON.parse(instructions)
+      let formattedItems: string[] = []
+      
+      // 處理每個群組的商品
+      Object.values(data).forEach((group: any) => {
+        if (Array.isArray(group)) {
+          group.forEach((item: any) => {
+            if (item.name) {
+              formattedItems.push(item.name)
+            }
+          })
+        }
+      })
+      
+      if (formattedItems.length > 0) {
+        return `套餐組合: ${formattedItems.join(' + ')}`
+      }
+    } catch (error) {
+      // JSON 解析失敗，返回原始說明
+    }
+    
+    return instructions
+  }
+
   // 獲取主題顏色
   const getThemeColors = () => {
     const styles = {
@@ -642,16 +678,31 @@ export default function OrderManagement() {
                             <div style={{
                               fontWeight: '500',
                               color: themeColors.text,
-                              marginBottom: '0.25rem'
+                              marginBottom: '0.25rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem'
                             }}>
                               {item.product_name}
+                              {isMealSet(item.product_name) && (
+                                <span style={{
+                                  padding: '0.125rem 0.375rem',
+                                  backgroundColor: '#f97316',
+                                  color: 'white',
+                                  borderRadius: '0.375rem',
+                                  fontSize: '0.6rem',
+                                  fontWeight: 'bold'
+                                }}>
+                                  🍽️ 套餐
+                                </span>
+                              )}
                             </div>
                             {item.special_instructions && (
                               <div style={{
                                 fontSize: '0.75rem',
                                 color: themeColors.subText
                               }}>
-                                備註: {item.special_instructions}
+                                備註: {formatMealSetInstructions(item.product_name, item.special_instructions)}
                               </div>
                             )}
                           </div>

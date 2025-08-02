@@ -761,7 +761,7 @@ const SimplePOS: React.FC = () => {
                   onClick={handleCheckout}
                   disabled={!selectedTable || cartItems.length === 0}
                 >
-                  結帳
+                  下單
                 </button>
                 <button 
                   className="btn-pos-secondary"
@@ -853,7 +853,7 @@ const SimplePOS: React.FC = () => {
                     className="pos-checkout-btn"
                     onClick={handleCheckout}
                   >
-                    結帳
+                    下單
                   </button>
                 </div>
               </>
