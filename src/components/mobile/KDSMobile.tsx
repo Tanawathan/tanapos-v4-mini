@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 import '../../styles/kds-mobile.css'
 
 interface OrderItem {
@@ -26,6 +27,7 @@ interface Order {
 }
 
 const KDSMobile: React.FC = () => {
+  const { currentStyle, styleConfig } = useUIStyle()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'pending' | 'preparing' | 'ready'>('all')

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { usePOSStore } from '../../lib/store-complete'
 import { useNotifications } from '../ui/NotificationSystem'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 import SearchAndFilter from '../ui/SearchAndFilter'
 import ComboSelector from '../ComboSelector'
 import { ShoppingCart, X, Move } from 'lucide-react'
@@ -29,6 +30,7 @@ interface ComboProduct {
 }
 
 const SimplePOS: React.FC = () => {
+  const { currentStyle, styleConfig } = useUIStyle()
   const { 
     products, 
     categories, 

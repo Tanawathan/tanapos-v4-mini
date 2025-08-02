@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useUIStyle } from '../contexts/UIStyleContext'
 
 interface Product {
   id: string
@@ -48,6 +49,7 @@ const ComboSelector: React.FC<ComboSelectorProps> = ({
   onCancel, 
   quantity 
 }) => {
+  const { currentStyle, styleConfig } = useUIStyle()
   const [choices, setChoices] = useState<ComboChoice[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])

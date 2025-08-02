@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { useLocation, Link } from 'react-router-dom'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 import ThemeToggle from '../ThemeToggle'
 
 interface LayoutProps {
@@ -7,6 +8,7 @@ interface LayoutProps {
 }
 
 export default function SimpleLayout({ children }: LayoutProps) {
+  const { currentStyle, styleConfig } = useUIStyle()
   const location = useLocation()
   const isDashboard = location.pathname === '/'
 

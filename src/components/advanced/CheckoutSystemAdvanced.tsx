@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 
 // 付款方式定義
 export type PaymentMethod = 'cash' | 'card' | 'mobile' | 'voucher' | 'points'
@@ -79,6 +80,7 @@ interface CheckoutOrder {
 }
 
 export default function CheckoutSystem() {
+  const { currentStyle, styleConfig } = useUIStyle()
   const [orders, setOrders] = useState<CheckoutOrder[]>([])
   const [selectedOrder, setSelectedOrder] = useState<CheckoutOrder | null>(null)
   const [showPaymentModal, setShowPaymentModal] = useState(false)

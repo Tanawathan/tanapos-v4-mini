@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useUIStyle } from '../contexts/UIStyleContext'
 
 // 類型定義
 interface Product {
@@ -56,6 +57,8 @@ interface Category {
 }
 
 const NewPOSSystem: React.FC = () => {
+  const { currentStyle, styleConfig } = useUIStyle()
+  
   // 狀態管理
   const [products, setProducts] = useState<Product[]>([])
   const [combos, setCombos] = useState<ComboProduct[]>([])

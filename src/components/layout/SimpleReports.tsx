@@ -1,6 +1,8 @@
 import React from 'react'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 
 const SimpleReports: React.FC = () => {
+  const { currentStyle, styleConfig } = useUIStyle()
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">營業報表</h1>

@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import NewPOSSystem from '../basic/NewPOSSystem'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 import { NotificationProvider } from '../ui/NotificationSystem'
 
 const NewPOSPage: React.FC = () => {
-  const [currentStyle, setCurrentStyle] = useState('modern')
+  const { currentStyle, styleConfig, setStyle, availableStyles } = useUIStyle()
+  const [currentStyleLocal, setCurrentStyleLocal] = useState('modern')
   
   const uiStyles = [
     { value: 'modern', label: '極簡現代' },

@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react'
 import { usePOSStore } from '../../lib/store-complete'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 import ThemeToggle from '../ThemeToggle'
 import type { Order, Table } from '../../lib/types-unified'
 
 const SimpleDashboard: React.FC<{
   onNavigate: (view: 'pos' | 'kds' | 'kds-mobile' | 'reports' | 'orders' | 'tables' | 'checkout' | 'inventory' | 'admin') => void
 }> = ({ onNavigate }) => {
+  const { currentStyle, styleConfig } = useUIStyle()
   const { orders, tables, loading, loadOrders, loadTables } = usePOSStore()
 
   useEffect(() => {

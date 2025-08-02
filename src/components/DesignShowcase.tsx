@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useUIStyle } from '../contexts/UIStyleContext';
 
 const DesignShowcase: React.FC = () => {
+  const { currentStyle, styleConfig } = useUIStyle();
   const [selectedTab, setSelectedTab] = useState('components');
 
   const tabs = [

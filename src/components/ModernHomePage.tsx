@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { APP_CONFIG } from '../config';
+import { useUIStyle } from '../contexts/UIStyleContext';
 
 const ModernHomePage: React.FC = () => {
   const navigate = useNavigate();
+  const { currentStyle, styleConfig } = useUIStyle();
 
   const features = [
     {

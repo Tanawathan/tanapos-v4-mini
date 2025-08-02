@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 import { APP_CONFIG, RESTAURANT_INFO } from '../../config'
 import ComboManagementEnhanced from './ComboManagementEnhanced'
 
@@ -107,6 +108,7 @@ function DangerConfirmModal({
 
 // 系統設定管理組件
 export default function AdminSystem() {
+  const { currentStyle, styleConfig } = useUIStyle()
   const [searchParams] = useSearchParams()
   const defaultTab = searchParams.get('tab') || 'general'
   const [activeTab, setActiveTab] = useState<'general' | 'database' | 'features' | 'layout' | 'reports' | 'dataexport' | 'backup' | 'dbeditor' | 'userguide' | 'operationguide' | 'combos'>(defaultTab as any)

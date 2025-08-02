@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 import { Table, Order } from '../../lib/types-unified'
 import '../../styles/tables-management.css'
 
@@ -252,6 +253,7 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
 }
 
 const NewTablesViewRedesigned: React.FC = () => {
+  const { currentStyle, styleConfig } = useUIStyle()
   const [tables, setTables] = useState<TableData[]>([])
   const [orders, setOrders] = useState<OrderData[]>([])
   const [loading, setLoading] = useState(true)

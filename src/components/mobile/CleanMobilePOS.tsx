@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { usePOSStore } from '../../lib/store-complete'
+import { useUIStyle } from '../../contexts/UIStyleContext'
 import type { Product, CartItem } from '../../lib/types-unified'
 
 const CleanMobilePOS: React.FC = () => {
+  const { currentStyle, styleConfig } = useUIStyle()
   const { 
     products, 
     categories, 
