@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import { usePOSStore } from '../../lib/store-supabase'
 import { useUIStyle } from '../../contexts/UIStyleContext'
-import type { Order } from '../../lib/types-unified'
+import type { Order, OrderItem } from '../../lib/types-unified'
 
 // 訂單狀態類型
 type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'served' | 'completed' | 'cancelled'
 
+// 訂單項目完成狀態追蹤
+interface OrderItemStatus {
+  orderId: string
+  itemIndex: number
+  isCompleted: boolean
+}
+
 // KDS 廚房顯示系統組件
 const KDSView: React.FC = () => {
-  const { orders, updateOrderStatus, loadOrders, loading } = usePOSStore()
+  const { orders, updateOrderStatus, loadOrders, loading, categories } = usePOSStore()
   const { currentStyle } = useUIStyle()
   const [currentTime, setCurrentTime] = useState(new Date())
+  
+  // 追蹤每個訂單項目的完成狀態
+  const [itemStatuses, setItemStatuses] = useState<Map<string, boolean>>(new Map())
 
-  // 組件掛載時載入訂單數據
+  // 組件掛載時載入訂單數據和分類數據
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -34,6 +44,64 @@ const KDSView: React.FC = () => {
     }, 1000)
     return () => clearInterval(timer)
   }, [])
+
+  // 切換訂單項目完成狀態
+  const toggleItemStatus = (orderId: string, itemIndex: number) => {
+    const key = `${orderId}-${itemIndex}`
+    setItemStatuses(prev => {
+      const newMap = new Map(prev)
+      newMap.set(key, !prev.get(key))
+      return newMap
+    })
+  }
+
+  // 獲取訂單項目完成狀態
+  const getItemStatus = (orderId: string, itemIndex: number): boolean => {
+    const key = `${orderId}-${itemIndex}`
+    return itemStatuses.get(key) || false
+  }
+
+  // 檢查訂單是否所有項目都已完成
+  const areAllItemsCompleted = (order: Order): boolean => {
+    return order.order_items.every((_, index) => 
+      getItemStatus(order.id, index)
+    )
+  }
+
+  // 檢查是否為甜點項目
+  const isDessertItem = (item: OrderItem): boolean => {
+    // 根據產品名稱或分類來判斷是否為甜點
+    const dessertKeywords = ['甜點', '蛋糕', '布丁', '提拉米蘇', '鬆餅', '冰淇淋', '仙草', '甜品', '巧克力', '芒果']
+    const itemName = item.product_name?.toLowerCase() || ''
+    return dessertKeywords.some(keyword => itemName.includes(keyword))
+  }
+
+  // 分離主餐和甜點項目
+  const separateOrderItems = (order: Order) => {
+    const mainItems = order.order_items.filter(item => !isDessertItem(item))
+    const dessertItems = order.order_items.filter(item => isDessertItem(item))
+    return { mainItems, dessertItems }
+  }
+
+  // 檢查主餐項目是否全部完成
+  const areAllMainItemsCompleted = (order: Order): boolean => {
+    const { mainItems } = separateOrderItems(order)
+    if (mainItems.length === 0) return true
+    return mainItems.every((_, originalIndex) => {
+      const originalIndexInOrder = order.order_items.findIndex(item => item === mainItems[originalIndex])
+      return getItemStatus(order.id, originalIndexInOrder)
+    })
+  }
+
+  // 檢查甜點項目是否全部完成
+  const areAllDessertItemsCompleted = (order: Order): boolean => {
+    const { dessertItems } = separateOrderItems(order)
+    if (dessertItems.length === 0) return true
+    return dessertItems.every((_, originalIndex) => {
+      const originalIndexInOrder = order.order_items.findIndex(item => item === dessertItems[originalIndex])
+      return getItemStatus(order.id, originalIndexInOrder)
+    })
+  }
 
   // 獲取主題顏色
   const getThemeColors = () => {
@@ -408,52 +476,238 @@ const KDSView: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* 訂單項目 */}
+                      {/* 訂單項目 - 分離主餐和甜點 */}
                       <div style={{ marginBottom: '1rem' }}>
-                        {order.order_items.map((item, index) => (
-                          <div key={index} style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            padding: '0.5rem 0',
-                            borderBottom: index < order.order_items.length - 1 ? `1px solid ${themeColors.border}` : 'none'
-                          }}>
-                            <div style={{
-                              flex: 1,
-                              color: themeColors.text
-                            }}>
-                              <span style={{ fontWeight: '500' }}>{item.product_name || '未知商品'}</span>
-                              {item.special_instructions && (
-                                <div style={{
-                                  fontSize: '0.75rem',
-                                  color: themeColors.subText,
-                                  marginTop: '0.25rem'
-                                }}>
-                                  {item.special_instructions}
+                        {(() => {
+                          const { mainItems, dessertItems } = separateOrderItems(order)
+                          
+                          return (
+                            <>
+                              {/* 主餐區域 */}
+                              {mainItems.length > 0 && (
+                                <div style={{ marginBottom: '1rem' }}>
+                                  <div style={{
+                                    fontSize: '0.875rem',
+                                    fontWeight: 'bold',
+                                    color: themeColors.primary,
+                                    marginBottom: '0.5rem',
+                                    padding: '0.25rem 0.5rem',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    borderRadius: '0.25rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem'
+                                  }}>
+                                    🍽️ 主餐 ({mainItems.filter((_, idx) => {
+                                      const originalIndex = order.order_items.findIndex(item => item === mainItems[idx])
+                                      return getItemStatus(order.id, originalIndex)
+                                    }).length}/{mainItems.length})
+                                  </div>
+                                  {mainItems.map((item, idx) => {
+                                    const originalIndex = order.order_items.findIndex(orderItem => orderItem === item)
+                                    const isCompleted = getItemStatus(order.id, originalIndex)
+                                    return (
+                                      <div 
+                                        key={`main-${originalIndex}`} 
+                                        onClick={() => toggleItemStatus(order.id, originalIndex)}
+                                        style={{
+                                          display: 'flex',
+                                          justifyContent: 'space-between',
+                                          alignItems: 'center',
+                                          padding: '0.5rem',
+                                          cursor: 'pointer',
+                                          transition: 'background-color 0.2s ease',
+                                          backgroundColor: isCompleted ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                                          borderRadius: '0.25rem',
+                                          marginBottom: '0.25rem',
+                                          border: `1px solid ${isCompleted ? 'rgba(16, 185, 129, 0.3)' : themeColors.border}`
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          if (!isCompleted) {
+                                            e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.05)'
+                                          }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor = isCompleted ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
+                                        }}
+                                      >
+                                        <div style={{
+                                          flex: 1,
+                                          color: themeColors.text,
+                                          position: 'relative'
+                                        }}>
+                                          <span style={{ 
+                                            fontWeight: '500',
+                                            textDecoration: isCompleted ? 'line-through' : 'none',
+                                            opacity: isCompleted ? 0.6 : 1,
+                                            position: 'relative'
+                                          }}>
+                                            {isCompleted && (
+                                              <span style={{
+                                                marginRight: '0.5rem',
+                                                color: themeColors.success,
+                                                fontSize: '1rem'
+                                              }}>
+                                                ✓
+                                              </span>
+                                            )}
+                                            {item.product_name || '未知商品'}
+                                          </span>
+                                          {item.special_instructions && (
+                                            <div style={{
+                                              fontSize: '0.75rem',
+                                              color: themeColors.subText,
+                                              marginTop: '0.25rem',
+                                              textDecoration: isCompleted ? 'line-through' : 'none',
+                                              opacity: isCompleted ? 0.6 : 1
+                                            }}>
+                                              {item.special_instructions}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div style={{
+                                          background: isCompleted ? themeColors.success : themeColors.primary,
+                                          color: '#ffffff',
+                                          padding: '0.25rem 0.5rem',
+                                          borderRadius: '1rem',
+                                          fontSize: '0.875rem',
+                                          fontWeight: 'bold',
+                                          minWidth: '2rem',
+                                          textAlign: 'center',
+                                          opacity: isCompleted ? 0.8 : 1
+                                        }}>
+                                          {item.quantity}
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
                                 </div>
                               )}
-                            </div>
-                            <div style={{
-                              background: themeColors.primary,
-                              color: '#ffffff',
-                              padding: '0.25rem 0.5rem',
-                              borderRadius: '1rem',
-                              fontSize: '0.875rem',
-                              fontWeight: 'bold',
-                              minWidth: '2rem',
-                              textAlign: 'center'
-                            }}>
-                              {item.quantity}
-                            </div>
-                          </div>
-                        ))}
+
+                              {/* 甜點區域 */}
+                              {dessertItems.length > 0 && (
+                                <div style={{ marginBottom: '1rem' }}>
+                                  <div style={{
+                                    fontSize: '0.875rem',
+                                    fontWeight: 'bold',
+                                    color: '#ec4899',
+                                    marginBottom: '0.5rem',
+                                    padding: '0.25rem 0.5rem',
+                                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                                    borderRadius: '0.25rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem'
+                                  }}>
+                                    🍰 甜點 (主餐後上) ({dessertItems.filter((_, idx) => {
+                                      const originalIndex = order.order_items.findIndex(item => item === dessertItems[idx])
+                                      return getItemStatus(order.id, originalIndex)
+                                    }).length}/{dessertItems.length})
+                                    {!areAllMainItemsCompleted(order) && (
+                                      <span style={{
+                                        fontSize: '0.75rem',
+                                        backgroundColor: '#f59e0b',
+                                        color: 'white',
+                                        padding: '0.125rem 0.5rem',
+                                        borderRadius: '1rem'
+                                      }}>
+                                        等待主餐
+                                      </span>
+                                    )}
+                                  </div>
+                                  {dessertItems.map((item, idx) => {
+                                    const originalIndex = order.order_items.findIndex(orderItem => orderItem === item)
+                                    const isCompleted = getItemStatus(order.id, originalIndex)
+                                    const canPrepare = areAllMainItemsCompleted(order)
+                                    return (
+                                      <div 
+                                        key={`dessert-${originalIndex}`} 
+                                        onClick={() => canPrepare && toggleItemStatus(order.id, originalIndex)}
+                                        style={{
+                                          display: 'flex',
+                                          justifyContent: 'space-between',
+                                          alignItems: 'center',
+                                          padding: '0.5rem',
+                                          cursor: canPrepare ? 'pointer' : 'not-allowed',
+                                          transition: 'background-color 0.2s ease',
+                                          backgroundColor: isCompleted ? 'rgba(236, 72, 153, 0.1)' : 'transparent',
+                                          borderRadius: '0.25rem',
+                                          marginBottom: '0.25rem',
+                                          border: `1px solid ${isCompleted ? 'rgba(236, 72, 153, 0.3)' : '#f3e8ff'}`,
+                                          opacity: canPrepare ? 1 : 0.5
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          if (!isCompleted && canPrepare) {
+                                            e.currentTarget.style.backgroundColor = 'rgba(236, 72, 153, 0.05)'
+                                          }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor = isCompleted ? 'rgba(236, 72, 153, 0.1)' : 'transparent'
+                                        }}
+                                      >
+                                        <div style={{
+                                          flex: 1,
+                                          color: themeColors.text,
+                                          position: 'relative'
+                                        }}>
+                                          <span style={{ 
+                                            fontWeight: '500',
+                                            textDecoration: isCompleted ? 'line-through' : 'none',
+                                            opacity: isCompleted ? 0.6 : 1,
+                                            position: 'relative'
+                                          }}>
+                                            {isCompleted && (
+                                              <span style={{
+                                                marginRight: '0.5rem',
+                                                color: '#ec4899',
+                                                fontSize: '1rem'
+                                              }}>
+                                                ✓
+                                              </span>
+                                            )}
+                                            {item.product_name || '未知商品'}
+                                          </span>
+                                          {item.special_instructions && (
+                                            <div style={{
+                                              fontSize: '0.75rem',
+                                              color: themeColors.subText,
+                                              marginTop: '0.25rem',
+                                              textDecoration: isCompleted ? 'line-through' : 'none',
+                                              opacity: isCompleted ? 0.6 : 1
+                                            }}>
+                                              {item.special_instructions}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div style={{
+                                          background: isCompleted ? '#ec4899' : '#f3e8ff',
+                                          color: isCompleted ? '#ffffff' : '#92400e',
+                                          padding: '0.25rem 0.5rem',
+                                          borderRadius: '1rem',
+                                          fontSize: '0.875rem',
+                                          fontWeight: 'bold',
+                                          minWidth: '2rem',
+                                          textAlign: 'center',
+                                          opacity: isCompleted ? 0.8 : 1
+                                        }}>
+                                          {item.quantity}
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              )}
+                            </>
+                          )
+                        })()}
                       </div>
 
                       {/* 操作按鈕 */}
                       <div style={{
                         display: 'flex',
                         gap: '0.5rem',
-                        flexWrap: 'wrap'
+                        flexWrap: 'wrap',
+                        alignItems: 'center'
                       }}>
                         {status === 'pending' && (
                           <button
@@ -474,22 +728,99 @@ const KDSView: React.FC = () => {
                           </button>
                         )}
                         {status === 'preparing' && (
-                          <button
-                            onClick={() => updateOrderStatus(order.id, 'ready')}
-                            style={{
-                              background: themeColors.success,
-                              color: '#ffffff',
-                              border: 'none',
-                              padding: '0.5rem 1rem',
-                              borderRadius: currentStyle === 'brutalism' ? '0' : '0.25rem',
-                              cursor: 'pointer',
-                              fontSize: '0.875rem',
-                              fontWeight: '500',
-                              boxShadow: currentStyle === 'brutalism' ? `2px 2px 0px ${themeColors.border}` : 'none'
-                            }}
-                          >
-                            製作完成
-                          </button>
+                          <>
+                            {/* 詳細進度顯示 */}
+                            {(() => {
+                              const { mainItems, dessertItems } = separateOrderItems(order)
+                              const completedMainItems = mainItems.filter((_, idx) => {
+                                const originalIndex = order.order_items.findIndex(item => item === mainItems[idx])
+                                return getItemStatus(order.id, originalIndex)
+                              }).length
+                              const completedDessertItems = dessertItems.filter((_, idx) => {
+                                const originalIndex = order.order_items.findIndex(item => item === dessertItems[idx])
+                                return getItemStatus(order.id, originalIndex)
+                              }).length
+                              
+                              return (
+                                <div style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '0.25rem',
+                                  padding: '0.5rem',
+                                  backgroundColor: themeColors.cardBg === '#ffffff' ? '#f9fafb' : 'rgba(255,255,255,0.05)',
+                                  borderRadius: '0.5rem',
+                                  border: `1px solid ${themeColors.border}`,
+                                  fontSize: '0.75rem'
+                                }}>
+                                  {mainItems.length > 0 && (
+                                    <div style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '0.5rem',
+                                      color: areAllMainItemsCompleted(order) ? themeColors.success : themeColors.text
+                                    }}>
+                                      🍽️ 主餐: {completedMainItems}/{mainItems.length}
+                                      {areAllMainItemsCompleted(order) && <span>✓</span>}
+                                    </div>
+                                  )}
+                                  {dessertItems.length > 0 && (
+                                    <div style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '0.5rem',
+                                      color: areAllDessertItemsCompleted(order) ? '#ec4899' : themeColors.subText,
+                                      opacity: areAllMainItemsCompleted(order) ? 1 : 0.6
+                                    }}>
+                                      🍰 甜點: {completedDessertItems}/{dessertItems.length}
+                                      {areAllDessertItemsCompleted(order) && <span>✓</span>}
+                                      {!areAllMainItemsCompleted(order) && <span style={{ color: '#f59e0b' }}>(等待主餐)</span>}
+                                    </div>
+                                  )}
+                                  <div style={{
+                                    borderTop: `1px solid ${themeColors.border}`,
+                                    paddingTop: '0.25rem',
+                                    marginTop: '0.25rem',
+                                    fontWeight: 'bold',
+                                    color: themeColors.text
+                                  }}>
+                                    總進度: {order.order_items.filter((_, index) => getItemStatus(order.id, index)).length}/{order.order_items.length}
+                                  </div>
+                                </div>
+                              )
+                            })()}
+                            
+                            <button
+                              onClick={() => updateOrderStatus(order.id, 'ready')}
+                              disabled={!areAllItemsCompleted(order)}
+                              style={{
+                                background: areAllItemsCompleted(order) ? themeColors.success : themeColors.subText,
+                                color: '#ffffff',
+                                border: 'none',
+                                padding: '0.5rem 1rem',
+                                borderRadius: currentStyle === 'brutalism' ? '0' : '0.25rem',
+                                cursor: areAllItemsCompleted(order) ? 'pointer' : 'not-allowed',
+                                fontSize: '0.875rem',
+                                fontWeight: '500',
+                                boxShadow: currentStyle === 'brutalism' ? `2px 2px 0px ${themeColors.border}` : 'none',
+                                opacity: areAllItemsCompleted(order) ? 1 : 0.6
+                              }}
+                              title={
+                                areAllItemsCompleted(order) 
+                                  ? '所有餐點製作完成' 
+                                  : (() => {
+                                      const { mainItems, dessertItems } = separateOrderItems(order)
+                                      if (!areAllMainItemsCompleted(order)) {
+                                        return '請先完成所有主餐項目'
+                                      } else if (!areAllDessertItemsCompleted(order)) {
+                                        return '請完成甜點項目'
+                                      }
+                                      return '請完成所有餐點項目'
+                                    })()
+                              }
+                            >
+                              {areAllItemsCompleted(order) ? '✓ 全部完成' : '製作完成'}
+                            </button>
+                          </>
                         )}
                         {status === 'ready' && (
                           <button

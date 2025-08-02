@@ -94,15 +94,21 @@ const MobileLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   return (
     <div style={{
-      height: '100vh',
+      minHeight: '100vh',
       backgroundColor: themeColors.background,
       position: 'relative',
-      overflow: 'hidden'
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      WebkitOverflowScrolling: 'touch',
+      touchAction: 'pan-y'
     }}>
       {/* 主要內容區域 */}
       <div style={{
-        height: '100vh',
-        overflow: 'hidden'
+        minHeight: '100vh',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        touchAction: 'pan-y'
       }}>
         {children}
       </div>

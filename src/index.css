@@ -1,263 +1,265 @@
-/* 導入現代設計系統 */
-@import './styles/modern-design.css';
-/* 導入餐廳主題樣式 */
-@import './styles/restaurant-themes.css';
-/* 導入深色主題樣式 */
-@import './styles/dark-theme.css';
-/* 導入 UI 修復樣式 */
-@import './styles/ui-fixes.css';
-/* 導入 UI 風格系統 */
-@import './styles/ui-styles.css';
-/* 導入購物車增強樣式 */
-@import './styles/cart-enhancement.css';
-/* 導入搜尋與篩選樣式 */
-@import './styles/search-filter-styles.css';
-/* 導入購物車主題樣式 */
-@import './styles/cart-styles.css';
-/* 導入響應式設計系統 */
-@import './styles/responsive-design.css';
-/* 導入新 POS 系統樣式 */
-@import './styles/new-pos-system.css';
-/* 導入新 POS 系統 UI 適配器 */
-@import './styles/new-pos-ui-adapter.css';
-/* 導入自定義滾動條樣式 */
-@import './styles/scroll-styles.css';
-/* 導入滾動增強功能 */
-@import './styles/scroll-enhancements.css';
+/* TanaPOS V4-Mini 基礎樣式 */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* 通知系統動畫 */
-@layer utilities {
-  .notification-enter {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  
-  .notification-exit {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  
-  .notification-item {
-    transform: translateX(100%);
-    opacity: 0;
-    transition: all 0.3s ease-in-out;
-  }
+/* 重置樣式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-    
-    /* POS 系統專用顏色變數 */
-    --pos-primary: 139 84% 54%;        /* 綠色主題 */
-    --pos-primary-foreground: 0 0% 100%;
-    --pos-secondary: 217 91% 60%;      /* 藍色輔助 */
-    --pos-secondary-foreground: 0 0% 100%;
-    --pos-warning: 45 93% 47%;         /* 警告橙色 */
-    --pos-warning-foreground: 0 0% 100%;
-    --pos-danger: 0 84% 60%;           /* 危險紅色 */
-    --pos-danger-foreground: 0 0% 100%;
-    --pos-success: 120 61% 50%;        /* 成功綠色 */
-    --pos-success-foreground: 0 0% 100%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 217.2 32.6% 17.5%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 217.2 32.6% 17.5%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 25%;
-    --input: 217.2 32.6% 15%;
-    --ring: 212.7 26.8% 83.9%;
-    
-    /* 深色模式 POS 系統專用顏色 */
-    --pos-primary: 142 76% 36%;        /* 深綠色主題 */
-    --pos-primary-foreground: 0 0% 100%;
-    --pos-secondary: 217 91% 45%;      /* 深藍色輔助 */
-    --pos-secondary-foreground: 0 0% 100%;
-    --pos-warning: 35 84% 55%;         /* 深橙色警告 */
-    --pos-warning-foreground: 0 0% 100%;
-    --pos-danger: 0 75% 55%;           /* 深紅色危險 */
-    --pos-danger-foreground: 0 0% 100%;
-    --pos-success: 120 50% 40%;        /* 深綠色成功 */
-    --pos-success-foreground: 0 0% 100%;
-  }
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8fafc;
 }
 
-@layer base {
-  * {
-    border-color: hsl(var(--border));
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-  }
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-feature-settings: "rlig" 1, "calt" 1;
-    margin: 0;
-    padding: 0;
+#root {
+  height: 100%;
+  min-height: 100vh;
+}
+
+/* 通用按鈕樣式 */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+  min-height: 44px; /* 觸控友好 */
+  min-width: 44px;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 輸入框樣式 */
+input, textarea, select {
+  font-family: inherit;
+  font-size: 16px; /* 防止iOS縮放 */
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 卡片樣式 */
+.card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* 響應式工具類 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid-auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+/* 文字工具類 */
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* 間距工具類 */
+.p-2 {
+  padding: 0.5rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.m-2 {
+  margin: 0.5rem;
+}
+
+.m-4 {
+  margin: 1rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+/* 顏色工具類 */
+.text-primary {
+  color: #3b82f6;
+}
+
+.text-secondary {
+  color: #6b7280;
+}
+
+.text-success {
+  color: #10b981;
+}
+
+.text-danger {
+  color: #ef4444;
+}
+
+.bg-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.bg-secondary {
+  background-color: #6b7280;
+  color: white;
+}
+
+.bg-success {
+  background-color: #10b981;
+  color: white;
+}
+
+.bg-danger {
+  background-color: #ef4444;
+  color: white;
+}
+
+/* 行動裝置優化 */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 0.5rem;
   }
   
-  /* 確保深色模式下的基本元素可見性 */
-  .dark {
-    color-scheme: dark;
-  }
-  
-  /* 修復按鈕和輸入框的顯示問題 */
   button {
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    min-height: 48px; /* 行動裝置更大的觸控區域 */
   }
   
-  input, textarea, select {
-    background-color: hsl(var(--background));
-    border-color: hsl(var(--border));
-    color: hsl(var(--foreground));
+  .grid-auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 }
 
-@layer components {
-  /* POS 系統核心組件樣式 */
-  .pos-product-card {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: 0.75rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-    position: relative;
+/* 載入動畫 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  .pos-product-card:hover {
-    background-color: hsl(var(--accent) / 0.5);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    transform: translateY(-2px);
-    border-color: hsl(var(--pos-primary) / 0.5);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .pos-cart {
-    background-color: hsl(var(--card));
-    border-left: 2px solid hsl(var(--pos-primary) / 0.3);
-    box-shadow: -5px 0 15px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(8px);
-    border-top-left-radius: 1rem;
-    border-bottom-left-radius: 1rem;
-  }
-  
-  .btn-pos-primary {
-    background: linear-gradient(135deg, hsl(var(--pos-primary)), hsl(var(--pos-primary)) 90%);
-    color: hsl(var(--pos-primary-foreground));
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    letter-spacing: 0.025em;
-    box-shadow: 0 4px 14px 0 hsl(var(--pos-primary) / 0.3);
-    transition: all 0.2s ease;
-  }
-  
-  .btn-pos-primary:hover {
-    background: linear-gradient(135deg, hsl(var(--pos-primary) / 0.9), hsl(var(--pos-primary) / 0.8));
-    box-shadow: 0 8px 25px 0 hsl(var(--pos-primary) / 0.4);
-    transform: translateY(-2px);
-  }
-  
-  .btn-pos-success {
-    background: linear-gradient(135deg, hsl(var(--pos-success)), hsl(var(--pos-success)) 90%);
-    color: hsl(var(--pos-success-foreground));
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    box-shadow: 0 4px 14px 0 hsl(var(--pos-success) / 0.3);
-    transition: all 0.2s ease;
-  }
-  
-  .btn-pos-success:hover {
-    background: linear-gradient(135deg, hsl(var(--pos-success) / 0.9), hsl(var(--pos-success) / 0.8));
-    box-shadow: 0 8px 25px 0 hsl(var(--pos-success) / 0.4);
-    transform: translateY(-2px);
-  }
-  
-  .quantity-btn {
-    background-color: hsl(var(--secondary));
-    border: 1px solid hsl(var(--border));
-    color: hsl(var(--secondary-foreground));
-    border-radius: 0.375rem;
-    font-weight: bold;
-    transition: all 0.2s ease;
-    cursor: pointer;
-  }
-  
-  .quantity-btn:hover {
-    background-color: hsl(var(--pos-primary));
-    color: hsl(var(--pos-primary-foreground));
-    border-color: hsl(var(--pos-primary));
-    transform: scale(1.1);
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-  }
-  
-  .category-btn {
-    background-color: hsl(var(--background));
-    border: 2px solid hsl(var(--border));
-    color: hsl(var(--foreground));
-    font-weight: 500;
-    transition: all 0.2s ease;
-  }
-  
-  .category-btn:hover {
-    background-color: hsl(var(--accent));
-    border-color: hsl(var(--pos-primary));
-    color: hsl(var(--pos-primary));
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.tanapos-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* 平滑滾動 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 隱藏元素 */
+.hidden {
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

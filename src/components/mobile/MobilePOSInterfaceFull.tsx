@@ -524,7 +524,7 @@ const MobilePOSInterfaceFull: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [isCartOpen, setIsCartOpen] = useState(false)
-  const [selectedTable, setSelectedTable] = useState<number>(1)
+  const [selectedTable, setSelectedTable] = useState<number>(0)
   const [cartNotes, setCartNotes] = useState<Record<string, string>>({})
 
   const { currentStyle } = useUIStyle()
@@ -737,16 +737,54 @@ const MobilePOSInterfaceFull: React.FC = () => {
   }
 
   const handleCheckout = async () => {
-    if (cartItems.length === 0) return
+    if (cartItems.length === 0) {
+      alert('購物車是空的，請先加入商品')
+      return
+    }
+    if (!selectedTable || selectedTable === 0) {
+      alert('請選擇桌號')
+      return
+    }
     
     try {
-      await createOrder({
-        tableNumber: selectedTable.toString(),
-        items: cartItems
-      })
+      // 找到所選桌位的資訊
+      const currentTable = currentTables.find(t => t.table_number === selectedTable)
+      const tableId = currentTable?.id
+      
+      // 計算總價
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      const taxAmount = subtotal * 0.1
+      const totalAmount = subtotal + taxAmount
+      
+      // 建立訂單資料
+      const orderData = {
+        table_id: tableId,
+        table_number: selectedTable,
+        items: cartItems.map(item => ({
+          product_id: item.id,
+          product_name: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          special_instructions: item.note || ''
+        })),
+        subtotal: subtotal,
+        tax_amount: taxAmount,
+        total_amount: totalAmount,
+        customer_name: '',
+        customer_phone: '',
+        notes: '',
+        created_by: '行動裝置'
+      }
+      
+      console.log('送出訂單資料:', orderData)
+      
+      await createOrder(orderData)
+      clearCart() // 清空購物車
       setIsCartOpen(false)
-      alert('訂單已成功送出！')
+      setSelectedTable(0) // 重置桌號選擇
+      alert(`訂單已成功送出！桌號: ${selectedTable}${currentTable?.table_name ? ` (${currentTable.table_name})` : ''}`)
     } catch (error) {
+      console.error('建立訂單錯誤:', error)
       alert('建立訂單失敗，請重試')
     }
   }
@@ -772,7 +810,10 @@ const MobilePOSInterfaceFull: React.FC = () => {
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
-      overflow: 'hidden'
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      WebkitOverflowScrolling: 'touch',
+      touchAction: 'pan-y'
     }}>
       {/* 頂部標題欄 */}
       <div style={{
@@ -805,10 +846,13 @@ const MobilePOSInterfaceFull: React.FC = () => {
               fontWeight: '500'
             }}
           >
+            <option value={0}>請選擇桌號</option>
             {currentTables.length > 0 ? (
               currentTables.map(table => (
                 <option key={table.id} value={table.table_number}>
-                  {table.table_name ? `${table.table_name} (#${table.table_number})` : `桌號 ${table.table_number}`} {table.status === 'occupied' ? '(使用中)' : ''}
+                  桌號 {table.table_number}
+                  {table.table_name ? ` - ${table.table_name}` : ''}
+                  {table.status === 'occupied' ? ' (使用中)' : ''}
                 </option>
               ))
             ) : (

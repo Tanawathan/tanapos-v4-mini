@@ -14,6 +14,19 @@ export interface Product {
   preparation_time?: number
   created_at: string
   updated_at: string
+  // 套餐相關屬性（可選）
+  combo_type?: 'fixed' | 'selectable'
+  combo_choices?: Array<{
+    id: string
+    category_id: string
+    min_selections: number
+    max_selections: number
+    sort_order: number
+    categories: {
+      id: string
+      name: string
+    }
+  }>
 }
 
 // 分類類型
@@ -166,6 +179,9 @@ export interface CartItem {
   price: number
   quantity: number
   note?: string       // 每個實例的獨立備註
+  type?: 'product' | 'combo'  // 項目類型
+  combo_type?: 'fixed' | 'selectable'  // 套餐類型
+  combo_selections?: any  // 套餐選擇內容
 }
 
 // UI 相關類型

@@ -11,9 +11,19 @@
 /* 容器佈局 */
 .pos-container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
-  overflow: hidden;
+  flex-direction: column;
+}
+
+/* 確保移動端可以滑動 */
+@media (max-width: 768px) {
+  .pos-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
 }
 
 /* 主內容區域 - 佈局結構 */
@@ -23,9 +33,12 @@
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 /* 產品網格佈局 */

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Clean Mobile POS Test - TanaPOS</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #f9fafb;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+    
+    /* 確保觸控友好 */
+    button, input, select, textarea {
+      min-height: 44px;
+      font-size: 16px;
+    }
+    
+    /* 防止縮放但允許輔助功能 */
+    .controlled-zoom {
+      touch-action: manipulation;
+    }
+    
+    /* 焦點指示器 */
+    button:focus, input:focus, select:focus, textarea:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+    }
+    
+    /* 減少動畫 */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="root"></div>
+  </div>
+
+  <!-- React 組件載入 -->
+  <script type="module">
+    import { createRoot } from 'react-dom/client'
+    import { createElement } from 'react'
+    import CleanMobilePOS from './src/components/mobile/CleanMobilePOS.tsx'
+
+    const root = createRoot(document.getElementById('root'))
+    root.render(createElement(CleanMobilePOS))
+  </script>
+</body>
+</html>

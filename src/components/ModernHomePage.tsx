@@ -21,9 +21,23 @@ const ModernHomePage: React.FC = () => {
       color: 'success'
     },
     {
+      title: '乾淨手機版',
+      description: '最新的簡潔手機點餐介面，使用內聯CSS設計',
+      icon: '🧹',
+      path: '/mobile-clean',
+      color: 'primary'
+    },
+    {
+      title: '新版點餐系統',
+      description: '全新設計的點餐系統，完整套餐功能支援',
+      icon: '🆕',
+      path: '/pos-new',
+      color: 'primary'
+    },
+    {
       title: '舊版點餐系統',
       description: '傳統的點餐介面，基本功能完整',
-      icon: '�',
+      icon: '📱',
       path: '/pos-old',
       color: 'secondary'
     },

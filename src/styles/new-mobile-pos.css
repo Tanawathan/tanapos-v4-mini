@@ -1,0 +1,137 @@
+/* 新行動POS專用樣式增強 */
+
+/* 確保基本樣式載入 */
+.new-mobile-pos {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+/* 增強的觸控體驗 - 允許適度縮放 */
+.new-mobile-pos button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* 改進的防意外操作 - 不完全禁用縮放 */
+.controlled-zoom {
+  touch-action: pan-x pan-y pinch-zoom;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 購物車滑動動畫 */
+.cart-modal {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 產品卡片懸浮效果增強 */
+.product-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* 響應式網格增強 */
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+/* 數量徽章動畫 */
+.quantity-badge {
+  animation: bounceIn 0.3s ease;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* iOS Safari 狀態列適配 */
+@supports (padding: max(0px)) {
+  .ios-safe-area {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* 高對比度支援 */
+@media (prefers-contrast: high) {
+  .new-mobile-pos {
+    --border-color: #000000;
+    --text-color: #000000;
+    --bg-color: #ffffff;
+  }
+}
+
+/* 無障礙友好的焦點指示器 */
+.new-mobile-pos button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* 減少動畫偏好設定支援 */
+@media (prefers-reduced-motion: reduce) {
+  .cart-modal,
+  .quantity-badge,
+  .product-card-hover {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* iOS Safari 狀態列適配 */
+@supports (padding: max(0px)) {
+  .ios-safe-area {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* 高對比度支援 */
+@media (prefers-contrast: high) {
+  .new-mobile-pos {
+    --border-color: #000000;
+    --text-color: #000000;
+    --bg-color: #ffffff;
+  }
+}

@@ -2,8 +2,31 @@ import React, { useEffect, useState, useRef } from 'react'
 import { usePOSStore } from '../../lib/store-complete'
 import { useNotifications } from '../ui/NotificationSystem'
 import SearchAndFilter from '../ui/SearchAndFilter'
+import ComboSelector from '../ComboSelector'
 import { ShoppingCart, X, Move } from 'lucide-react'
 import type { Product, CartItem } from '../../lib/types-unified'
+import { supabase } from '../../lib/supabase'
+
+interface ComboProduct {
+  id: string
+  name: string
+  description: string
+  price: number
+  combo_type: 'fixed' | 'selectable'
+  is_available: boolean
+  preparation_time: number
+  combo_choices?: Array<{
+    id: string
+    category_id: string
+    min_selections: number
+    max_selections: number
+    sort_order: number
+    categories: {
+      id: string
+      name: string
+    }
+  }>
+}
 
 const SimplePOS: React.FC = () => {
   const { 
@@ -13,6 +36,7 @@ const SimplePOS: React.FC = () => {
     loading, 
     loadProducts, 
     loadCategories,
+    loadTables,
     addToCart,
     removeFromCart,
     updateCartQuantity,
@@ -31,6 +55,13 @@ const SimplePOS: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [note, setNote] = useState('')
   
+  // 套餐相關狀態
+  const [combos, setCombos] = useState<ComboProduct[]>([])
+  const [selectedCombo, setSelectedCombo] = useState<ComboProduct | null>(null)
+  const [comboQuantity, setComboQuantity] = useState(1)
+  const [showComboSelector, setShowComboSelector] = useState(false)
+  const [viewMode, setViewMode] = useState<'products' | 'combos'>('products')
+  
   // 拖動相關狀態
   const [cartPosition, setCartPosition] = useState({ x: 20, y: 80 })
   const [isDragging, setIsDragging] = useState(false)
@@ -41,10 +72,40 @@ const SimplePOS: React.FC = () => {
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0)
   const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0)
 
-  // 處理添加商品到購物車
-  const handleAddToCart = (product: Product) => {
-    addToCart(product)
-    notifications.success('成功', `已將 ${product.name} 加入購物車`)
+  // 處理添加商品到購物車 - 增強版支援套餐檢測
+  const handleAddToCart = async (product: Product) => {
+    console.log('handleAddToCart 被調用，產品:', product.name)
+    console.log('產品類型 combo_type:', product.combo_type)
+    console.log('產品選擇規則:', product.combo_choices?.length || 0)
+    
+    // 檢查是否為套餐產品（透過 combo_type 屬性判斷）
+    if (product.combo_type) {
+      console.log('檢測到套餐產品，類型:', product.combo_type)
+      
+      // 轉換為 ComboProduct 格式
+      const combo: ComboProduct = {
+        id: product.id,
+        name: product.name.replace('🍽️ ', ''), // 移除圖標前綴
+        description: product.description || '',
+        price: product.price,
+        combo_type: product.combo_type,
+        is_available: product.is_available,
+        preparation_time: product.preparation_time || 15,
+        combo_choices: product.combo_choices || []
+      }
+      
+      console.log('轉換後的套餐資料:', combo)
+      console.log('套餐類型:', combo.combo_type)
+      console.log('選擇規則數量:', combo.combo_choices?.length)
+      
+      // 使用現有的套餐處理邏輯
+      handleComboSelect(combo, 1)
+    } else {
+      // 一般產品的處理
+      console.log('一般產品，直接加入購物車')
+      addToCart(product)
+      notifications.success('成功', `已將 ${product.name} 加入購物車`)
+    }
   }
 
   // 處理更新購物車商品數量
@@ -167,12 +228,115 @@ const SimplePOS: React.FC = () => {
     }
   }, [isDragging, dragOffset])
 
+  // 載入套餐資料 - 增強版本，檢查選擇規則
+  const loadCombos = async () => {
+    try {
+      console.log('開始載入套餐資料...')
+      
+      // 載入套餐和其選擇規則
+      const { data: combosData, error: combosError } = await supabase
+        .from('combo_products')
+        .select(`
+          *,
+          combo_choices (
+            id,
+            category_id,
+            min_selections,
+            max_selections,
+            sort_order,
+            categories (
+              id,
+              name
+            )
+          )
+        `)
+        .eq('is_available', true)
+        .order('name')
+      
+      if (combosError) {
+        console.error('載入套餐錯誤:', combosError)
+        throw combosError
+      }
+      
+      console.log('載入的套餐資料:', combosData)
+      
+      // 過濾出有完整設定的套餐
+      const validCombos = combosData?.filter(combo => {
+        if (combo.combo_type === 'fixed') return true // 固定套餐不需要選擇規則
+        return combo.combo_choices && combo.combo_choices.length > 0 // 可選套餐需要選擇規則
+      }) || []
+      
+      console.log('有效套餐數量:', validCombos.length)
+      if (validCombos.length !== combosData?.length) {
+        console.warn('部分套餐因缺少選擇規則被過濾掉')
+        notifications.warning('提醒', `${(combosData?.length || 0) - validCombos.length} 個套餐因缺少選擇規則無法顯示，請到管理介面設定`)
+      }
+      
+      setCombos(validCombos)
+    } catch (error) {
+      console.error('載入套餐失敗:', error)
+      notifications.error('錯誤', '載入套餐失敗')
+    }
+  }
+
+  // 處理套餐選擇
+  const handleComboSelect = (combo: ComboProduct, quantity: number = 1) => {
+    console.log('處理套餐選擇:', combo.name, '類型:', combo.combo_type)
+    console.log('套餐選擇規則:', combo.combo_choices?.length || 0)
+    
+    if (combo.combo_type === 'fixed') {
+      // 固定套餐直接加入購物車
+      console.log('固定套餐，直接加入購物車')
+      const comboCartItem: CartItem = {
+        id: combo.id,
+        instanceId: `combo_${combo.id}_${Date.now()}`,
+        name: combo.name,
+        price: combo.price,
+        quantity: quantity,
+        type: 'combo',
+        combo_type: 'fixed'
+      }
+      addToCart(comboCartItem as any)
+      notifications.success('成功', `已將 ${combo.name} 加入購物車`)
+    } else {
+      // 可選擇套餐需要打開選擇器
+      console.log('可選套餐，打開選擇器')
+      console.log('設定 selectedCombo:', combo)
+      console.log('設定 comboQuantity:', quantity)
+      console.log('設定 showComboSelector: true')
+      
+      setSelectedCombo(combo)
+      setComboQuantity(quantity)
+      setShowComboSelector(true)
+    }
+  }
+
+  // 處理套餐確認
+  const handleComboConfirm = (combo: ComboProduct, selections: any, totalPrice: number) => {
+    const comboCartItem: CartItem = {
+      id: combo.id,
+      instanceId: `combo_${combo.id}_${Date.now()}`,
+      name: combo.name,
+      price: totalPrice / comboQuantity,
+      quantity: comboQuantity,
+      type: 'combo',
+      combo_type: 'selectable',
+      combo_selections: selections
+    }
+    addToCart(comboCartItem as any)
+    notifications.success('成功', `已將 ${combo.name} 加入購物車`)
+    setShowComboSelector(false)
+    setSelectedCombo(null)
+  }
+
   // 載入數據
   useEffect(() => {
     console.log('SimplePOS: 開始載入數據')
     loadProducts()
     loadCategories()
-  }, [loadProducts, loadCategories])
+    loadTables()
+    loadCombos()
+  }, [loadProducts, loadCategories, loadTables])
 
   // 調試用 - 監控數據變化
   useEffect(() => {
@@ -189,6 +353,26 @@ const SimplePOS: React.FC = () => {
     console.log('SimplePOS: loading狀態:', loading)
   }, [loading])
 
+  useEffect(() => {
+    console.log('SimplePOS: tables數量:', tables.length)
+    console.log('SimplePOS: tables:', tables)
+  }, [tables])
+
+  // 新增：監控套餐資料變化
+  useEffect(() => {
+    console.log('SimplePOS: combos數量:', combos.length)
+    console.log('SimplePOS: combos:', combos)
+  }, [combos])
+
+  // 組件掛載時載入數據
+  useEffect(() => {
+    console.log('SimplePOS 組件掛載，載入數據...')
+    loadProducts()
+    loadCategories()
+    loadTables()
+    loadCombos() // 載入套餐數據
+  }, [])
+
   return (
     <div className="pos-container">
       {/* 主內容區域 */}
@@ -201,111 +385,282 @@ const SimplePOS: React.FC = () => {
             onFilterChange={setActiveFilters}
           />
           
-          {/* 分類按鈕 */}
-          <div className="pos-categories">
+          {/* 產品/套餐切換 */}
+          <div className="view-mode-toggle" style={{ marginBottom: '1rem' }}>
             <button
-              className={`category-btn ${!selectedCategory ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(null)}
+              className={`view-mode-btn ${viewMode === 'products' ? 'active' : ''}`}
+              onClick={() => setViewMode('products')}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: viewMode === 'products' ? '#3b82f6' : '#f3f4f6',
+                color: viewMode === 'products' ? 'white' : '#374151',
+                border: 'none',
+                borderRadius: '0.375rem 0 0 0.375rem',
+                cursor: 'pointer'
+              }}
             >
-              全部
+              🍔 單點商品
             </button>
-            {categories.map(category => (
-              <button
-                key={category.id}
-                className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(category.id)}
-              >
-                {category.name}
-              </button>
-            ))}
+            <button
+              className={`view-mode-btn ${viewMode === 'combos' ? 'active' : ''}`}
+              onClick={() => setViewMode('combos')}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: viewMode === 'combos' ? '#3b82f6' : '#f3f4f6',
+                color: viewMode === 'combos' ? 'white' : '#374151',
+                border: 'none',
+                borderRadius: '0 0.375rem 0.375rem 0',
+                cursor: 'pointer'
+              }}
+            >
+              🍽️ 套餐組合 ({combos.length})
+            </button>
           </div>
+          
+          {/* 分類按鈕 - 只在單點模式顯示 */}
+          {viewMode === 'products' && (
+            <div className="pos-categories">
+              <button
+                className={`category-btn ${!selectedCategory ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(null)}
+              >
+                全部
+              </button>
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(category.id)}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* 產品網格 */}
+        {/* 產品/套餐網格 */}
         <div className="pos-products-grid">
           {loading ? (
             <div className="pos-loading">載入中...</div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="pos-empty-state">
-              <p>沒有找到商品</p>
-            </div>
-          ) : (
-            filteredProducts.map(product => {
-              const cartItem = cartItems.find(item => item.id === product.id)
-              const quantity = cartItem ? cartItem.quantity : 0
-              
-              return (
-                <div 
-                  key={product.id} 
-                  className="pos-product-card"
-                >
-                  {/* 數量徽章 */}
-                  {quantity > 0 && (
-                    <div className="pos-quantity-badge">
-                      {quantity}
-                    </div>
-                  )}
-                  
-                  {/* 產品標題 */}
-                  <h3>{product.name}</h3>
-                  
-                  {/* 產品描述 */}
-                  <p>{product.description}</p>
-                  
-                  {/* 價格 */}
-                  <div className="price">
-                    NT$ {product.price}
-                  </div>
-                  
-                  {/* 控制按鈕 */}
-                  {quantity > 0 ? (
-                    <div className="pos-product-controls">
-                      <button
-                        className="btn-pos-secondary"
-                        onClick={() => handleUpdateQuantity(product.id, quantity - 1)}
-                        disabled={quantity <= 1}
-                      >
-                        −
-                      </button>
-                      <span>{quantity}</span>
-                      <button
-                        className="btn-pos-secondary"
-                        onClick={() => handleUpdateQuantity(product.id, quantity + 1)}
-                      >
-                        +
-                      </button>
-                      <button
-                        className="btn-pos-danger"
-                        onClick={() => removeFromCart(product.id)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ) : (
-                    <button 
-                      className="btn-pos-primary"
-                      onClick={() => handleAddToCart(product)}
-                      disabled={!product.is_available}
-                    >
-                      加入購物車
-                    </button>
-                  )}
-                  
-                  {/* 缺貨狀態 */}
-                  {!product.is_available && (
-                    <div className="pos-product-unavailable">缺貨</div>
-                  )}
-
-                  {/* 商品詳情按鈕 */}
-                  <button
-                    className="btn-pos-text"
-                    onClick={() => setSelectedProduct(product)}
+          ) : viewMode === 'products' ? (
+            // 單點商品模式
+            filteredProducts.length === 0 ? (
+              <div className="pos-empty-state">
+                <p>沒有找到商品</p>
+              </div>
+            ) : (
+              filteredProducts.map(product => {
+                const cartItem = cartItems.find(item => item.id === product.id)
+                const quantity = cartItem ? cartItem.quantity : 0
+                
+                return (
+                  <div 
+                    key={product.id} 
+                    className="pos-product-card"
                   >
-                    商品詳情
+                    {/* 數量徽章 */}
+                    {quantity > 0 && (
+                      <div className="pos-quantity-badge">
+                        {quantity}
+                      </div>
+                    )}
+                    
+                    {/* 產品標題 */}
+                    <h3>{product.name}</h3>
+                    
+                    {/* 產品描述 */}
+                    <p>{product.description}</p>
+                    
+                    {/* 價格 */}
+                    <div className="price">
+                      NT$ {product.price}
+                    </div>
+                    
+                    {/* 控制按鈕 */}
+                    {quantity > 0 ? (
+                      <div className="pos-product-controls">
+                        <button
+                          className="btn-pos-secondary"
+                          onClick={() => handleUpdateQuantity(product.id, quantity - 1)}
+                          disabled={quantity <= 1}
+                        >
+                          −
+                        </button>
+                        <span>{quantity}</span>
+                        <button
+                          className="btn-pos-secondary"
+                          onClick={() => handleUpdateQuantity(product.id, quantity + 1)}
+                        >
+                          +
+                        </button>
+                        <button
+                          className="btn-pos-danger"
+                          onClick={() => removeFromCart(product.id)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <button 
+                        className="btn-pos-primary"
+                        onClick={() => handleAddToCart(product)}
+                        disabled={!product.is_available}
+                      >
+                        加入購物車
+                      </button>
+                    )}
+                    
+                    {/* 缺貨狀態 */}
+                    {!product.is_available && (
+                      <div className="pos-product-unavailable">缺貨</div>
+                    )}
+
+                    {/* 商品詳情按鈕 */}
+                    <button
+                      className="btn-pos-text"
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      商品詳情
+                    </button>
+                  </div>
+                )
+              })
+            )
+          ) : (
+            // 套餐模式
+            combos.length === 0 ? (
+              <div className="pos-empty-state">
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🍽️</div>
+                <h3>暫無可用套餐</h3>
+                <p className="text-sm text-gray-500 mb-4">請選擇以下操作：</p>
+                <div className="space-y-2">
+                  <button 
+                    className="btn-pos-primary"
+                    onClick={() => window.open('/admin', '_blank')}
+                    style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
+                  >
+                    📝 前往管理介面創建套餐
+                  </button>
+                  <button 
+                    className="btn-pos-secondary"
+                    onClick={loadCombos}
+                    style={{ display: 'block', width: '100%' }}
+                  >
+                    🔄 重新載入套餐
                   </button>
                 </div>
-              )
-            })
+                <div style={{ 
+                  marginTop: '1rem', 
+                  padding: '1rem', 
+                  backgroundColor: '#fef3c7', 
+                  borderRadius: '0.5rem',
+                  fontSize: '0.875rem',
+                  color: '#92400e'
+                }}>
+                  💡 <strong>提示：</strong>套餐需要設定選擇規則才能顯示。
+                  <br />請確認已在管理介面中完成套餐配置。
+                </div>
+              </div>
+            ) : (
+              combos.map(combo => {
+                // 檢查套餐是否有完整設定
+                const hasChoices = combo.combo_type === 'fixed' || 
+                  (combo.combo_choices && combo.combo_choices.length > 0)
+                
+                return (
+                  <div 
+                    key={combo.id} 
+                    className={`pos-product-card combo-card ${!hasChoices ? 'combo-incomplete' : ''}`}
+                    style={{ 
+                      borderColor: hasChoices ? '#f59e0b' : '#ef4444',
+                      opacity: hasChoices ? 1 : 0.7
+                    }}
+                  >
+                    {/* 套餐標識 */}
+                    <div className="combo-badge" style={{
+                      position: 'absolute',
+                      top: '0.5rem',
+                      right: '0.5rem',
+                      backgroundColor: hasChoices ? '#f59e0b' : '#ef4444',
+                      color: 'white',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '0.25rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold'
+                    }}>
+                      {combo.combo_type === 'fixed' ? '固定套餐' : '可選套餐'}
+                      {!hasChoices && ' ⚠️'}
+                    </div>
+                    
+                    {/* 套餐標題 */}
+                    <h3>{combo.name}</h3>
+                    
+                    {/* 套餐描述 */}
+                    <p>{combo.description}</p>
+                    
+                    {/* 價格 */}
+                    <div className="price" style={{ color: hasChoices ? '#f59e0b' : '#ef4444' }}>
+                      NT$ {combo.price}
+                      {combo.combo_type === 'selectable' && (
+                        <span style={{ fontSize: '0.75rem', color: '#6b7280' }}> 起</span>
+                      )}
+                    </div>
+                    
+                    {/* 製作時間 */}
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.5rem' }}>
+                      ⏱️ 約 {combo.preparation_time} 分鐘
+                    </div>
+                    
+                    {/* 選擇規則狀態 */}
+                    {combo.combo_type === 'selectable' && (
+                      <div style={{ 
+                        fontSize: '0.75rem', 
+                        color: hasChoices ? '#059669' : '#dc2626',
+                        marginBottom: '0.5rem',
+                        fontWeight: '500'
+                      }}>
+                        {hasChoices ? 
+                          `✅ ${combo.combo_choices?.length || 0} 個選擇分類` : 
+                          '⚠️ 尚未設定選擇規則'
+                        }
+                      </div>
+                    )}
+                    
+                    {/* 套餐按鈕 */}
+                    <button 
+                      className="btn-pos-primary"
+                      style={{ 
+                        backgroundColor: hasChoices ? '#f59e0b' : '#6b7280',
+                        cursor: hasChoices ? 'pointer' : 'not-allowed'
+                      }}
+                      onClick={() => hasChoices ? handleComboSelect(combo, 1) : null}
+                      disabled={!hasChoices}
+                    >
+                      {hasChoices ? 
+                        (combo.combo_type === 'fixed' ? '加入購物車' : '選擇套餐內容') :
+                        '需要設定選擇規則'
+                      }
+                    </button>
+                    
+                    {/* 不完整套餐的提示 */}
+                    {!hasChoices && (
+                      <div style={{
+                        marginTop: '0.5rem',
+                        padding: '0.5rem',
+                        backgroundColor: '#fef2f2',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem',
+                        color: '#dc2626',
+                        textAlign: 'center'
+                      }}>
+                        請到管理介面完成套餐設定
+                      </div>
+                    )}
+                  </div>
+                )
+              })
+            )
           )}
         </div>
       </div>
@@ -561,6 +916,43 @@ const SimplePOS: React.FC = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 套餐選擇器 */}
+      {showComboSelector && selectedCombo && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '20px',
+            maxWidth: '800px',
+            maxHeight: '80vh',
+            overflow: 'auto'
+          }}>
+            <h2>選擇套餐內容：{selectedCombo.name}</h2>
+            <ComboSelector
+              combo={selectedCombo}
+              quantity={comboQuantity}
+              onConfirm={handleComboConfirm}
+              onCancel={() => {
+                console.log('取消套餐選擇')
+                setShowComboSelector(false)
+                setSelectedCombo(null)
+              }}
+            />
           </div>
         </div>
       )}

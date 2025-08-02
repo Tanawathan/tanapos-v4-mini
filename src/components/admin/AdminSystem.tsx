@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { APP_CONFIG, RESTAURANT_INFO } from '../../config'
+import ComboManagementEnhanced from './ComboManagementEnhanced'
 
 // 危險操作確認對話框組件
 interface DangerConfirmModalProps {
@@ -108,7 +109,7 @@ function DangerConfirmModal({
 export default function AdminSystem() {
   const [searchParams] = useSearchParams()
   const defaultTab = searchParams.get('tab') || 'general'
-  const [activeTab, setActiveTab] = useState<'general' | 'database' | 'features' | 'layout' | 'reports' | 'dataexport' | 'backup' | 'dbeditor' | 'userguide' | 'operationguide'>(defaultTab as any)
+  const [activeTab, setActiveTab] = useState<'general' | 'database' | 'features' | 'layout' | 'reports' | 'dataexport' | 'backup' | 'dbeditor' | 'userguide' | 'operationguide' | 'combos'>(defaultTab as any)
   const [systemConfig, setSystemConfig] = useState(APP_CONFIG)
   const [restaurantInfo, setRestaurantInfo] = useState(RESTAURANT_INFO)
   const [loading, setLoading] = useState(false)
@@ -379,6 +380,7 @@ export default function AdminSystem() {
                 {[
                   { id: 'general', label: '基本設定', icon: '🏪' },
                   { id: 'database', label: '資料庫管理', icon: '🗄️' },
+                  { id: 'combos', label: '套餐管理', icon: '🍽️' },
                   { id: 'dbeditor', label: '資料庫編輯器', icon: '📝' },
                   { id: 'features', label: '功能開關', icon: '🔧' },
                   { id: 'layout', label: '佈局管理', icon: '🏗️' },
@@ -426,6 +428,10 @@ export default function AdminSystem() {
                   loading={loading}
                   onDangerousOperation={handleDangerousOperation}
                 />
+              )}
+
+              {activeTab === 'combos' && (
+                <ComboManagementEnhanced />
               )}
 
               {activeTab === 'dbeditor' && (

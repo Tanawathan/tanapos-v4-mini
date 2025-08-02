@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>移動端滑動測試</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      overscroll-behavior: none;
+    }
+    
+    .container {
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    
+    .test-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .tall-content {
+      height: 300px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    
+    .status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="status" id="status">
+    滑動測試中...
+  </div>
+
+  <div class="container">
+    <h1>📱 移動端滑動測試</h1>
+    <p>如果你能看到這個頁面並且可以上下滑動，表示修復成功！</p>
+    
+    <div class="test-section">
+      <h2>🎯 測試區域 1</h2>
+      <p>這是第一個測試區域。請嘗試向下滑動。</p>
+      <div class="tall-content">
+        高度測試內容 1
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>🔄 測試區域 2</h2>
+      <p>這是第二個測試區域。如果你能看到這裡，滑動正常。</p>
+      <div class="tall-content">
+        高度測試內容 2
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>✅ 測試區域 3</h2>
+      <p>這是第三個測試區域。繼續向下滑動測試。</p>
+      <div class="tall-content">
+        高度測試內容 3
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>🚀 測試區域 4</h2>
+      <p>這是第四個測試區域。</p>
+      <div class="tall-content">
+        高度測試內容 4
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>🎉 測試區域 5</h2>
+      <p>這是第五個測試區域。</p>
+      <div class="tall-content">
+        高度測試內容 5
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>🏁 最後測試區域</h2>
+      <p>如果你能滑動到這裡，表示移動端滑動修復完全成功！</p>
+      <div class="tall-content">
+        恭喜！滑動正常工作
+      </div>
+    </div>
+    
+    <div style="height: 100px; text-align: center; padding-top: 50px;">
+      <p>頁面底部</p>
+    </div>
+  </div>
+
+  <script>
+    let scrollCount = 0;
+    window.addEventListener('scroll', function() {
+      scrollCount++;
+      document.getElementById('status').textContent = `滑動次數: ${scrollCount} ✅ 正常工作`;
+    });
+    
+    // 檢測觸控滑動
+    let touchCount = 0;
+    document.addEventListener('touchstart', function(e) {
+      touchCount++;
+      console.log('Touch detected:', touchCount);
+    });
+    
+    document.addEventListener('touchmove', function(e) {
+      document.getElementById('status').textContent = `觸控滑動: ${touchCount} ✅ 正常工作`;
+    });
+  </script>
+</body>
+</html>

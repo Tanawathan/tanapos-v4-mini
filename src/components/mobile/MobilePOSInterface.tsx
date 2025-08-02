@@ -530,23 +530,58 @@ const MobilePOSInterface: React.FC = () => {
       return
     }
 
+    if (cartItems.length === 0) {
+      alert('購物車是空的，請先加入商品')
+      return
+    }
+
     setIsLoading(true)
     try {
+      // 找到所選桌位的資訊
+      const currentTable = tables.find(t => t.table_number === parseInt(selectedTable))
+      const tableId = currentTable?.id
+      
+      // 計算總價
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      const taxAmount = subtotal * 0.1
+      const totalAmount = subtotal + taxAmount
+      
+      // 建立訂單資料
       const orderData = {
-        tableNumber: parseInt(selectedTable),
-        items: cartItems,
-        notes: ''
+        table_id: tableId,
+        table_number: parseInt(selectedTable),
+        items: cartItems.map(item => ({
+          product_id: item.id,
+          product_name: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          special_instructions: item.note || ''
+        })),
+        subtotal: subtotal,
+        tax_amount: taxAmount,
+        total_amount: totalAmount,
+        customer_name: '',
+        customer_phone: '',
+        notes: '',
+        created_by: '行動裝置'
       }
       
+      console.log('送出訂單資料:', orderData)
+      
       await createOrder(orderData)
+      clearCart() // 清空購物車
       setIsCartOpen(false)
+      setSelectedTable(null) // 重置桌號選擇
       
       // 成功反饋
       if (navigator.vibrate) {
         navigator.vibrate([100, 50, 100])
       }
+      
+      alert(`訂單已成功送出！桌號: ${selectedTable}${currentTable?.table_name ? ` (${currentTable.table_name})` : ''}`)
     } catch (error) {
       console.error('結帳失敗:', error)
+      alert('建立訂單失敗，請重試')
     } finally {
       setIsLoading(false)
     }
@@ -874,7 +909,12 @@ const MobilePOSInterface: React.FC = () => {
                       textAlign: 'center'
                     }}
                   >
-                    {table.table_number}
+                    <div>桌號 {table.table_number}</div>
+                    {table.table_name && (
+                      <div style={{ fontSize: '12px', opacity: 0.8 }}>
+                        {table.table_name}
+                      </div>
+                    )}
                   </button>
                 ))}
             </div>

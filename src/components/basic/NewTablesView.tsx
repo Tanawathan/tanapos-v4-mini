@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { Table, Order } from '../../lib/types-unified'
 import Button from '../ui/Button'
 import LoadingSpinner from '../ui/LoadingSpinner'
+import '../../styles/tables-management.css'
 
 interface TableData {
   id: string
@@ -40,7 +42,14 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
   onClose,
   onUpdateStatus
 }) => {
-  if (!isOpen || !table) return null
+  console.log('🎭 TableDetailsModal 渲染中:', { table, isOpen, hasOrders: orders.length })
+  
+  if (!isOpen || !table) {
+    console.log('🎭 Modal 不顯示 - isOpen:', isOpen, 'table:', !!table)
+    return null
+  }
+
+  console.log('🎭 Modal 應該顯示！')
 
   const tableOrders = orders.filter(order => 
     order.table_id === table.id && 
@@ -75,9 +84,24 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
     { name: '紅燒獅子頭', price: 360, quantity: 1, status: '準備中' },
   ].slice(0, Math.floor(Math.random() * 3) + 1) : []
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+  return createPortal(
+    <div 
+      className="fixed inset-0 flex items-center justify-center p-4" 
+      style={{ 
+        zIndex: 99999,  // 超高 z-index
+        backgroundColor: 'rgba(255, 0, 0, 0.5)',  // 紅色背景便於看到
+        backdropFilter: 'blur(4px)'
+      }}
+      onClick={onClose}  // 點擊背景關閉
+    >
+      <div 
+        className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        style={{ 
+          border: '5px solid blue',  // 藍色邊框便於看到
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
+        }}
+        onClick={(e) => e.stopPropagation()}  // 防止點擊內容關閉
+      >
         {/* 標題欄 */}
         <div className="bg-blue-600 text-white p-4 rounded-t-lg">
           <div className="flex items-center justify-between">
@@ -254,7 +278,8 @@ const TableDetailsModal: React.FC<TableDetailsModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body  // 將 Modal 渲染到 body 元素
   )
 }
 
@@ -450,17 +475,44 @@ const NewTablesView: React.FC = () => {
   })
 
   // 打開詳細資訊
-  const handleTableDetails = (table: TableData) => {
-    console.log('🔍 打開桌位詳細資訊:', table)
-    setSelectedTable(table)
-    setIsModalOpen(true)
-  }
+  const handleTableDetails = React.useCallback((table: TableData) => {
+    console.log('🔍 handleTableDetails 被呼叫')
+    console.log('🔧 桌位資料:', table)
+    console.log('🔧 當前狀態:', { isModalOpen, selectedTable })
+    
+    // 使用 functional updates 確保狀態正確更新
+    setSelectedTable(prevTable => {
+      console.log('🔧 設置 selectedTable from:', prevTable, 'to:', table)
+      return table
+    })
+    
+    setIsModalOpen(prevOpen => {
+      console.log('🔧 設置 isModalOpen from:', prevOpen, 'to:', true)
+      return true
+    })
+    
+    console.log('🔧 狀態已更新，應該打開模組')
+    
+    // 延遲檢查狀態
+    setTimeout(() => {
+      console.log('🔧 延遲檢查 - 模組應該已開啟:', { 
+        selectedTable: table, 
+        isModalOpen: true 
+      })
+    }, 100)
+  }, [])  // 空依賴數組，因為我們使用 functional updates
 
   // 關閉詳細資訊
-  const handleCloseModal = () => {
+  const handleCloseModal = React.useCallback(() => {
+    console.log('🔧 關閉模組')
     setIsModalOpen(false)
     setSelectedTable(null)
-  }
+  }, [])
+
+  // Debug: 監控 modal 狀態變化
+  React.useEffect(() => {
+    console.log('🔄 Modal state changed - isModalOpen:', isModalOpen, 'selectedTable:', selectedTable)
+  }, [isModalOpen, selectedTable])
 
   if (loading) {
     return (
@@ -641,7 +693,15 @@ const NewTablesView: React.FC = () => {
                   )}
                   
                   <Button
-                    onClick={() => handleTableDetails(table)}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      console.log('🔍 詳細按鈕被點擊！')
+                      console.log('🔧 桌台資料:', table)
+                      console.log('🔧 模組狀態:', { isModalOpen, selectedTable })
+                      handleTableDetails(table)
+                      console.log('🔧 呼叫後模組狀態:', { isModalOpen: true })
+                    }}
                     className="w-full text-sm bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     📊 詳細

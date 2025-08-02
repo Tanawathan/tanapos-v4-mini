@@ -16,6 +16,7 @@ const NewPOSSystem: React.FC<NewPOSSystemProps> = ({ uiStyle = 'modern' }) => {
     loading, 
     loadProducts, 
     loadCategories,
+    loadTables,
     addToCart,
     removeFromCart,
     updateCartQuantity,
@@ -44,7 +45,8 @@ const NewPOSSystem: React.FC<NewPOSSystemProps> = ({ uiStyle = 'modern' }) => {
   useEffect(() => {
     loadProducts()
     loadCategories()
-  }, [loadProducts, loadCategories])
+    loadTables()
+  }, [loadProducts, loadCategories, loadTables])
 
   // 計算總計
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0)

@@ -1,16 +1,29 @@
+import React from 'react'
+
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
 
-export default function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerProps) {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12'
+const LoadingSpinner = ({ size = 'md', className = '' }: LoadingSpinnerProps) => {
+  const sizes = {
+    sm: { width: '1rem', height: '1rem' },
+    md: { width: '2rem', height: '2rem' },
+    lg: { width: '3rem', height: '3rem' }
   }
 
   return (
-    <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-emerald-600 ${sizeClasses[size]} ${className}`} />
+    <div
+      style={{
+        ...sizes[size],
+        border: '2px solid #e5e7eb',
+        borderTop: '2px solid #3b82f6',
+        borderRadius: '50%',
+        display: 'inline-block'
+      }}
+      className={`tanapos-spinner ${className}`}
+    />
   )
 }
+
+export default LoadingSpinner

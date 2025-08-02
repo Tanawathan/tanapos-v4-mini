@@ -4,7 +4,7 @@ import ThemeToggle from '../ThemeToggle'
 import type { Order, Table } from '../../lib/types-unified'
 
 const SimpleDashboard: React.FC<{
-  onNavigate: (view: 'pos' | 'kds' | 'reports' | 'orders' | 'tables' | 'checkout' | 'inventory' | 'admin') => void
+  onNavigate: (view: 'pos' | 'kds' | 'kds-mobile' | 'reports' | 'orders' | 'tables' | 'checkout' | 'inventory' | 'admin') => void
 }> = ({ onNavigate }) => {
   const { orders, tables, loading, loadOrders, loadTables } = usePOSStore()
 
@@ -86,6 +86,15 @@ const SimpleDashboard: React.FC<{
             <div className="text-2xl mb-2">🍳</div>
             <h2 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary">廚房顯示系統</h2>
             <p className="text-muted-foreground">即時訂單管理</p>
+          </button>
+          
+          <button
+            onClick={() => onNavigate('kds-mobile')}
+            className="bg-card rounded-lg shadow-md p-6 text-left hover:shadow-lg transition-all duration-200 hover:scale-105 border border-border group"
+          >
+            <div className="text-2xl mb-2">📱</div>
+            <h2 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary">KDS 移動版</h2>
+            <p className="text-muted-foreground">移動端廚房顯示系統</p>
           </button>
           
           <button

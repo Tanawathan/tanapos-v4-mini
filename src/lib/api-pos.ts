@@ -221,18 +221,28 @@ export const ordersService = {
         order_id: order.id,
         product_id: item.product_id,
         product_name: item.product_name,
-        product_sku: item.product_sku,
+        product_sku: item.product_sku || null, // 允許為空值
         quantity: item.quantity,
         unit_price: item.unit_price,
         total_price: item.quantity * item.unit_price,
-        special_instructions: item.special_instructions
+        special_instructions: item.special_instructions || null // 允許為空值
       }))
       
-      const { error: itemsError } = await supabase
+      console.log('📦 建立訂單項目，數量:', orderItems.length)
+      console.log('📦 項目詳細:', JSON.stringify(orderItems, null, 2))
+      
+      const { data: insertedItems, error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItems)
+        .select()
       
-      if (itemsError) throw itemsError
+      if (itemsError) {
+        console.error('❌ 建立訂單項目失敗:', itemsError)
+        console.error('❌ 失敗的資料:', orderItems)
+        throw itemsError
+      }
+      
+      console.log('✅ 訂單項目建立成功:', insertedItems)
       
       // 如果有桌位，更新桌位狀態為佔用
       if (orderData.table_id) {

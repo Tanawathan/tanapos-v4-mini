@@ -5,9 +5,71 @@ type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed'
 
 // Products Service
 export const productsService = {
+  // 修復套餐產品問題
+  async fixComboProducts(): Promise<void> {
+    try {
+      console.log('🔧 開始修復套餐產品問題...');
+      
+      // 獲取所有套餐
+      const { data: combos, error: comboError } = await supabase
+        .from('combo_products')
+        .select('*');
+      
+      if (comboError) {
+        console.error('獲取套餐失敗:', comboError);
+        return;
+      }
+      
+      console.log(`找到 ${combos.length} 個套餐`);
+      
+      // 檢查並插入缺失的套餐到 products 表
+      for (const combo of combos) {
+        console.log(`處理套餐: ${combo.name} (ID: ${combo.id})`);
+        
+        // 檢查是否已存在
+        const { data: existingProduct } = await supabase
+          .from('products')
+          .select('id')
+          .eq('id', combo.id)
+          .single();
+        
+        if (existingProduct) {
+          console.log(`  ✅ 套餐已存在於 products 表中`);
+          continue;
+        }
+        
+        // 插入套餐到 products 表
+        const { error: insertError } = await supabase
+          .from('products')
+          .insert({
+            id: combo.id,
+            name: combo.name,
+            description: combo.description || '',
+            price: combo.price,
+            category_id: combo.category_id,
+            image_url: combo.image_url || null,
+            is_available: true
+          });
+        
+        if (insertError) {
+          console.error(`  ❌ 插入套餐失敗:`, insertError);
+        } else {
+          console.log(`  ✅ 成功插入套餐到 products 表`);
+        }
+      }
+      
+      console.log('🎉 套餐產品修復完成！');
+      
+    } catch (error) {
+      console.error('修復過程出錯:', error);
+      throw error;
+    }
+  },
+
   async getAll(): Promise<Product[]> {
     try {
-      const { data, error } = await supabase
+      // 載入一般產品
+      const { data: products, error: productsError } = await supabase
         .from('products')
         .select(`
           id,
@@ -24,12 +86,74 @@ export const productsService = {
         .eq('is_available', true)
         .order('name')
 
-      if (error) {
-        console.error('Error fetching products:', error)
+      if (productsError) {
+        console.error('Error fetching products:', productsError)
         return []
       }
 
-      return data || []
+      // 載入套餐產品（轉換為Product格式）
+      const { data: combos, error: combosError } = await supabase
+        .from('combo_products')
+        .select(`
+          id,
+          name,
+          description,
+          price,
+          category_id,
+          is_available,
+          preparation_time,
+          created_at,
+          updated_at,
+          combo_type,
+          combo_choices (
+            id,
+            category_id,
+            min_selections,
+            max_selections,
+            sort_order,
+            categories (
+              id,
+              name
+            )
+          )
+        `)
+        .eq('is_available', true)
+        .order('name')
+
+      if (combosError) {
+        console.error('Error fetching combos:', combosError)
+        // 即使套餐載入失敗，還是返回一般產品
+        return products || []
+      }
+
+      // 將套餐轉換為Product格式
+      const comboProducts: Product[] = (combos || []).map(combo => ({
+        id: combo.id,
+        name: `🍽️ ${combo.name}`, // 添加套餐標識
+        description: combo.description || '',
+        price: combo.price,
+        category_id: combo.category_id || '',
+        image_url: undefined,
+        is_available: combo.is_available,
+        preparation_time: combo.preparation_time || 15,
+        created_at: combo.created_at,
+        updated_at: combo.updated_at,
+        combo_type: combo.combo_type, // 保留套餐類型
+        combo_choices: (combo.combo_choices || []).map(choice => ({
+          id: choice.id,
+          category_id: choice.category_id,
+          min_selections: choice.min_selections,
+          max_selections: choice.max_selections,
+          sort_order: choice.sort_order,
+          categories: choice.categories && choice.categories.length > 0 ? choice.categories[0] : { id: '', name: '' }
+        }))
+      }))
+
+      // 合併一般產品和套餐產品
+      const allProducts = [...(products || []), ...comboProducts]
+      console.log(`載入產品總數: ${allProducts.length} (一般產品: ${products?.length || 0}, 套餐: ${comboProducts.length})`)
+      
+      return allProducts
     } catch (error) {
       console.error('Service error fetching products:', error)
       return []
@@ -38,7 +162,8 @@ export const productsService = {
 
   async getByCategory(categoryId: string): Promise<Product[]> {
     try {
-      const { data, error } = await supabase
+      // 載入該分類的一般產品
+      const { data: products, error: productsError } = await supabase
         .from('products')
         .select(`
           id,
@@ -56,12 +181,75 @@ export const productsService = {
         .eq('is_available', true)
         .order('name')
 
-      if (error) {
-        console.error('Error fetching products by category:', error)
+      if (productsError) {
+        console.error('Error fetching products by category:', productsError)
         return []
       }
 
-      return data || []
+      // 載入該分類的套餐產品
+      const { data: combos, error: combosError } = await supabase
+        .from('combo_products')
+        .select(`
+          id,
+          name,
+          description,
+          price,
+          category_id,
+          is_available,
+          preparation_time,
+          created_at,
+          updated_at,
+          combo_type,
+          combo_choices (
+            id,
+            category_id,
+            min_selections,
+            max_selections,
+            sort_order,
+            categories (
+              id,
+              name
+            )
+          )
+        `)
+        .eq('category_id', categoryId)
+        .eq('is_available', true)
+        .order('name')
+
+      if (combosError) {
+        console.error('Error fetching combos by category:', combosError)
+        // 即使套餐載入失敗，還是返回一般產品
+        return products || []
+      }
+
+      // 將套餐轉換為Product格式
+      const comboProducts: Product[] = (combos || []).map(combo => ({
+        id: combo.id,
+        name: `🍽️ ${combo.name}`, // 添加套餐標識
+        description: combo.description || '',
+        price: combo.price,
+        category_id: combo.category_id || '',
+        image_url: undefined,
+        is_available: combo.is_available,
+        preparation_time: combo.preparation_time || 15,
+        created_at: combo.created_at,
+        updated_at: combo.updated_at,
+        combo_type: combo.combo_type, // 保留套餐類型
+        combo_choices: (combo.combo_choices || []).map(choice => ({
+          id: choice.id,
+          category_id: choice.category_id,
+          min_selections: choice.min_selections,
+          max_selections: choice.max_selections,
+          sort_order: choice.sort_order,
+          categories: choice.categories && choice.categories.length > 0 ? choice.categories[0] : { id: '', name: '' }
+        }))
+      }))
+
+      // 合併一般產品和套餐產品
+      const allProducts = [...(products || []), ...comboProducts]
+      console.log(`分類 ${categoryId} 產品數: ${allProducts.length} (一般: ${products?.length || 0}, 套餐: ${comboProducts.length})`)
+      
+      return allProducts
     } catch (error) {
       console.error('Service error fetching products by category:', error)
       return []

@@ -1,7 +1,30 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { usePOSStore } from '../../lib/store-supabase'
 import { useNotifications } from '../ui/NotificationSystem'
+import { productsService } from '../../lib/api'
+import ComboSelector from '../ComboSelector'
 import type { Product, CartItem, Category } from '../../lib/types-unified'
+
+interface ComboProduct {
+  id: string
+  name: string
+  description: string
+  price: number
+  combo_type: 'fixed' | 'selectable'
+  is_available: boolean
+  preparation_time?: number
+  combo_choices?: Array<{
+    id: string
+    category_id: string
+    min_selections: number
+    max_selections: number
+    sort_order: number
+    categories: {
+      id: string
+      name: string
+    }
+  }>
+}
 
 interface SimplePOSSystemProps {
   uiStyle?: string
@@ -15,6 +38,7 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
     loading, 
     loadProducts, 
     loadCategories,
+    loadTables,
     addToCart,
     removeFromCart,
     updateCartQuantity,
@@ -36,6 +60,11 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
   const [noteModalProduct, setNoteModalProduct] = useState<Product | null>(null)
   const [editingInstanceId, setEditingInstanceId] = useState<string | null>(null)
   const [customNote, setCustomNote] = useState('')
+  
+  // 套餐相關狀態
+  const [showComboSelector, setShowComboSelector] = useState(false)
+  const [selectedCombo, setSelectedCombo] = useState<ComboProduct | null>(null)
+  const [comboQuantity, setComboQuantity] = useState(1)
   
   // 響應式設計相關狀態
   const [isMobile, setIsMobile] = useState(false)
@@ -63,9 +92,21 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
 
   // 初始化數據
   useEffect(() => {
-    loadProducts()
-    loadCategories()
-  }, [loadProducts, loadCategories])
+    const initializeData = async () => {
+      try {
+        console.log('🔧 檢查並修復套餐產品問題...')
+        await productsService.fixComboProducts()
+      } catch (error) {
+        console.error('修復套餐產品失敗:', error)
+      }
+      
+      loadProducts()
+      loadCategories()
+      loadTables()
+    }
+    
+    initializeData()
+  }, [loadProducts, loadCategories, loadTables])
 
   // 根據 UI 風格獲取主題配色
   const getThemeColors = (style: string) => {
@@ -179,10 +220,99 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
     return matchesCategory && matchesSearch && product.is_available
   })
 
-  // 處理添加到購物車
-  const handleAddToCart = (product: Product) => {
-    addToCart(product)
-    notifications.success('成功', `已將 ${product.name} 加入購物車`)
+  // 處理添加到購物車 - 增強版支援套餐檢測
+  // 手動測試修復函數
+  const handleTestFixCombo = async () => {
+    try {
+      console.log('🔧 手動觸發套餐產品修復...')
+      await productsService.fixComboProducts()
+      notifications.success('成功', '套餐產品修復完成！')
+    } catch (error) {
+      console.error('修復失敗:', error)
+      notifications.error('錯誤', '套餐產品修復失敗')
+    }
+  }
+
+  const handleAddToCart = async (product: Product) => {
+    console.log('handleAddToCart 被調用，產品:', product.name)
+    console.log('產品類型 combo_type:', product.combo_type)
+    console.log('產品選擇規則:', product.combo_choices?.length || 0)
+    
+    // 檢查是否為套餐產品（透過 combo_type 屬性判斷）
+    if (product.combo_type) {
+      console.log('檢測到套餐產品，類型:', product.combo_type)
+      
+      // 轉換為 ComboProduct 格式
+      const combo: ComboProduct = {
+        id: product.id,
+        name: product.name,
+        description: product.description || '',
+        price: product.price,
+        combo_type: product.combo_type,
+        is_available: product.is_available,
+        preparation_time: product.preparation_time,
+        combo_choices: product.combo_choices
+      }
+      
+      // 呼叫套餐選擇處理邏輯
+      handleComboSelect(combo, 1)
+    } else {
+      // 一般產品的處理
+      console.log('一般產品，直接加入購物車')
+      addToCart(product)
+      notifications.success('成功', `已將 ${product.name} 加入購物車`)
+    }
+  }
+
+  // 處理套餐選擇
+  const handleComboSelect = (combo: ComboProduct, quantity: number = 1) => {
+    console.log('處理套餐選擇:', combo.name, '類型:', combo.combo_type)
+    console.log('套餐選擇規則:', combo.combo_choices?.length || 0)
+    
+    if (combo.combo_type === 'fixed') {
+      // 固定套餐直接加入購物車
+      console.log('固定套餐，直接加入購物車')
+      const comboCartItem: CartItem = {
+        id: combo.id,
+        instanceId: `combo_${combo.id}_${Date.now()}`,
+        name: combo.name,
+        price: combo.price,
+        quantity: quantity,
+        type: 'combo',
+        combo_type: 'fixed'
+      }
+      addToCart(comboCartItem as any)
+      notifications.success('成功', `已將 ${combo.name} 加入購物車`)
+    } else {
+      // 可選擇套餐需要打開選擇器
+      console.log('可選套餐，打開選擇器')
+      console.log('設定 selectedCombo:', combo)
+      console.log('設定 comboQuantity:', quantity)
+      console.log('設定 showComboSelector: true')
+      
+      setSelectedCombo(combo)
+      setComboQuantity(quantity)
+      setShowComboSelector(true)
+    }
+  }
+
+  // 處理套餐確認
+  const handleComboConfirm = (combo: ComboProduct, selections: any, totalPrice: number) => {
+    console.log('處理套餐確認:', combo.name)
+    const comboCartItem: CartItem = {
+      id: combo.id,
+      instanceId: `combo_${combo.id}_${Date.now()}`,
+      name: combo.name,
+      price: totalPrice / comboQuantity,
+      quantity: comboQuantity,
+      type: 'combo',
+      combo_type: 'selectable',
+      combo_selections: selections
+    }
+    addToCart(comboCartItem as any)
+    notifications.success('成功', `已將 ${combo.name} 加入購物車`)
+    setShowComboSelector(false)
+    setSelectedCombo(null)
   }
 
   // 處理帶備註添加到購物車
@@ -749,23 +879,75 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
 
         {/* 滾動按鈕 */}
         {showScrollButtons && (
-          <>
+          <div style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            zIndex: 10
+          }}>
             <button
-              className="scroll-to-top visible"
-              onClick={() => scrollToTop(mainScrollRef.current)}
-              title="回到頂部"
+              onClick={() => mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                border: `1px solid ${themeColors.primary}`,
+                backgroundColor: themeColors.cardBg,
+                color: themeColors.primary,
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
             >
               ↑
             </button>
             <button
-              className="scroll-to-bottom visible"
-              onClick={() => scrollToBottom(mainScrollRef.current)}
-              title="滾動到底部"
+              onClick={() => mainScrollRef.current?.scrollTo({ top: mainScrollRef.current?.scrollHeight, behavior: 'smooth' })}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                border: `1px solid ${themeColors.primary}`,
+                backgroundColor: themeColors.cardBg,
+                color: themeColors.primary,
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
             >
               ↓
             </button>
-          </>
+          </div>
         )}
+
+        {/* 開發者測試區域 - 臨時添加 */}
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+          backgroundColor: 'rgba(255, 0, 0, 0.1)',
+          padding: '10px',
+          borderRadius: '5px',
+          border: '1px solid red'
+        }}>
+          <button
+            onClick={handleTestFixCombo}
+            style={{
+              backgroundColor: '#ff4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              padding: '8px 12px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            修復套餐
+          </button>
+        </div>
+        
         {/* 搜尋區域 */}
         <div style={{ marginBottom: isMobile ? '15px' : '20px' }}>
           <input
@@ -1333,6 +1515,43 @@ const SimplePOSSystem: React.FC<SimplePOSSystemProps> = ({ uiStyle = 'modern' })
                 </button>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 套餐選擇器 */}
+      {showComboSelector && selectedCombo && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '20px',
+            maxWidth: '800px',
+            maxHeight: '80vh',
+            overflow: 'auto'
+          }}>
+            <h2>選擇套餐內容：{selectedCombo.name}</h2>
+            <ComboSelector
+              combo={selectedCombo}
+              quantity={comboQuantity}
+              onConfirm={handleComboConfirm}
+              onCancel={() => {
+                console.log('取消套餐選擇')
+                setShowComboSelector(false)
+                setSelectedCombo(null)
+              }}
+            />
           </div>
         </div>
       )}

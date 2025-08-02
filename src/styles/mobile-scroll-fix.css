@@ -1,0 +1,252 @@
+/* ========================================
+   移動端滑動修復
+   解決所有頁面在移動端無法滑動的問題
+   ======================================== */
+
+/* 基礎滑動修復 */
+html, body {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
+  overscroll-behavior: none !important;
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+/* 根容器修復 */
+#root {
+  min-height: 100vh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
+  height: auto !important;
+}
+
+/* 全局移動端修復 - 適用於所有屏幕尺寸 */
+@media screen {
+  /* 確保所有容器都能滑動 */
+  .min-h-screen {
+    min-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復 Tailwind 類別 */
+  .overflow-hidden {
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+}
+
+/* 移動端專用滑動修復 */
+@media (max-width: 768px) {
+  /* 確保所有主要容器都能滑動 */
+  .min-h-screen {
+    min-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復 POS 容器 */
+  .pos-container {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    flex-direction: column !important;
+  }
+  
+  /* 修復主要內容區域 */
+  .pos-main-mobile,
+  .pos-main-tablet,
+  .pos-main-desktop {
+    height: auto !important;
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復現代容器 */
+  .modern-container {
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復表格管理容器 */
+  .tables-management {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復 KDS 移動端容器 */
+  .kds-mobile {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復所有卡片容器 */
+  .modern-card,
+  .pos-order-card,
+  .table-card {
+    overflow: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復網格容器 */
+  .modern-grid,
+  .pos-products-grid,
+  .table-grid {
+    overflow: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 確保購物車在移動端不阻止滑動 */
+  .pos-cart-mobile {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* 修復表單元素 */
+  .pos-search-area,
+  .pos-categories {
+    overflow: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復模態框 */
+  .modal-overlay {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 確保按鈕可以正常觸控 */
+  button {
+    touch-action: manipulation !important;
+  }
+  
+  /* 確保連結可以正常觸控 */
+  a {
+    touch-action: manipulation !important;
+  }
+  
+  /* 修復任何可能阻止滑動的元素 */
+  .overflow-hidden {
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 確保頁面可以完整滑動 */
+  * {
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* 修復特定組件 */
+  .ui-style-kawaii,
+  .ui-style-modern,
+  .ui-style-brutalism,
+  .ui-style-code {
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復卡哇伊主題的 body */
+  .kawaii-body,
+  .modern-body,
+  .brutalism-body,
+  .code-body {
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復任何設定了固定高度的容器 */
+  [style*="height: 100vh"],
+  [style*="overflow: hidden"] {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 更強制的全局修復 */
+  * {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: none !important;
+  }
+  
+  /* 確保任何容器都不會阻止滑動 */
+  div[style*="overflow: hidden"],
+  div[style*="height: 100vh"] {
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* 修復 Flexbox 容器 */
+  div[style*="display: flex"] {
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+}
+
+/* 平板端修復 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  html, body {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+  
+  #root {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+}

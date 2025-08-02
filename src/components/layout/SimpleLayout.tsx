@@ -26,6 +26,7 @@ export default function SimpleLayout({ children }: LayoutProps) {
               <div className="text-sm text-muted-foreground">
                 {location.pathname === '/reports' ? '營業報表' : 
                  location.pathname === '/kds' ? '廚房顯示系統' :
+                 location.pathname === '/kds-mobile' ? '廚房顯示系統 (移動版)' :
                  location.pathname === '/pos' ? '點餐系統' : 
                  location.pathname === '/orders' ? '訂單管理系統' :
                  location.pathname === '/tables' ? '桌位管理系統' :
