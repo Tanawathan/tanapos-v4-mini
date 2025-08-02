@@ -3,6 +3,16 @@
    支持 9 種不同的 UI 風格切換
    ======================================== */
 
+/* 基礎動畫 */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* 基礎風格重置 */
 .style-switcher {
   position: relative;

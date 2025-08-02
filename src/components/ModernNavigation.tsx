@@ -146,6 +146,8 @@ const ModernNavigation: React.FC = () => {
     { path: '/pos-simple', label: '點餐', icon: '🛒' },
     { path: '/tables', label: '桌台', icon: '🪑' },
     { path: '/orders', label: '訂單', icon: '📋' },
+    { path: '/checkout', label: '結帳', icon: '💰' },
+    { path: '/checkout-post-meal', label: '餐後', icon: '🍽️' },
     { path: '/kds', label: '廚房', icon: '👨‍🍳' },
     { path: '/inventory', label: '庫存', icon: '📦' },
     { path: '/reports', label: '報表', icon: '📊' },

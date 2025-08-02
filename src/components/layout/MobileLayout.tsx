@@ -80,8 +80,10 @@ const MobileLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     { title: '行動點餐', path: '/mobile', icon: '📱' },
     { title: '桌面點餐', path: '/pos', icon: '🛒' },
     { title: '桌台管理', path: '/tables', icon: '🪑' },
-    { title: '廚房顯示', path: '/kds', icon: '👨‍🍳' },
-    { title: '訂單管理', path: '/orders', icon: '📋' },
+    { title: '訂單管理', path: '/orders', icon: '�' },
+    { title: '完整結帳', path: '/checkout', icon: '💰' },
+    { title: '餐後結帳', path: '/checkout-post-meal', icon: '�️' },
+    { title: '廚房顯示', path: '/kds', icon: '�‍🍳' },
     { title: '庫存管理', path: '/inventory', icon: '📦' },
     { title: '報表分析', path: '/reports', icon: '📊' },
     { title: '系統設定', path: '/admin', icon: '⚙️' }

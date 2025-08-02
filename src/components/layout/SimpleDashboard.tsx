@@ -5,7 +5,7 @@ import ThemeToggle from '../ThemeToggle'
 import type { Order, Table } from '../../lib/types-unified'
 
 const SimpleDashboard: React.FC<{
-  onNavigate: (view: 'pos' | 'kds' | 'kds-mobile' | 'reports' | 'orders' | 'tables' | 'checkout' | 'inventory' | 'admin') => void
+  onNavigate: (view: 'pos' | 'kds' | 'kds-mobile' | 'reports' | 'orders' | 'tables' | 'checkout' | 'checkout-post-meal' | 'inventory' | 'admin') => void
 }> = ({ onNavigate }) => {
   const { currentStyle, styleConfig } = useUIStyle()
   const { orders, tables, loading, loadOrders, loadTables } = usePOSStore()
@@ -124,6 +124,15 @@ const SimpleDashboard: React.FC<{
             <div className="text-2xl mb-2">💰</div>
             <h2 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary">完整結帳系統</h2>
             <p className="text-muted-foreground">多元付款與發票開立</p>
+          </button>
+          
+          <button
+            onClick={() => onNavigate('checkout-post-meal')}
+            className="bg-card rounded-lg shadow-md p-6 text-left hover:shadow-lg transition-all duration-200 hover:scale-105 border border-border group"
+          >
+            <div className="text-2xl mb-2">🍽️</div>
+            <h2 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary">餐後結帳系統</h2>
+            <p className="text-muted-foreground">用餐完畢後的結帳流程</p>
           </button>
           
           <button

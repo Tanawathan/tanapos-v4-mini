@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐後結帳功能測試 - TanaPOS V4-Mini</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 1rem;
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #059669;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+        .success { background: #dcfce7; color: #166534; }
+        .error { background: #fef2f2; color: #dc2626; }
+        .warning { background: #fef3c7; color: #d97706; }
+        .info { background: #dbeafe; color: #1d4ed8; }
+        .button {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background: #047857;
+        }
+        .button.secondary {
+            background: #6b7280;
+        }
+        .button.secondary:hover {
+            background: #4b5563;
+        }
+        .log {
+            background: #1f2937;
+            color: #f9fafb;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .table-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .table-badge {
+            background: #3b82f6;
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧾 餐後結帳系統功能測試</h1>
+            <p>TanaPOS V4-Mini - 完整功能驗證工具</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 測試目標</h3>
+            <ul class="checklist">
+                <li>✅ 驗證桌號選擇器是否正常顯示</li>
+                <li>✅ 測試訂單列表載入功能</li>
+                <li>✅ 檢查桌號篩選功能</li>
+                <li>✅ 驗證支付流程</li>
+                <li>✅ 測試手機端響應式設計</li>
+            </ul>
+        </div>
+
+        <div class="grid">
+            <div class="test-section">
+                <h3>📊 系統檢查</h3>
+                <button class="button" onclick="checkSystemData()">檢查系統數據</button>
+                <button class="button" onclick="listTableNumbers()">列出所有桌號</button>
+                <button class="button secondary" onclick="clearLog()">清除日誌</button>
+            </div>
+
+            <div class="test-section">
+                <h3>🔧 快速操作</h3>
+                <button class="button" onclick="openCheckoutPage()">開啟結帳頁面</button>
+                <button class="button" onclick="openDiagnostic()">開啟診斷工具</button>
+                <button class="button secondary" onclick="window.location.href='/'">返回主頁</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🏷️ 可用桌號預覽</h3>
+            <div id="table-summary">載入中...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 測試步驟指南</h3>
+            <ol>
+                <li><strong>基本功能測試：</strong>
+                    <ul>
+                        <li>點擊「開啟結帳頁面」</li>
+                        <li>檢查桌號下拉選單是否有選項</li>
+                        <li>選擇不同桌號，確認訂單列表更新</li>
+                    </ul>
+                </li>
+                <li><strong>訂單操作測試：</strong>
+                    <ul>
+                        <li>點擊任一訂單，檢查是否顯示詳情</li>
+                        <li>測試支付方式選擇</li>
+                        <li>嘗試完成支付流程</li>
+                    </ul>
+                </li>
+                <li><strong>響應式測試：</strong>
+                    <ul>
+                        <li>調整瀏覽器寬度</li>
+                        <li>檢查手機端佈局</li>
+                        <li>測試觸控操作</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div id="log" class="log">
+            <div>[系統] 餐後結帳功能測試工具已就緒</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js'
+        
+        const supabase = createClient(
+            'https://peubpisofenlyquqnpan.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBldWJwaXNvZmVubHlxdXFucGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NTgwODgsImV4cCI6MjA2OTQzNDA4OH0.6IzK9jjs-Ld_mFBRQqNk594ayXapjGxwAmhQpoY26cY'
+        )
+
+        const log = document.getElementById('log');
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            const typePrefix = {
+                'info': '📊',
+                'success': '✅',
+                'error': '❌',
+                'warning': '⚠️'
+            }[type] || '📊';
+            div.innerHTML = `<span style="color: #6b7280">[${timestamp}]</span> ${typePrefix} ${message}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        window.checkSystemData = async function() {
+            addLog('開始檢查系統數據...', 'info');
+            
+            try {
+                // 檢查可結帳訂單
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('id, order_number, table_number, status, payment_status, total_amount')
+                    .eq('status', 'completed')
+                    .eq('payment_status', 'unpaid')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                addLog(`找到 ${orders.length} 個可結帳訂單`, 'success');
+                
+                // 統計桌號分佈
+                const tableStats = orders.reduce((acc, order) => {
+                    const tableNum = order.table_number;
+                    if (tableNum) {
+                        acc[tableNum] = (acc[tableNum] || 0) + 1;
+                    }
+                    return acc;
+                }, {});
+
+                addLog(`桌號分佈: ${Object.entries(tableStats).map(([table, count]) => `桌${table}(${count}筆)`).join(', ')}`, 'info');
+                
+                // 計算總金額
+                const totalAmount = orders.reduce((sum, order) => sum + order.total_amount, 0);
+                addLog(`總待收金額: NT$ ${totalAmount.toLocaleString()}`, 'info');
+
+            } catch (error) {
+                addLog(`系統檢查失敗: ${error.message}`, 'error');
+            }
+        };
+
+        window.listTableNumbers = async function() {
+            addLog('載入桌號列表...', 'info');
+            
+            try {
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('table_number')
+                    .eq('status', 'completed')
+                    .eq('payment_status', 'unpaid');
+
+                if (error) throw error;
+
+                const tableNumbers = [...new Set(orders.map(o => o.table_number))]
+                    .filter(Boolean)
+                    .sort((a, b) => a - b);
+
+                addLog(`可用桌號: ${tableNumbers.join(', ')}`, 'success');
+                
+                // 更新桌號預覽
+                const tableSummary = document.getElementById('table-summary');
+                if (tableNumbers.length > 0) {
+                    tableSummary.innerHTML = `
+                        <div class="table-summary">
+                            ${tableNumbers.map(num => 
+                                `<div class="table-badge">桌 ${num}</div>`
+                            ).join('')}
+                        </div>
+                        <p style="margin-top: 1rem; color: #6b7280; font-size: 0.875rem;">
+                            總計 ${tableNumbers.length} 個桌號有待結帳訂單
+                        </p>
+                    `;
+                } else {
+                    tableSummary.innerHTML = '<p style="color: #ef4444;">沒有找到可用的桌號</p>';
+                }
+
+            } catch (error) {
+                addLog(`載入桌號失敗: ${error.message}`, 'error');
+            }
+        };
+
+        window.openCheckoutPage = function() {
+            addLog('開啟餐後結帳頁面...', 'info');
+            window.open('/checkout-post-meal', '_blank');
+        };
+
+        window.openDiagnostic = function() {
+            addLog('開啟診斷工具...', 'info');
+            window.open('/checkout-diagnostic.html', '_blank');
+        };
+
+        window.clearLog = function() {
+            log.innerHTML = '<div>[系統] 日誌已清除</div>';
+        };
+
+        // 自動載入數據
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                listTableNumbers();
+                checkSystemData();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐後結帳系統 UIStyle 測試</title>
+    <style>
+        body { 
+            font-family: 'Microsoft JhengHei', Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+        }
+        h1 { 
+            color: #333; 
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .style-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+            margin: 30px 0; 
+        }
+        .style-card { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 12px; 
+            border-left: 5px solid #007bff; 
+            text-align: center;
+        }
+        .style-card h3 { 
+            margin: 0 0 15px 0; 
+            color: #333; 
+        }
+        .style-btn { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px;
+            margin: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .style-btn:hover { 
+            background: #0056b3; 
+            transform: translateY(-2px);
+        }
+        .style-btn.modern { background: #3b82f6; }
+        .style-btn.neumorphism { background: #6366f1; }
+        .style-btn.glassmorphism { background: #8b5cf6; }
+        .style-btn.brutalism { background: #ef4444; }
+        .style-btn.cyberpunk { background: #10b981; }
+        .style-btn.skeuomorphism { background: #f59e0b; }
+        .style-btn.dos { background: #06b6d4; }
+        .style-btn.bios { background: #84cc16; }
+        .style-btn.kawaii { background: #ec4899; }
+        .style-btn.code { background: #6b7280; }
+        
+        .info-section { 
+            background: #e3f2fd; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+        }
+        .info-section h3 { 
+            color: #1976d2; 
+            margin-top: 0; 
+        }
+        .feature-list { 
+            list-style: none; 
+            padding: 0; 
+        }
+        .feature-list li { 
+            background: white; 
+            margin: 8px 0; 
+            padding: 12px; 
+            border-radius: 6px; 
+            border-left: 4px solid #4caf50; 
+        }
+        .feature-list li::before { 
+            content: "✅ "; 
+            color: #4caf50; 
+            font-weight: bold; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧾 餐後結帳系統 UIStyle 測試</h1>
+        
+        <div class="info-section">
+            <h3>📋 更新內容</h3>
+            <ul class="feature-list">
+                <li>已整合 UIStyleProvider 上下文</li>
+                <li>動態風格切換支援</li>
+                <li>響應式設計優化</li>
+                <li>桌號選擇功能完整測試</li>
+                <li>多風格主題兼容</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h3>🎨 支援的風格主題</h3>
+            <div class="style-grid">
+                <div class="style-card">
+                    <h3>🎯 極簡現代</h3>
+                    <p>簡潔、專業、符合現代設計趨勢</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=modern" class="style-btn modern">測試 Modern</a>
+                </div>
+                
+                <div class="style-card">
+                    <h3>🔘 新擬物風</h3>
+                    <p>立體浮雕效果，獨特的視覺體驗</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=neumorphism" class="style-btn neumorphism">測試 Neumorphism</a>
+                </div>
+                
+                <div class="style-card">
+                    <h3>💎 玻璃質感</h3>
+                    <p>半透明玻璃效果，現代科技感</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=glassmorphism" class="style-btn glassmorphism">測試 Glassmorphism</a>
+                </div>
+                
+                <div class="style-card">
+                    <h3>🔥 野性主義</h3>
+                    <p>大膽、粗糙、具有衝擊力</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=brutalism" class="style-btn brutalism">測試 Brutalism</a>
+                </div>
+                
+                <div class="style-card">
+                    <h3>🚀 賽博朋克</h3>
+                    <p>未來感、霓虹色彩、科幻風格</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=cyberpunk" class="style-btn cyberpunk">測試 Cyberpunk</a>
+                </div>
+                
+                <div class="style-card">
+                    <h3>📱 擬真設計</h3>
+                    <p>模仿真實物理材質和陰影</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=skeuomorphism" class="style-btn skeuomorphism">測試 Skeuomorphism</a>
+                </div>
+                
+                <div class="style-card">
+                    <h3>💻 DOS 復古</h3>
+                    <p>經典 DOS 系統界面風格</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=dos" class="style-btn dos">測試 DOS</a>
+                </div>
+                
+                <div class="style-card">
+                    <h3>⚙️ BIOS 風格</h3>
+                    <p>經典 BIOS 系統界面</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=bios" class="style-btn bios">測試 BIOS</a>
+                </div>
+                
+                <div class="style-card">
+                    <h3>🌸 可愛風格</h3>
+                    <p>日系可愛、粉嫩色彩</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=kawaii" class="style-btn kawaii">測試 Kawaii</a>
+                </div>
+                
+                <div class="style-card">
+                    <h3>👨‍💻 程式碼風</h3>
+                    <p>程式設計師專用界面（需解鎖）</p>
+                    <a href="http://localhost:5173/checkout-post-meal?theme=code" class="style-btn code">測試 Code</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>🧪 測試步驟</h3>
+            <ol>
+                <li>點擊上方任一風格按鈕</li>
+                <li>觀察頁面風格變化</li>
+                <li>測試桌號選擇功能</li>
+                <li>選擇訂單查看詳情</li>
+                <li>測試結帳流程</li>
+            </ol>
+        </div>
+
+        <div class="info-section">
+            <h3>📊 功能狀態</h3>
+            <ul class="feature-list">
+                <li>桌號選擇器：已整合動態樣式</li>
+                <li>訂單列表：支援風格切換</li>
+                <li>結帳詳情：動態主題適配</li>
+                <li>按鈕樣式：多風格優化</li>
+                <li>響應式設計：完全兼容</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="http://localhost:5173/checkout-post-meal" class="style-btn" style="background: #22c55e; font-size: 16px; padding: 15px 30px;">
+                🚀 開始測試餐後結帳系統
+            </a>
+        </div>
+    </div>
+</body>
+</html>

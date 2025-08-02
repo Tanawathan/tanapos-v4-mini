@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA 功能測試 - TanaPOS V4-Mini</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 1rem;
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .test-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .success { background: #dcfce7; color: #166534; }
+        .error { background: #fef2f2; color: #dc2626; }
+        .warning { background: #fef3c7; color: #d97706; }
+        .button {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin: 0.25rem;
+        }
+        .button:hover {
+            background: #047857;
+        }
+        .log {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 PWA 功能測試</h1>
+            <p>TanaPOS V4-Mini Progressive Web App</p>
+        </div>
+
+        <div class="test-item">
+            <span>Service Worker 支援</span>
+            <span id="sw-support" class="status">檢測中...</span>
+        </div>
+
+        <div class="test-item">
+            <span>Service Worker 註冊狀態</span>
+            <span id="sw-status" class="status">檢測中...</span>
+        </div>
+
+        <div class="test-item">
+            <span>PWA 安裝狀態</span>
+            <span id="install-status" class="status">檢測中...</span>
+        </div>
+
+        <div class="test-item">
+            <span>離線快取功能</span>
+            <span id="cache-status" class="status">檢測中...</span>
+        </div>
+
+        <div class="test-item">
+            <span>Manifest 檔案</span>
+            <span id="manifest-status" class="status">檢測中...</span>
+        </div>
+
+        <div style="text-align: center; margin: 1.5rem 0;">
+            <button class="button" onclick="testInstallPrompt()">測試安裝提示</button>
+            <button class="button" onclick="testOfflineMode()">測試離線模式</button>
+            <button class="button" onclick="clearCache()">清除快取</button>
+            <button class="button" onclick="window.location.href='/'">返回主頁</button>
+        </div>
+
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        const log = document.getElementById('log');
+        
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateStatus(id, status, className) {
+            const element = document.getElementById(id);
+            element.textContent = status;
+            element.className = `status ${className}`;
+        }
+
+        // 檢測 Service Worker 支援
+        function checkServiceWorkerSupport() {
+            if ('serviceWorker' in navigator) {
+                updateStatus('sw-support', '✅ 支援', 'success');
+                addLog('瀏覽器支援 Service Worker');
+                return true;
+            } else {
+                updateStatus('sw-support', '❌ 不支援', 'error');
+                addLog('瀏覽器不支援 Service Worker');
+                return false;
+            }
+        }
+
+        // 檢測 Service Worker 註冊狀態
+        async function checkServiceWorkerStatus() {
+            if (!('serviceWorker' in navigator)) {
+                updateStatus('sw-status', '❌ 不支援', 'error');
+                return;
+            }
+
+            try {
+                const registration = await navigator.serviceWorker.getRegistration();
+                if (registration) {
+                    updateStatus('sw-status', '✅ 已註冊', 'success');
+                    addLog(`Service Worker 已註冊: ${registration.scope}`);
+                    
+                    if (registration.active) {
+                        addLog('Service Worker 狀態: 已啟動');
+                    } else if (registration.installing) {
+                        addLog('Service Worker 狀態: 安裝中');
+                    } else if (registration.waiting) {
+                        addLog('Service Worker 狀態: 等待中');
+                    }
+                } else {
+                    updateStatus('sw-status', '❌ 未註冊', 'error');
+                    addLog('Service Worker 未註冊');
+                }
+            } catch (error) {
+                updateStatus('sw-status', '❌ 錯誤', 'error');
+                addLog(`Service Worker 檢測錯誤: ${error.message}`);
+            }
+        }
+
+        // 檢測 PWA 安裝狀態
+        function checkInstallStatus() {
+            // 檢查是否在獨立模式運行
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                updateStatus('install-status', '✅ 已安裝', 'success');
+                addLog('應用程式以獨立模式運行');
+            } else if (window.navigator.standalone === true) {
+                updateStatus('install-status', '✅ 已安裝 (iOS)', 'success');
+                addLog('應用程式在 iOS 以獨立模式運行');
+            } else {
+                updateStatus('install-status', '⚠️ 未安裝', 'warning');
+                addLog('應用程式在瀏覽器中運行');
+            }
+        }
+
+        // 檢測快取功能
+        async function checkCacheStatus() {
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    if (cacheNames.length > 0) {
+                        updateStatus('cache-status', '✅ 有快取', 'success');
+                        addLog(`找到 ${cacheNames.length} 個快取: ${cacheNames.join(', ')}`);
+                    } else {
+                        updateStatus('cache-status', '⚠️ 無快取', 'warning');
+                        addLog('尚未建立快取');
+                    }
+                } catch (error) {
+                    updateStatus('cache-status', '❌ 錯誤', 'error');
+                    addLog(`快取檢測錯誤: ${error.message}`);
+                }
+            } else {
+                updateStatus('cache-status', '❌ 不支援', 'error');
+                addLog('瀏覽器不支援 Cache API');
+            }
+        }
+
+        // 檢測 Manifest 檔案
+        async function checkManifest() {
+            try {
+                const response = await fetch('/manifest.json');
+                if (response.ok) {
+                    const manifest = await response.json();
+                    updateStatus('manifest-status', '✅ 有效', 'success');
+                    addLog(`Manifest 載入成功: ${manifest.name}`);
+                } else {
+                    updateStatus('manifest-status', '❌ 錯誤', 'error');
+                    addLog('Manifest 檔案載入失敗');
+                }
+            } catch (error) {
+                updateStatus('manifest-status', '❌ 錯誤', 'error');
+                addLog(`Manifest 檢測錯誤: ${error.message}`);
+            }
+        }
+
+        // 測試安裝提示
+        function testInstallPrompt() {
+            addLog('嘗試觸發安裝提示...');
+            window.dispatchEvent(new Event('beforeinstallprompt'));
+        }
+
+        // 測試離線模式
+        async function testOfflineMode() {
+            addLog('測試離線模式...');
+            try {
+                // 嘗試離線請求
+                const response = await fetch('/', { cache: 'force-cache' });
+                if (response.ok) {
+                    addLog('✅ 離線模式測試成功');
+                } else {
+                    addLog('❌ 離線模式測試失敗');
+                }
+            } catch (error) {
+                addLog(`離線模式測試錯誤: ${error.message}`);
+            }
+        }
+
+        // 清除快取
+        async function clearCache() {
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    addLog(`✅ 已清除 ${cacheNames.length} 個快取`);
+                    setTimeout(() => window.location.reload(), 1000);
+                } catch (error) {
+                    addLog(`清除快取錯誤: ${error.message}`);
+                }
+            }
+        }
+
+        // 初始化檢測
+        window.addEventListener('load', async () => {
+            addLog('開始 PWA 功能檢測...');
+            
+            checkServiceWorkerSupport();
+            await checkServiceWorkerStatus();
+            checkInstallStatus();
+            await checkCacheStatus();
+            await checkManifest();
+            
+            addLog('PWA 功能檢測完成');
+        });
+
+        // 監聽安裝事件
+        window.addEventListener('beforeinstallprompt', (e) => {
+            addLog('📱 收到安裝提示事件');
+        });
+
+        window.addEventListener('appinstalled', (e) => {
+            addLog('✅ 應用程式已安裝');
+        });
+    </script>
+</body>
+</html>

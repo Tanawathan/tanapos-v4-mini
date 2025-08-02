@@ -12,15 +12,44 @@
     {
       "src": "/favicon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/favicon-512x512.png",
+      "src": "/favicon-512x512.png", 
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "categories": ["food", "business", "productivity"],
   "lang": "zh-TW",
-  "dir": "ltr"
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "點餐系統",
+      "short_name": "POS",
+      "description": "快速進入點餐介面",
+      "url": "/pos-simple",
+      "icons": [
+        {
+          "src": "/favicon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "廚房顯示",
+      "short_name": "KDS",
+      "description": "廚房訂單顯示系統",
+      "url": "/kds",
+      "icons": [
+        {
+          "src": "/favicon-192x192.png", 
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐後結帳系統 - 左右 Flex 布局測試</title>
+    <style>
+        body { 
+            font-family: 'Microsoft JhengHei', Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+        }
+        h1 { 
+            color: #333; 
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .layout-preview { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            border: 2px solid #e9ecef;
+        }
+        .preview-header {
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .flex-container {
+            display: flex;
+            gap: 15px;
+            height: 200px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+        }
+        .left-panel {
+            flex: 1;
+            max-width: 300px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .right-panel {
+            flex: 1;
+            min-width: 400px;
+            background: #f3e5f5;
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-header {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+        }
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .feature-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 20px 0;
+        }
+        .feature-list li { 
+            background: #e8f5e8; 
+            margin: 8px 0; 
+            padding: 12px; 
+            border-radius: 6px; 
+            border-left: 4px solid #4caf50; 
+        }
+        .feature-list li::before { 
+            content: "✅ "; 
+            color: #4caf50; 
+            font-weight: bold; 
+        }
+        .test-btn { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px;
+            margin: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .test-btn:hover { 
+            background: #0056b3; 
+            transform: translateY(-2px);
+        }
+        .test-btn.primary { background: #28a745; }
+        .test-btn.primary:hover { background: #1e7e34; }
+        
+        .mobile-note {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .flex-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .left-panel, .right-panel {
+                max-width: none;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧾 餐後結帳系統 - 左右 Flex 布局</h1>
+        
+        <div class="layout-preview">
+            <div class="preview-header">新布局預覽</div>
+            <div class="flex-container">
+                <div class="left-panel">
+                    <div class="panel-header">📋 左側：訂單清單</div>
+                    <div class="panel-content">
+                        • 桌號篩選<br>
+                        • 訂單列表<br>
+                        • 滾動顯示<br>
+                        • 固定寬度<br>
+                        • 響應式設計
+                    </div>
+                </div>
+                <div class="right-panel">
+                    <div class="panel-header">💰 右側：結帳詳情</div>
+                    <div class="panel-content">
+                        • 訂單詳情<br>
+                        • 項目清單<br>
+                        • 金額計算<br>
+                        • 結帳按鈕<br>
+                        • 空狀態提示
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-note">
+            📱 <strong>響應式設計：</strong>在手機版本中，布局會自動切換為上下堆疊模式，確保在小螢幕上也能良好顯示。
+        </div>
+
+        <h3>🎯 布局改進重點</h3>
+        <ul class="feature-list">
+            <li>左右 Flex 布局替代 Grid 系統</li>
+            <li>左側訂單列表固定寬度 (最大 md/lg)</li>
+            <li>右側結帳詳情自適應寬度 (最小 400px)</li>
+            <li>垂直滾動優化，避免內容溢出</li>
+            <li>移動端自動切換為垂直堆疊</li>
+            <li>更好的空狀態提示設計</li>
+            <li>保持所有 UIStyle 風格兼容</li>
+        </ul>
+
+        <h3>📐 技術細節</h3>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h4>CSS 類別更改：</h4>
+            <pre style="background: #fff; padding: 15px; border-radius: 6px; border-left: 4px solid #007bff; overflow-x: auto;">
+// 主容器
+&lt;div className="flex flex-col lg:flex-row gap-6 min-h-[600px]"&gt;
+
+// 左側容器  
+&lt;div className="flex-1 lg:max-w-md xl:max-w-lg ... flex flex-col"&gt;
+
+// 左側列表區域
+&lt;div className="flex-1 overflow-y-auto max-h-[calc(100vh-300px)] lg:max-h-[500px]"&gt;
+
+// 右側容器
+&lt;div className="flex-1 lg:min-w-[400px] ... flex flex-col max-h-[calc(100vh-300px)] lg:max-h-[500px]"&gt;
+
+// 右側內容區域
+&lt;div className="p-6 flex-1 overflow-y-auto"&gt;</pre>
+        </div>
+
+        <h3>🔧 功能測試</h3>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://localhost:5173/checkout-post-meal" class="test-btn primary">
+                🚀 測試新布局
+            </a>
+            <a href="http://localhost:5173/checkout-post-meal?theme=cyberpunk" class="test-btn">
+                🎨 測試 Cyberpunk 風格
+            </a>
+            <a href="http://localhost:5173/checkout-post-meal?theme=glassmorphism" class="test-btn">
+                💎 測試 Glassmorphism 風格
+            </a>
+        </div>
+
+        <h3>📱 響應式測試</h3>
+        <div style="background: #e8f5e8; padding: 20px; border-radius: 8px;">
+            <p><strong>建議測試步驟：</strong></p>
+            <ol>
+                <li>在桌面版本測試左右並排布局</li>
+                <li>調整瀏覽器寬度測試響應式變化</li>
+                <li>在移動設備上測試垂直堆疊布局</li>
+                <li>測試訂單選擇和結帳流程</li>
+                <li>驗證所有 UIStyle 風格下的表現</li>
+            </ol>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e9ecef;">
+            <p style="color: #666; font-size: 14px;">
+                ✨ 新的左右 Flex 布局提供更好的視覺層次和使用體驗
+            </p>
+        </div>
+    </div>
+</body>
+</html>

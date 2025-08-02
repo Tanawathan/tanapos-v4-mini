@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐後結帳系統測試頁面</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .test-section { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            margin: 15px 0; 
+            border-radius: 5px; 
+            border-left: 4px solid #007bff; 
+        }
+        .success { border-left-color: #28a745; }
+        .warning { border-left-color: #ffc107; }
+        .error { border-left-color: #dc3545; }
+        .status { 
+            padding: 5px 10px; 
+            border-radius: 3px; 
+            margin: 5px 0; 
+            display: inline-block; 
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        .table-select { 
+            padding: 8px 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            margin: 10px 0; 
+        }
+        .order-card { 
+            background: white; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            padding: 12px; 
+            margin: 8px 0; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+        }
+        .order-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 15px; 
+            margin: 20px 0; 
+        }
+        .test-btn { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        .test-btn:hover { background: #0056b3; }
+        .refresh-btn { background: #28a745; }
+        .refresh-btn:hover { background: #1e7e34; }
+        pre { 
+            background: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto; 
+            font-size: 12px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧾 餐後結帳系統測試頁面</h1>
+        <p>實時測試 PostMealCheckout 組件的桌號選擇功能</p>
+
+        <div class="test-section">
+            <h3>🔌 連線狀態檢測</h3>
+            <div id="connection-status">檢測中...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 訂單數據載入測試</h3>
+            <button class="test-btn refresh-btn" onclick="loadCheckoutOrders()">🔄 重新載入訂單</button>
+            <div id="order-status">等待載入...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🏷️ 桌號選擇功能測試</h3>
+            <label for="table-selector">選擇桌號：</label>
+            <select id="table-selector" class="table-select" onchange="filterByTable()">
+                <option value="">載入中...</option>
+            </select>
+            <div id="filter-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 訂單顯示測試</h3>
+            <div id="orders-display">載入中...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 實際頁面測試</h3>
+            <button class="test-btn" onclick="openActualPage()">🚀 開啟實際頁面</button>
+            <button class="test-btn" onclick="openDevConsole()">🛠️ 開啟開發者工具</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📈 測試結果統計</h3>
+            <div id="test-summary">等待測試完成...</div>
+        </div>
+    </div>
+
+    <script>
+        let supabase;
+        let orders = [];
+        let tableNumbers = [];
+
+        // 初始化 Supabase
+        function initializeSupabase() {
+            try {
+                supabase = window.supabase.createClient(
+                    'https://peubpisofenlyquqnpan.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBldWJwaXNvZmVubHlxdXFucGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NTgwODgsImV4cCI6MjA2OTQzNDA4OH0.6IzK9jjs-Ld_mFBRQqNk594ayXapjGxwAmhQpoY26cY'
+                );
+                updateStatus('connection-status', '✅ Supabase 連線成功', 'success');
+                return true;
+            } catch (error) {
+                updateStatus('connection-status', '❌ Supabase 連線失敗: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        // 更新狀態顯示
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = `<div class="status ${type}">${message}</div>`;
+            }
+        }
+
+        // 載入可結帳訂單 (模擬 PostMealCheckout 組件邏輯)
+        async function loadCheckoutOrders() {
+            updateStatus('order-status', '⏳ 載入訂單中...', 'info');
+            
+            try {
+                const { data, error } = await supabase
+                    .from('orders')
+                    .select(`
+                        *,
+                        order_items (*)
+                    `)
+                    .eq('status', 'completed')
+                    .eq('payment_status', 'unpaid')
+                    .order('created_at', { ascending: true });
+
+                if (error) {
+                    throw error;
+                }
+
+                orders = data || [];
+                tableNumbers = [...new Set(orders.map(o => o.table_number))]
+                    .filter(Boolean)
+                    .sort((a, b) => a - b);
+
+                updateStatus('order-status', 
+                    `✅ 成功載入 ${orders.length} 筆訂單，${tableNumbers.length} 個桌號`, 
+                    'success'
+                );
+
+                updateTableSelector();
+                displayOrders();
+                updateTestSummary();
+
+            } catch (error) {
+                updateStatus('order-status', '❌ 載入失敗: ' + error.message, 'error');
+                console.error('Load orders error:', error);
+            }
+        }
+
+        // 更新桌號選擇器
+        function updateTableSelector() {
+            const selector = document.getElementById('table-selector');
+            selector.innerHTML = `<option value="">全部桌號 (${orders.length}筆)</option>`;
+            
+            tableNumbers.forEach(tableNum => {
+                const count = orders.filter(o => o.table_number === tableNum).length;
+                const option = document.createElement('option');
+                option.value = tableNum;
+                option.textContent = `桌號 ${tableNum} (${count}筆)`;
+                selector.appendChild(option);
+            });
+
+            updateStatus('filter-status', 
+                `✅ 桌號選擇器已更新，包含 ${tableNumbers.length} 個桌號`, 
+                'success'
+            );
+        }
+
+        // 依桌號篩選
+        function filterByTable() {
+            const selector = document.getElementById('table-selector');
+            const selectedTable = selector.value ? Number(selector.value) : null;
+            
+            if (selectedTable) {
+                const filteredOrders = orders.filter(o => o.table_number === selectedTable);
+                updateStatus('filter-status', 
+                    `🏷️ 已篩選桌號 ${selectedTable}，顯示 ${filteredOrders.length} 筆訂單`, 
+                    'info'
+                );
+                displayOrders(filteredOrders);
+            } else {
+                updateStatus('filter-status', `📋 顯示全部 ${orders.length} 筆訂單`, 'info');
+                displayOrders(orders);
+            }
+        }
+
+        // 顯示訂單
+        function displayOrders(ordersToShow = orders) {
+            const display = document.getElementById('orders-display');
+            
+            if (ordersToShow.length === 0) {
+                display.innerHTML = `
+                    <div class="order-card">
+                        <h4>🍽️ 沒有找到訂單</h4>
+                        <p>請檢查篩選條件或創建測試數據</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const ordersHtml = ordersToShow.map(order => `
+                <div class="order-card">
+                    <h4>🧾 ${order.order_number}</h4>
+                    <p><strong>桌號:</strong> ${order.table_number}</p>
+                    <p><strong>金額:</strong> NT$ ${order.total_amount?.toLocaleString() || 0}</p>
+                    <p><strong>狀態:</strong> ${order.status} / ${order.payment_status}</p>
+                    <p><strong>項目數:</strong> ${order.order_items?.length || 0}</p>
+                    <p><strong>時間:</strong> ${new Date(order.created_at).toLocaleString()}</p>
+                </div>
+            `).join('');
+
+            display.innerHTML = `<div class="order-grid">${ordersHtml}</div>`;
+        }
+
+        // 更新測試統計
+        function updateTestSummary() {
+            const summary = {
+                totalOrders: orders.length,
+                uniqueTables: tableNumbers.length,
+                totalAmount: orders.reduce((sum, o) => sum + (o.total_amount || 0), 0),
+                tableRange: tableNumbers.length > 0 ? 
+                    `${Math.min(...tableNumbers)} - ${Math.max(...tableNumbers)}` : 'N/A'
+            };
+
+            document.getElementById('test-summary').innerHTML = `
+                <div class="status success">
+                    📊 總訂單數: ${summary.totalOrders}<br>
+                    🏷️ 桌號數量: ${summary.uniqueTables}<br>
+                    💰 總金額: NT$ ${summary.totalAmount.toLocaleString()}<br>
+                    📈 桌號範圍: ${summary.tableRange}
+                </div>
+            `;
+        }
+
+        // 開啟實際頁面
+        function openActualPage() {
+            window.open('http://localhost:5173/checkout-post-meal', '_blank');
+        }
+
+        // 開啟開發者工具
+        function openDevConsole() {
+            alert('請按 F12 或右鍵 → 檢查元素 來開啟開發者工具');
+        }
+
+        // 頁面載入時初始化
+        window.addEventListener('load', () => {
+            if (initializeSupabase()) {
+                loadCheckoutOrders();
+            }
+        });
+    </script>
+</body>
+</html>

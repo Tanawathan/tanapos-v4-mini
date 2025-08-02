@@ -52,6 +52,7 @@ import { AdminSystem } from './components/admin'
 // UI Components
 import NotificationProvider from './components/ui/NotificationSystem'
 import NotificationDemo from './components/ui/NotificationDemo'
+import PWAInstallPrompt from './components/ui/PWAInstallPrompt'
 
 // ============================================================================
 // 裝置檢測功能
@@ -67,7 +68,7 @@ const isMobileDevice = () => {
 const DashboardWrapper = () => {
   const navigate = useNavigate()
   
-  const handleNavigate = (view: 'pos' | 'kds' | 'kds-mobile' | 'reports' | 'orders' | 'tables' | 'checkout' | 'inventory' | 'admin') => {
+  const handleNavigate = (view: 'pos' | 'kds' | 'kds-mobile' | 'reports' | 'orders' | 'tables' | 'checkout' | 'checkout-post-meal' | 'inventory' | 'admin') => {
     switch (view) {
       case 'pos':
         navigate('/pos-simple')
@@ -89,6 +90,9 @@ const DashboardWrapper = () => {
         break
       case 'checkout':
         navigate('/checkout')
+        break
+      case 'checkout-post-meal':
+        navigate('/checkout-post-meal')
         break
       case 'inventory':
         navigate('/inventory')
@@ -175,6 +179,9 @@ function App() {
               </Routes>
             </LayoutComponent>
           </div>
+          
+          {/* PWA 安裝提示 */}
+          <PWAInstallPrompt />
         </Router>
       </NotificationProvider>
     </UIStyleProvider>

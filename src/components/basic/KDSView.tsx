@@ -19,8 +19,25 @@ const KDSView: React.FC = () => {
   const { currentStyle } = useUIStyle()
   const [currentTime, setCurrentTime] = useState(new Date())
   
+  // 響應式狀態
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+  
   // 追蹤每個訂單項目的完成狀態
   const [itemStatuses, setItemStatuses] = useState<Map<string, boolean>>(new Map())
+  
+  // 自動刷新狀態
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date>(new Date())
+
+  // 響應式監聽器
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // 檢查是否為套餐
   const isMealSet = (productName: string): boolean => {
@@ -57,19 +74,35 @@ const KDSView: React.FC = () => {
     }
   }
 
-  // 組件掛載時載入訂單數據和分類數據
+  // 組件掛載時載入訂單數據和分類數據，並設置自動刷新
   useEffect(() => {
     const loadData = async () => {
       try {
+        setIsRefreshing(true)
         console.log('🍳 KDS: 載入訂單數據...')
         await loadOrders()
+        setLastRefreshTime(new Date())
         console.log('✅ KDS: 訂單數據載入完成')
       } catch (error) {
         console.error('❌ KDS: 載入訂單數據失敗:', error)
+      } finally {
+        setIsRefreshing(false)
       }
     }
     
+    // 立即載入一次數據
     loadData()
+    
+    // 設置 10 秒自動刷新
+    const refreshInterval = setInterval(() => {
+      console.log('🔄 KDS: 自動刷新訂單數據 (10秒週期)')
+      loadData()
+    }, 10000) // 10 秒 = 10000 毫秒
+    
+    // 清理定時器
+    return () => {
+      clearInterval(refreshInterval)
+    }
   }, [loadOrders])
 
   // 更新時間
@@ -94,6 +127,21 @@ const KDSView: React.FC = () => {
   const getItemStatus = (orderId: string, itemIndex: number): boolean => {
     const key = `${orderId}-${itemIndex}`
     return itemStatuses.get(key) || false
+  }
+
+  // 手動刷新訂單數據
+  const handleManualRefresh = async () => {
+    try {
+      setIsRefreshing(true)
+      console.log('🔄 KDS: 手動刷新訂單數據')
+      await loadOrders()
+      setLastRefreshTime(new Date())
+      console.log('✅ KDS: 手動刷新完成')
+    } catch (error) {
+      console.error('❌ KDS: 手動刷新失敗:', error)
+    } finally {
+      setIsRefreshing(false)
+    }
   }
 
   // 檢查訂單是否所有項目都已完成
@@ -342,48 +390,110 @@ const KDSView: React.FC = () => {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: themeColors.bg,
-      color: themeColors.text,
-      padding: '1.5rem',
-      fontFamily: currentStyle === 'dos' || currentStyle === 'bios' ? 'monospace' : 'system-ui, sans-serif'
-    }}>
+    <>
+      {/* CSS 動畫樣式 */}
+      <style>
+        {`
+          @keyframes spin {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        `}
+      </style>
+      
+      <div style={{
+        minHeight: '100vh',
+        background: themeColors.bg,
+        color: themeColors.text,
+        padding: isMobile ? '0.75rem' : '1.5rem',
+        fontFamily: currentStyle === 'dos' || currentStyle === 'bios' ? 'monospace' : 'system-ui, sans-serif'
+      }}>
       {/* 標題區域 */}
       <div style={{
         display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '2rem',
-        padding: '1rem',
+        alignItems: isMobile ? 'center' : 'center',
+        marginBottom: isMobile ? '1rem' : '2rem',
+        padding: isMobile ? '0.75rem' : '1rem',
         background: themeColors.cardBg,
         borderRadius: currentStyle === 'brutalism' ? '0' : '0.5rem',
         border: currentStyle === 'brutalism' ? `2px solid ${themeColors.border}` : `1px solid ${themeColors.border}`,
-        boxShadow: themeColors.shadow
+        boxShadow: themeColors.shadow,
+        gap: isMobile ? '0.5rem' : '0'
       }}>
         <h1 style={{
           margin: 0,
-          fontSize: '2rem',
+          fontSize: isMobile ? '1.5rem' : '2rem',
           fontWeight: 'bold',
-          color: themeColors.text
+          color: themeColors.text,
+          textAlign: isMobile ? 'center' : 'left'
         }}>
           👨‍🍳 廚房顯示系統
         </h1>
         <div style={{ 
-          fontSize: '1.25rem',
-          color: themeColors.subText,
-          fontWeight: '500'
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'center' : 'flex-end',
+          gap: isMobile ? '0.25rem' : '1rem'
         }}>
-          {currentTime.toLocaleTimeString('zh-TW')}
+          <div style={{ 
+            fontSize: isMobile ? '1rem' : '1.25rem',
+            color: themeColors.subText,
+            fontWeight: '500'
+          }}>
+            {currentTime.toLocaleTimeString('zh-TW')}
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: isMobile ? '0.75rem' : '0.875rem',
+            color: isRefreshing ? themeColors.primary : themeColors.subText
+          }}>
+            <span style={{
+              animation: isRefreshing ? 'spin 1s linear infinite' : 'none',
+              display: 'inline-block'
+            }}>
+              🔄
+            </span>
+            <span>
+              自動刷新: {isRefreshing ? '更新中...' : `${Math.floor((new Date().getTime() - lastRefreshTime.getTime()) / 1000)}秒前`}
+            </span>
+            <button
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              style={{
+                background: isRefreshing ? themeColors.subText : themeColors.primary,
+                color: '#ffffff',
+                border: 'none',
+                padding: isMobile ? '0.25rem 0.5rem' : '0.375rem 0.75rem',
+                borderRadius: currentStyle === 'brutalism' ? '0' : '0.25rem',
+                cursor: isRefreshing ? 'not-allowed' : 'pointer',
+                fontSize: isMobile ? '0.65rem' : '0.75rem',
+                fontWeight: '500',
+                opacity: isRefreshing ? 0.6 : 1,
+                boxShadow: currentStyle === 'brutalism' ? `1px 1px 0px ${themeColors.border}` : 'none'
+              }}
+            >
+              立即刷新
+            </button>
+          </div>
         </div>
       </div>
 
       {/* 統計區域 */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '1rem',
-        marginBottom: '2rem'
+        gridTemplateColumns: isMobile 
+          ? 'repeat(2, 1fr)' 
+          : 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: isMobile ? '0.5rem' : '1rem',
+        marginBottom: isMobile ? '1rem' : '2rem'
       }}>
         {[
           { label: '待處理', count: groupedOrders.pending.length, color: themeColors.warning },
@@ -393,14 +503,14 @@ const KDSView: React.FC = () => {
         ].map((stat, index) => (
           <div key={index} style={{
             background: themeColors.cardBg,
-            padding: '1rem',
+            padding: isMobile ? '0.75rem' : '1rem',
             borderRadius: currentStyle === 'brutalism' ? '0' : '0.5rem',
             border: currentStyle === 'brutalism' ? `2px solid ${themeColors.border}` : `1px solid ${themeColors.border}`,
             boxShadow: themeColors.shadow,
             textAlign: 'center'
           }}>
             <div style={{
-              fontSize: '2rem',
+              fontSize: isMobile ? '1.5rem' : '2rem',
               fontWeight: 'bold',
               color: stat.color,
               marginBottom: '0.5rem'
@@ -409,7 +519,7 @@ const KDSView: React.FC = () => {
             </div>
             <div style={{
               color: themeColors.subText,
-              fontSize: '0.875rem'
+              fontSize: isMobile ? '0.75rem' : '0.875rem'
             }}>
               {stat.label}
             </div>
@@ -420,8 +530,10 @@ const KDSView: React.FC = () => {
       {/* 訂單區域 */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-        gap: '1.5rem'
+        gridTemplateColumns: isMobile 
+          ? '1fr' 
+          : 'repeat(auto-fit, minmax(350px, 1fr))',
+        gap: isMobile ? '1rem' : '1.5rem'
       }}>
         {Object.entries(groupedOrders).map(([status, statusOrders]) => (
           <div key={status} style={{
@@ -433,11 +545,11 @@ const KDSView: React.FC = () => {
           }}>
             {/* 列標題 */}
             <div style={{
-              padding: '1rem',
+              padding: isMobile ? '0.75rem' : '1rem',
               background: getStatusColors(status as OrderStatus).bg,
               color: getStatusColors(status as OrderStatus).text,
               fontWeight: 'bold',
-              fontSize: '1.125rem',
+              fontSize: isMobile ? '1rem' : '1.125rem',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
@@ -458,13 +570,17 @@ const KDSView: React.FC = () => {
             </div>
 
             {/* 訂單列表 */}
-            <div style={{ padding: '1rem', maxHeight: '70vh', overflowY: 'auto' }}>
+            <div style={{ 
+              padding: isMobile ? '0.75rem' : '1rem', 
+              maxHeight: isMobile ? '60vh' : '70vh', 
+              overflowY: 'auto' 
+            }}>
               {statusOrders.length === 0 ? (
                 <div style={{
                   textAlign: 'center',
                   color: themeColors.subText,
-                  padding: '2rem',
-                  fontSize: '0.875rem'
+                  padding: isMobile ? '1rem' : '2rem',
+                  fontSize: isMobile ? '0.8rem' : '0.875rem'
                 }}>
                   暫無訂單
                 </div>
@@ -483,7 +599,7 @@ const KDSView: React.FC = () => {
                                           priority === 'warning' ? themeColors.warning : 
                                           themeColors.border}`,
                       borderRadius: currentStyle === 'brutalism' ? '0' : '0.375rem',
-                      padding: '1rem',
+                      padding: isMobile ? '0.75rem' : '1rem',
                       marginBottom: '0.75rem',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease'
@@ -491,13 +607,15 @@ const KDSView: React.FC = () => {
                       {/* 訂單標題 */}
                       <div style={{
                         display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
                         justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '0.75rem'
+                        alignItems: isMobile ? 'stretch' : 'center',
+                        marginBottom: '0.75rem',
+                        gap: isMobile ? '0.5rem' : '0'
                       }}>
                         <div style={{
                           fontWeight: 'bold',
-                          fontSize: '1.125rem',
+                          fontSize: isMobile ? '1rem' : '1.125rem',
                           color: themeColors.text
                         }}>
                           訂單 #{order.order_number || order.id.slice(-4)}
@@ -549,12 +667,13 @@ const KDSView: React.FC = () => {
                                           display: 'flex',
                                           justifyContent: 'space-between',
                                           alignItems: 'center',
-                                          padding: '0.5rem',
+                                          padding: isMobile ? '0.375rem' : '0.5rem',
                                           cursor: 'pointer',
                                           transition: 'background-color 0.2s ease',
-                                          backgroundColor: isCompleted ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                                          backgroundColor: isCompleted ? 'rgba(34, 197, 94, 0.1)' : 'rgba(156, 163, 175, 0.1)',
                                           borderRadius: '0.25rem',
                                           marginBottom: '0.25rem',
+                                          fontSize: isMobile ? '0.8rem' : '0.875rem',
                                           border: `1px solid ${isCompleted ? 'rgba(16, 185, 129, 0.3)' : themeColors.border}`
                                         }}
                                         onMouseEnter={(e) => {
@@ -575,13 +694,14 @@ const KDSView: React.FC = () => {
                                             fontWeight: '500',
                                             textDecoration: isCompleted ? 'line-through' : 'none',
                                             opacity: isCompleted ? 0.6 : 1,
-                                            position: 'relative'
+                                            position: 'relative',
+                                            fontSize: isMobile ? '0.8rem' : '0.875rem'
                                           }}>
                                             {isCompleted && (
                                               <span style={{
                                                 marginRight: '0.5rem',
                                                 color: themeColors.success,
-                                                fontSize: '1rem'
+                                                fontSize: isMobile ? '0.8rem' : '1rem'
                                               }}>
                                                 ✓
                                               </span>
@@ -594,7 +714,7 @@ const KDSView: React.FC = () => {
                                                 backgroundColor: '#f97316',
                                                 color: 'white',
                                                 borderRadius: '0.375rem',
-                                                fontSize: '0.6rem',
+                                                fontSize: isMobile ? '0.5rem' : '0.6rem',
                                                 fontWeight: 'bold'
                                               }}>
                                                 🍽️ 套餐
@@ -777,12 +897,13 @@ const KDSView: React.FC = () => {
                               background: themeColors.primary,
                               color: '#ffffff',
                               border: 'none',
-                              padding: '0.5rem 1rem',
+                              padding: isMobile ? '0.5rem 0.75rem' : '0.5rem 1rem',
                               borderRadius: currentStyle === 'brutalism' ? '0' : '0.25rem',
                               cursor: 'pointer',
-                              fontSize: '0.875rem',
+                              fontSize: isMobile ? '0.75rem' : '0.875rem',
                               fontWeight: '500',
-                              boxShadow: currentStyle === 'brutalism' ? `2px 2px 0px ${themeColors.border}` : 'none'
+                              boxShadow: currentStyle === 'brutalism' ? `2px 2px 0px ${themeColors.border}` : 'none',
+                              width: isMobile ? '100%' : 'auto'
                             }}
                           >
                             開始製作
@@ -807,11 +928,11 @@ const KDSView: React.FC = () => {
                                   display: 'flex',
                                   flexDirection: 'column',
                                   gap: '0.25rem',
-                                  padding: '0.5rem',
+                                  padding: isMobile ? '0.375rem' : '0.5rem',
                                   backgroundColor: themeColors.cardBg === '#ffffff' ? '#f9fafb' : 'rgba(255,255,255,0.05)',
                                   borderRadius: '0.5rem',
                                   border: `1px solid ${themeColors.border}`,
-                                  fontSize: '0.75rem'
+                                  fontSize: isMobile ? '0.65rem' : '0.75rem'
                                 }}>
                                   {mainItems.length > 0 && (
                                     <div style={{
@@ -857,13 +978,14 @@ const KDSView: React.FC = () => {
                                 background: areAllItemsCompleted(order) ? themeColors.success : themeColors.subText,
                                 color: '#ffffff',
                                 border: 'none',
-                                padding: '0.5rem 1rem',
+                                padding: isMobile ? '0.5rem 0.75rem' : '0.5rem 1rem',
                                 borderRadius: currentStyle === 'brutalism' ? '0' : '0.25rem',
                                 cursor: areAllItemsCompleted(order) ? 'pointer' : 'not-allowed',
-                                fontSize: '0.875rem',
+                                fontSize: isMobile ? '0.75rem' : '0.875rem',
                                 fontWeight: '500',
                                 boxShadow: currentStyle === 'brutalism' ? `2px 2px 0px ${themeColors.border}` : 'none',
-                                opacity: areAllItemsCompleted(order) ? 1 : 0.6
+                                opacity: areAllItemsCompleted(order) ? 1 : 0.6,
+                                width: isMobile ? '100%' : 'auto'
                               }}
                               title={
                                 areAllItemsCompleted(order) 
@@ -890,12 +1012,13 @@ const KDSView: React.FC = () => {
                               background: themeColors.subText,
                               color: '#ffffff',
                               border: 'none',
-                              padding: '0.5rem 1rem',
+                              padding: isMobile ? '0.5rem 0.75rem' : '0.5rem 1rem',
                               borderRadius: currentStyle === 'brutalism' ? '0' : '0.25rem',
                               cursor: 'pointer',
-                              fontSize: '0.875rem',
+                              fontSize: isMobile ? '0.75rem' : '0.875rem',
                               fontWeight: '500',
-                              boxShadow: currentStyle === 'brutalism' ? `2px 2px 0px ${themeColors.border}` : 'none'
+                              boxShadow: currentStyle === 'brutalism' ? `2px 2px 0px ${themeColors.border}` : 'none',
+                              width: isMobile ? '100%' : 'auto'
                             }}
                           >
                             出餐完成
@@ -943,7 +1066,8 @@ const KDSView: React.FC = () => {
           </p>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
 

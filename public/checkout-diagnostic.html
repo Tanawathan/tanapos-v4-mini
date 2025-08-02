@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐後結帳系統診斷 - TanaPOS V4-Mini</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 1rem;
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #059669;
+        }
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+        .success { background: #dcfce7; color: #166534; }
+        .error { background: #fef2f2; color: #dc2626; }
+        .warning { background: #fef3c7; color: #d97706; }
+        .info { background: #dbeafe; color: #1d4ed8; }
+        .button {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin: 0.25rem;
+        }
+        .button:hover {
+            background: #047857;
+        }
+        .log {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .data-table th,
+        .data-table td {
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        .data-table th {
+            background: #f9fafb;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧾 餐後結帳系統診斷</h1>
+            <p>TanaPOS V4-Mini 結帳功能檢測工具</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 系統狀態檢查</h3>
+            <button class="button" onclick="checkSystemStatus()">檢查系統狀態</button>
+            <button class="button" onclick="checkOrders()">檢查訂單數據</button>
+            <button class="button" onclick="checkTables()">檢查桌台數據</button>
+            <button class="button" onclick="createTestData()">創建測試數據</button>
+            <button class="button" onclick="window.location.href='/checkout-post-meal'">前往結帳頁面</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 數據概覽</h3>
+            <div id="data-overview">
+                <p>點擊上方按鈕開始檢查...</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🏷️ 可用桌號</h3>
+            <div id="table-numbers">
+                <p>載入中...</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 結帳訂單詳情</h3>
+            <div id="checkout-orders">
+                <p>載入中...</p>
+            </div>
+        </div>
+
+        <div id="log" class="log">
+            <div>[診斷工具] 餐後結帳系統診斷工具已載入</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js'
+        
+        const supabase = createClient(
+            'https://peubpisofenlyquqnpan.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBldWJwaXNvZmVubHlxdXFucGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NTgwODgsImV4cCI6MjA2OTQzNDA4OH0.6IzK9jjs-Ld_mFBRQqNk594ayXapjGxwAmhQpoY26cY'
+        )
+
+        const log = document.getElementById('log');
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.innerHTML = `<span style="color: #6b7280">[${timestamp}]</span> ${message}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        window.checkSystemStatus = async function() {
+            addLog('🔍 開始檢查系統狀態...')
+            
+            try {
+                // 檢查數據庫連接
+                const { data, error } = await supabase.from('orders').select('count').limit(1)
+                if (error) throw error
+                addLog('✅ 數據庫連接正常')
+                
+                // 檢查表格結構
+                const { data: tableCheck } = await supabase.from('tables').select('*').limit(1)
+                addLog(tableCheck ? '✅ tables 表格存在' : '❌ tables 表格不存在')
+                
+                const { data: orderCheck } = await supabase.from('orders').select('*').limit(1)
+                addLog(orderCheck ? '✅ orders 表格存在' : '❌ orders 表格不存在')
+                
+            } catch (error) {
+                addLog(`❌ 系統檢查失敗: ${error.message}`)
+            }
+        }
+
+        window.checkOrders = async function() {
+            addLog('📋 檢查訂單數據...')
+            
+            try {
+                // 檢查所有訂單
+                const { data: allOrders, error: allError } = await supabase
+                    .from('orders')
+                    .select('id, order_number, table_number, status, checkout_status, total_amount')
+                    .order('created_at', { ascending: false })
+                    .limit(10)
+                
+                if (allError) throw allError
+                
+                addLog(`📊 找到 ${allOrders.length} 個最近訂單`)
+                
+                // 檢查可結帳訂單
+                const { data: checkoutOrders, error: checkoutError } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('status', 'completed')
+                    .in('checkout_status', ['pending', 'ready'])
+                
+                if (checkoutError) throw checkoutError
+                
+                addLog(`🧾 找到 ${checkoutOrders.length} 個可結帳訂單`)
+                
+                // 顯示數據概覽
+                const overview = document.getElementById('data-overview')
+                overview.innerHTML = `
+                    <div>總訂單數: <span class="status info">${allOrders.length}</span></div>
+                    <div>可結帳訂單: <span class="status success">${checkoutOrders.length}</span></div>
+                    <div>狀態分佈:</div>
+                    <ul>
+                        ${Object.entries(
+                            allOrders.reduce((acc, order) => {
+                                acc[order.status] = (acc[order.status] || 0) + 1
+                                return acc
+                            }, {})
+                        ).map(([status, count]) => 
+                            `<li>${status}: ${count} 筆</li>`
+                        ).join('')}
+                    </ul>
+                `
+                
+                // 顯示可結帳訂單詳情
+                const checkoutDiv = document.getElementById('checkout-orders')
+                if (checkoutOrders.length > 0) {
+                    checkoutDiv.innerHTML = `
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>訂單號</th>
+                                    <th>桌號</th>
+                                    <th>狀態</th>
+                                    <th>結帳狀態</th>
+                                    <th>金額</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${checkoutOrders.map(order => `
+                                    <tr>
+                                        <td>${order.order_number}</td>
+                                        <td>桌 ${order.table_number}</td>
+                                        <td><span class="status success">${order.status}</span></td>
+                                        <td><span class="status warning">${order.checkout_status}</span></td>
+                                        <td>NT$ ${order.total_amount}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `
+                } else {
+                    checkoutDiv.innerHTML = '<p>沒有可結帳的訂單</p>'
+                }
+                
+            } catch (error) {
+                addLog(`❌ 訂單檢查失敗: ${error.message}`)
+            }
+        }
+
+        window.checkTables = async function() {
+            addLog('🏷️ 檢查桌台和桌號數據...')
+            
+            try {
+                // 從訂單中提取桌號
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('table_number')
+                    .eq('status', 'completed')
+                    .in('checkout_status', ['pending', 'ready'])
+                
+                if (error) throw error
+                
+                const tableNumbers = [...new Set(orders.map(o => o.table_number))]
+                    .filter(Boolean)
+                    .sort((a, b) => a - b)
+                
+                addLog(`🏷️ 可用桌號: ${tableNumbers.join(', ')}`)
+                
+                // 顯示桌號信息
+                const tableDiv = document.getElementById('table-numbers')
+                if (tableNumbers.length > 0) {
+                    tableDiv.innerHTML = `
+                        <div>
+                            ${tableNumbers.map(num => 
+                                `<span class="status success">桌 ${num}</span>`
+                            ).join('')}
+                        </div>
+                        <p class="mt-2 text-sm text-gray-600">
+                            總計 ${tableNumbers.length} 個桌號有待結帳訂單
+                        </p>
+                    `
+                } else {
+                    tableDiv.innerHTML = '<p>沒有找到可用的桌號</p>'
+                }
+                
+            } catch (error) {
+                addLog(`❌ 桌台檢查失敗: ${error.message}`)
+            }
+        }
+
+        window.createTestData = async function() {
+            addLog('🛠️ 開始創建測試數據...')
+            
+            try {
+                // 這裡可以創建測試訂單
+                addLog('💡 請使用 create-checkout-test-data.js 腳本創建測試數據')
+                addLog('💡 或手動將現有訂單狀態改為 completed')
+                
+            } catch (error) {
+                addLog(`❌ 創建測試數據失敗: ${error.message}`)
+            }
+        }
+
+        // 自動載入數據
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                checkOrders()
+                checkTables()
+            }, 1000)
+        })
+    </script>
+</body>
+</html>
