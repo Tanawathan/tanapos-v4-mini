@@ -1,0 +1,520 @@
+{
+  "config": {
+    "configFile": "C:\\TanaPOS\\tanapos-v4-ai\\playwright.config.ts",
+    "rootDir": "C:/TanaPOS/tanapos-v4-ai/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/TanaPOS/tanapos-v4-ai/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/TanaPOS/tanapos-v4-ai/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/TanaPOS/tanapos-v4-ai/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "C:/TanaPOS/tanapos-v4-ai/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.54.2",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:5178",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "final-verification.test.ts",
+      "file": "final-verification.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "TanaPOS V4-AI 最終功能驗證",
+          "file": "final-verification.test.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "V4-AI 系統基本功能完整驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11330,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🎯 開始V4-AI系統完整驗證...\n"
+                        },
+                        {
+                          "text": "✅ 頁面標題驗證通過\n"
+                        },
+                        {
+                          "text": "✅ \"開始點餐\" 按鈕存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"訂單管理\" 按鈕存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"桌台管理\" 按鈕存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"結帳管理\" 按鈕存在且可見\n"
+                        },
+                        {
+                          "text": "🪑 測試桌台管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理頁面導航成功\n"
+                        },
+                        {
+                          "text": "✅ 返回首頁功能正常\n"
+                        },
+                        {
+                          "text": "🍽️ 測試點餐功能...\n"
+                        },
+                        {
+                          "text": "✅ 點餐功能導航成功\n"
+                        },
+                        {
+                          "text": "📋 測試訂單管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 訂單管理功能導航成功\n"
+                        },
+                        {
+                          "text": "💰 測試結帳管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 結帳管理功能導航成功\n"
+                        },
+                        {
+                          "text": "🎉 V4-AI系統功能驗證完成！\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-04T13:32:32.932Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-b6b1288e5fbde9238861",
+              "file": "final-verification.test.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 響應式設計測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4121,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📱 開始響應式設計測試...\n"
+                        },
+                        {
+                          "text": "✅ 桌面版 (1280x720): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 平板版 (768x1024): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 手機版 (375x667): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 響應式設計測試通過\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-04T13:32:44.676Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-d22f6c309521a8944736",
+              "file": "final-verification.test.ts",
+              "line": 90,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 系統穩定性測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13221,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🛡️ 開始系統穩定性測試...\n"
+                        },
+                        {
+                          "text": "🔄 測試 桌台管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 開始點餐 功能...\n"
+                        },
+                        {
+                          "text": "✅ 開始點餐 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 訂單管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 訂單管理 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 結帳管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 結帳管理 導航完成\n"
+                        },
+                        {
+                          "text": "📊 控制台錯誤統計: 總計 0 個，嚴重錯誤 0 個\n"
+                        },
+                        {
+                          "text": "✅ 未發現嚴重系統錯誤\n"
+                        },
+                        {
+                          "text": "✅ 系統穩定性測試通過\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-04T13:32:48.809Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-c5f0e62dac9c1fcd5dd9",
+              "file": "final-verification.test.ts",
+              "line": 123,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 系統基本功能完整驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10985,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🎯 開始V4-AI系統完整驗證...\n"
+                        },
+                        {
+                          "text": "✅ 頁面標題驗證通過\n"
+                        },
+                        {
+                          "text": "✅ \"開始點餐\" 按鈕存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"訂單管理\" 按鈕存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"桌台管理\" 按鈕存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"結帳管理\" 按鈕存在且可見\n"
+                        },
+                        {
+                          "text": "🪑 測試桌台管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理頁面導航成功\n"
+                        },
+                        {
+                          "text": "✅ 返回首頁功能正常\n"
+                        },
+                        {
+                          "text": "🍽️ 測試點餐功能...\n"
+                        },
+                        {
+                          "text": "✅ 點餐功能導航成功\n"
+                        },
+                        {
+                          "text": "📋 測試訂單管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 訂單管理功能導航成功\n"
+                        },
+                        {
+                          "text": "💰 測試結帳管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 結帳管理功能導航成功\n"
+                        },
+                        {
+                          "text": "🎉 V4-AI系統功能驗證完成！\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-04T13:33:04.541Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-6b27d07dbbfb9830da2b",
+              "file": "final-verification.test.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 響應式設計測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4335,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📱 開始響應式設計測試...\n"
+                        },
+                        {
+                          "text": "✅ 桌面版 (1280x720): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 平板版 (768x1024): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 手機版 (375x667): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 響應式設計測試通過\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-04T13:33:15.934Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-394f843314543585f274",
+              "file": "final-verification.test.ts",
+              "line": 90,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 系統穩定性測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13315,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🛡️ 開始系統穩定性測試...\n"
+                        },
+                        {
+                          "text": "🔄 測試 桌台管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 開始點餐 功能...\n"
+                        },
+                        {
+                          "text": "✅ 開始點餐 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 訂單管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 訂單管理 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 結帳管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 結帳管理 導航完成\n"
+                        },
+                        {
+                          "text": "📊 控制台錯誤統計: 總計 0 個，嚴重錯誤 0 個\n"
+                        },
+                        {
+                          "text": "✅ 未發現嚴重系統錯誤\n"
+                        },
+                        {
+                          "text": "✅ 系統穩定性測試通過\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-04T13:33:20.278Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-81fcb844860ee543feea",
+              "file": "final-verification.test.ts",
+              "line": 123,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-08-04T13:32:30.127Z",
+    "duration": 63856.100000000006,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
