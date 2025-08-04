@@ -115,33 +115,33 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-ui-secondary">
       {/* 頂部導航 */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+      <header className="bg-ui-primary shadow-sm border-b border-ui sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* 左側：返回按鈕和標題 */}
             <div className="flex items-center space-x-4">
               <button
                 onClick={onBack}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center space-x-2 text-ui-muted hover:text-ui-primary transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>返回</span>
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">🍽️ 點餐系統</h1>
+              <h1 className="text-2xl font-bold text-ui-primary">🍽️ 點餐系統</h1>
             </div>
 
             {/* 右側：桌台選擇和購物車 */}
             <div className="flex items-center space-x-4">
               {/* 桌台選擇 */}
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">桌台：</span>
+                <span className="text-sm text-ui-muted">桌台：</span>
                 <button
                   onClick={() => setShowTableModal(true)}
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-gray-50 transition-colors flex items-center space-x-2"
+                  className="px-3 py-2 border border-ui rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-ui-secondary transition-colors flex items-center space-x-2"
                 >
                   {selectedTableInfo ? (
                     <span>
@@ -180,7 +180,7 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
           {/* 左側：分類和產品列表 */}
           <div className="lg:col-span-2 space-y-6">
             {/* 產品類型切換 */}
-            <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="bg-ui-primary rounded-lg shadow-sm border border-ui p-4">
               <div className="flex space-x-4">
                 <button
                   onClick={() => setViewMode('products')}
@@ -358,8 +358,8 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
           </div>
 
           {/* 右側：購物車 */}
-          <div className="bg-white rounded-lg shadow-sm border p-4 h-fit sticky top-24">
-            <h3 className="text-lg font-semibold mb-4">購物車</h3>
+          <div className="bg-ui-primary rounded-lg shadow-sm border border-ui p-4 h-fit sticky top-24">
+            <h3 className="text-lg font-semibold mb-4 text-ui-primary">購物車</h3>
             
             {/* 桌台資訊 */}
             {selectedTableInfo ? (
@@ -486,12 +486,12 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
       {/* 備註模態框 */}
       {noteModalItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-96 overflow-y-auto">
+          <div className="bg-ui-primary rounded-lg p-6 max-w-md w-full max-h-96 overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">商品備註</h3>
+              <h3 className="text-lg font-semibold text-ui-primary">商品備註</h3>
               <button
                 onClick={closeNoteModal}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-ui-muted hover:text-ui-primary transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -500,17 +500,17 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
             </div>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-ui-secondary mb-2">
                 備註內容
               </label>
               <textarea
                 value={tempNote}
                 onChange={(e) => setTempNote(e.target.value)}
                 placeholder="請輸入商品備註（例如：不要洋蔥、多加醬汁、少冰等）"
-                className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full h-24 px-3 py-2 border border-ui rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-ui-primary text-ui-primary"
                 maxLength={100}
               />
-              <div className="text-right text-xs text-gray-500 mt-1">
+              <div className="text-right text-xs text-ui-muted mt-1">
                 {tempNote.length}/100 字
               </div>
             </div>
@@ -518,7 +518,7 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
             <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
               <button
                 onClick={closeNoteModal}
-                className="w-full sm:w-auto px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:text-gray-800 hover:bg-gray-50 transition-colors"
+                className="w-full sm:w-auto px-4 py-2 text-ui-muted border border-ui rounded-lg hover:text-ui-primary hover:bg-ui-secondary transition-colors"
               >
                 取消
               </button>
@@ -536,15 +536,15 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
       {/* 桌台選擇模態框 */}
       {showTableModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-ui-primary rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">選擇桌台</h3>
-                <p className="text-gray-600 mt-1">請選擇可用的桌台開始點餐</p>
+                <h3 className="text-2xl font-bold text-ui-primary">選擇桌台</h3>
+                <p className="text-ui-muted mt-1">請選擇可用的桌台開始點餐</p>
               </div>
               <button
                 onClick={() => setShowTableModal(false)}
-                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-all"
+                className="text-ui-muted hover:text-ui-primary p-2 hover:bg-ui-secondary rounded-full transition-all"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -620,8 +620,8 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
             
             {tables.filter(t => t.status === 'available').length === 0 && (
               <div className="text-center py-8">
-                <div className="text-gray-400 text-4xl mb-4">😔</div>
-                <p className="text-gray-600">目前沒有可用的桌台</p>
+                <div className="text-ui-muted text-4xl mb-4">😔</div>
+                <p className="text-ui-muted">目前沒有可用的桌台</p>
               </div>
             )}
           </div>

@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -57,6 +58,31 @@ export default {
           700: '#b91c1c',
           800: '#991b1b',
           900: '#7f1d1d',
+        },
+        // 色盲友善顏色系統
+        colorblind: {
+          // 藍橙對比 (適合大多數色盲患者)
+          primary: '#0F4C75',    // 深藍
+          secondary: '#FF6B35',   // 橙色
+          accent: '#FFD23F',      // 黃色
+          neutral: '#6C757D',     // 灰色
+          light: '#F8F9FA',       // 淺灰
+          dark: '#343A40',        // 深灰
+        },
+        // 深色模式配色
+        dark: {
+          bg: {
+            primary: '#0F172A',    // 主背景 slate-900
+            secondary: '#1E293B',  // 次背景 slate-800
+            tertiary: '#334155',   // 三級背景 slate-700
+          },
+          text: {
+            primary: '#F1F5F9',    // 主文字 slate-100
+            secondary: '#CBD5E1',  // 次文字 slate-300
+            muted: '#94A3B8',      // 弱化文字 slate-400
+          },
+          border: '#475569',       // 邊框 slate-600
+          accent: '#3B82F6',       // 強調色 blue-500
         }
       },
       animation: {

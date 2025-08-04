@@ -168,38 +168,40 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-ui-secondary">
       {/* 頂部導航 */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+      <header className="bg-ui-primary shadow-sm border-b border-ui sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* 左側：返回按鈕和標題 */}
             <div className="flex items-center space-x-4">
               <button
                 onClick={onBack}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center space-x-2 text-ui-muted hover:text-ui-primary transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>返回</span>
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">🪑 桌台管理</h1>
+              <h1 className="text-2xl font-bold text-ui-primary">🪑 桌台管理</h1>
             </div>
 
             {/* 右側：重新整理按鈕 */}
-            <button
-              onClick={() => {
-                loadTables()
-                loadOrders()
-              }}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>重新整理</span>
-            </button>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => {
+                  loadTables()
+                  loadOrders()
+                }}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>重新整理</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -209,10 +211,10 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           <button 
             onClick={() => setStatusFilter('all')}
-            className={`rounded-lg p-4 shadow-sm border transition-all duration-200 hover:shadow-md transform hover:-translate-y-1 ${
+            className={`rounded-lg p-4 shadow-sm border border-ui transition-all duration-200 hover:shadow-md transform hover:-translate-y-1 ${
               statusFilter === 'all'
                 ? 'bg-blue-50 border-blue-300 ring-2 ring-blue-200'
-                : 'bg-white hover:bg-gray-50'
+                : 'bg-ui-primary hover:bg-ui-secondary'
             }`}
           >
             <div className="text-center">
@@ -288,8 +290,8 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
         </div>
 
         {/* 桌台列表 */}
-        <div className="bg-white rounded-lg shadow-sm border p-4">
-          <h3 className="text-lg font-semibold mb-4">桌台列表</h3>
+        <div className="bg-ui-primary rounded-lg shadow-sm border border-ui p-4">
+          <h3 className="text-lg font-semibold mb-4 text-ui-primary">桌台列表</h3>
           
           {loading ? (
             <div className="text-center py-8">
@@ -381,7 +383,7 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
       {/* 狀態變更模態框 */}
       {showStatusModal && selectedTable && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+          <div className="bg-ui-primary rounded-2xl p-6 max-w-md w-full shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">變更桌台狀態</h3>
@@ -470,7 +472,7 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
       {/* 訂單詳情模態框 */}
       {showOrderModal && selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-ui-primary rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">訂單詳情</h3>

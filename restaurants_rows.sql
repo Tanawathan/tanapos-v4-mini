@@ -1,0 +1,1 @@
+INSERT INTO "public"."restaurants" ("id", "name", "address", "phone", "email", "tax_rate", "currency", "timezone", "is_active", "created_at", "updated_at") VALUES ('a8fff0de-a2dd-4749-a80c-08a6102de734', 'TanawatThai', 'keelong', '0971715711', 'info@tanawat.tw', '0.1000', 'TWD', 'Asia/Taipei', 'true', '2025-07-31 12:43:28.845282+00', '2025-07-31 15:11:15.867159+00');

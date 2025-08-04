@@ -130,35 +130,38 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-ui-secondary">
       {/* 頂部導航 */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+      <header className="bg-ui-primary shadow-sm border-b border-ui sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <button
                 onClick={onBack}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center space-x-2 text-ui-muted hover:text-ui-primary transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>返回</span>
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">💰 結帳系統</h1>
+              <h1 className="text-2xl font-bold text-ui-primary">💰 結帳系統</h1>
             </div>
-            <button
-              onClick={() => {
-                loadTables()
-                loadOrders()
-              }}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>重新整理</span>
-            </button>
+            
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => {
+                  loadTables()
+                  loadOrders()
+                }}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>重新整理</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -166,18 +169,18 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* 左側：桌台選擇 */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">選擇結帳桌台</h2>
+          <div className="bg-ui-primary rounded-lg shadow-sm border border-ui p-6">
+            <h2 className="text-xl font-bold text-ui-primary mb-4">選擇結帳桌台</h2>
             
             {loading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-gray-600">載入桌台資訊中...</p>
+                <p className="text-ui-muted">載入桌台資訊中...</p>
               </div>
             ) : getOccupiedTables().length === 0 ? (
               <div className="text-center py-8">
-                <div className="text-gray-400 text-4xl mb-4">🍽️</div>
-                <p className="text-gray-600">目前沒有需要結帳的桌台</p>
+                <div className="text-ui-muted text-4xl mb-4">🍽️</div>
+                <p className="text-ui-muted">目前沒有需要結帳的桌台</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -192,7 +195,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                       className={`p-4 rounded-lg border-2 text-left transition-all duration-200 ${
                         isSelected
                           ? 'border-blue-500 bg-blue-50 shadow-lg'
-                          : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
+                          : 'border-ui hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -233,13 +236,13 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
           </div>
 
           {/* 右側：結帳詳情 */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">結帳詳情</h2>
+          <div className="bg-ui-primary rounded-lg shadow-sm border border-ui p-6">
+            <h2 className="text-xl font-bold text-ui-primary mb-4">結帳詳情</h2>
             
             {!selectedTable || !selectedOrder ? (
               <div className="text-center py-8">
-                <div className="text-gray-400 text-4xl mb-4">👈</div>
-                <p className="text-gray-600">請先選擇要結帳的桌台</p>
+                <div className="text-ui-muted text-4xl mb-4">👈</div>
+                <p className="text-ui-muted">請先選擇要結帳的桌台</p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -419,14 +422,14 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       {/* 確認結帳模態框 */}
       {showConfirmModal && selectedOrder && selectedTable && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+          <div className="bg-ui-primary rounded-2xl p-6 max-w-md w-full shadow-2xl">
             <div className="text-center mb-6">
               <div className="text-4xl mb-4">💰</div>
-              <h3 className="text-xl font-bold text-gray-900">確認結帳</h3>
+              <h3 className="text-xl font-bold text-ui-primary">確認結帳</h3>
             </div>
             
             <div className="space-y-4 mb-6">
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-ui-secondary rounded-lg p-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <div className="text-sm text-gray-600">桌號</div>
@@ -468,7 +471,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:text-gray-800 hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 text-ui-muted border border-ui rounded-lg hover:text-ui-primary hover:bg-ui-secondary transition-colors"
               >
                 取消
               </button>

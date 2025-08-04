@@ -1,3 +1,6 @@
+/* 匯入 UI 樣式變數系統 */
+@import './styles/ui-variables.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

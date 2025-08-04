@@ -82,26 +82,26 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-ui-secondary">
       {/* 頂部導航 */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+      <header className="bg-ui-primary shadow-sm border-b border-ui sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <button
                 onClick={onBack}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center space-x-2 text-ui-muted hover:text-ui-primary transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>返回</span>
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">📋 訂單管理</h1>
+              <h1 className="text-2xl font-bold text-ui-primary">📋 訂單管理</h1>
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-ui-muted">
                 總計 {filteredOrders.length} 筆訂單
               </span>
             </div>
@@ -114,19 +114,19 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
           {/* 左側：訂單列表 */}
           <div className="lg:col-span-2 space-y-6">
             {/* 篩選器 */}
-            <div className="bg-white rounded-lg shadow-sm border p-4">
-              <h3 className="text-lg font-semibold mb-4">篩選條件</h3>
+            <div className="bg-ui-primary rounded-lg shadow-sm border border-ui p-4">
+              <h3 className="text-lg font-semibold mb-4 text-ui-primary">篩選條件</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* 狀態篩選 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-ui-secondary mb-2">
                     訂單狀態
                   </label>
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-ui rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-ui-primary text-ui-primary"
                   >
                     <option value="all">全部狀態</option>
                     <option value="pending">待確認</option>
@@ -141,13 +141,13 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
 
                 {/* 日期篩選 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-ui-secondary mb-2">
                     時間範圍
                   </label>
                   <select
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-ui rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-ui-primary text-ui-primary"
                   >
                     <option value="today">今天</option>
                     <option value="yesterday">昨天</option>
@@ -159,27 +159,27 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
             </div>
 
             {/* 訂單列表 */}
-            <div className="bg-white rounded-lg shadow-sm border">
-              <div className="p-4 border-b">
-                <h3 className="text-lg font-semibold">訂單列表</h3>
+            <div className="bg-ui-primary rounded-lg shadow-sm border border-ui">
+              <div className="p-4 border-b border-ui">
+                <h3 className="text-lg font-semibold text-ui-primary">訂單列表</h3>
               </div>
 
               {loading ? (
                 <div className="p-8 text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                  <p className="text-gray-600">載入訂單中...</p>
+                  <p className="text-ui-muted">載入訂單中...</p>
                 </div>
               ) : filteredOrders.length === 0 ? (
                 <div className="p-8 text-center">
-                  <p className="text-gray-600">沒有找到符合條件的訂單</p>
+                  <p className="text-ui-muted">沒有找到符合條件的訂單</p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-ui">
                   {filteredOrders.map(order => (
                     <div
                       key={order.id}
                       onClick={() => setSelectedOrder(order)}
-                      className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                      className={`p-4 hover:bg-ui-secondary cursor-pointer transition-colors ${
                         selectedOrder?.id === order.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
                       }`}
                     >
@@ -241,14 +241,14 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
           </div>
 
           {/* 右側：訂單詳情 */}
-          <div className="bg-white rounded-lg shadow-sm border h-fit sticky top-24">
+          <div className="bg-ui-primary rounded-lg shadow-sm border border-ui h-fit sticky top-24">
             {selectedOrder ? (
               <div className="p-4">
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-semibold">訂單詳情</h3>
+                  <h3 className="text-lg font-semibold text-ui-primary">訂單詳情</h3>
                   <button
                     onClick={() => setSelectedOrder(null)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-ui-muted hover:text-ui-primary"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -412,8 +412,8 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
               </div>
             ) : (
               <div className="p-8 text-center">
-                <div className="text-gray-400 text-4xl mb-4">📋</div>
-                <p className="text-gray-600">點擊左側訂單查看詳情</p>
+                <div className="text-ui-muted text-4xl mb-4">📋</div>
+                <p className="text-ui-muted">點擊左側訂單查看詳情</p>
               </div>
             )}
           </div>
