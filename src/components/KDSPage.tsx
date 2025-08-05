@@ -7,12 +7,17 @@ import { OrderColumn } from './kds/OrderBoard/OrderColumn';
 import { SettingsModal } from './kds/Modals/SettingsModal';
 import { useKDSStore } from '../lib/kds-store';
 
-export const KDSPage: React.FC = () => {
+interface KDSPageProps {
+  onNavigateToHome?: () => void;
+}
+
+export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
   const {
     orders,
     stats,
     settings,
     isLoading,
+    isInitialLoad,  // 新增：獲取初次載入狀態
     fetchOrders,
     updateOrderStatus,
     updateSettings
@@ -25,11 +30,12 @@ export const KDSPage: React.FC = () => {
 
   // 初始化數據
   useEffect(() => {
+    // 初次載入（非靜默模式）
     fetchOrders();
     
-    // 設置自動刷新
+    // 設置自動刷新（靜默模式）
     const interval = setInterval(() => {
-      fetchOrders();
+      fetchOrders(true);  // 靜默更新，不顯示載入動畫
     }, settings.autoRefreshInterval * 1000);
 
     return () => clearInterval(interval);
@@ -85,10 +91,15 @@ export const KDSPage: React.FC = () => {
 
   // 返回首頁功能
   const handleBackToHome = () => {
-    window.history.back();
+    if (onNavigateToHome) {
+      onNavigateToHome();
+    } else {
+      // 如果沒有提供導航函數，嘗試回到首頁路徑
+      window.location.href = '/';
+    }
   };
 
-  if (isLoading) {
+  if (isLoading && isInitialLoad) {
     return (
       <div className="min-h-screen bg-ui-secondary flex items-center justify-center">
         <div className="text-center">
@@ -101,6 +112,14 @@ export const KDSPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-ui-secondary">
+      {/* 靜默更新指示器 */}
+      {isLoading && !isInitialLoad && (
+        <div className="fixed top-4 right-4 z-50 bg-blue-500 text-white px-3 py-1 rounded-full text-sm shadow-lg">
+          <span className="inline-block w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+          更新中...
+        </div>
+      )}
+      
       {/* 標題欄 */}
       <header className="bg-ui-primary shadow-sm border-b border-ui">
         <div className="px-6 py-4">

@@ -17,10 +17,11 @@ interface KDSStore {
   settings: KDSSettings;
   filter: KDSFilter;
   isLoading: boolean;
+  isInitialLoad: boolean;  // 新增：用於追蹤是否為初次載入
   error: string | null;
 
   // Actions
-  fetchOrders: () => Promise<void>;
+  fetchOrders: (silent?: boolean) => Promise<void>;  // 修改：新增 silent 參數
   updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
   updateMenuItemStatus: (itemId: string, status: MenuItemStatus) => Promise<void>;
   updateSettings: (settings: Partial<KDSSettings>) => void;
@@ -77,11 +78,20 @@ export const useKDSStore = create<KDSStore>((set, get) => ({
   settings: defaultSettings,
   filter: defaultFilter,
   isLoading: false,
+  isInitialLoad: true,  // 新增：初始狀態為 true
   error: null,
 
   // 獲取訂單數據
-  fetchOrders: async () => {
-    set({ isLoading: true, error: null });
+  fetchOrders: async (silent: boolean = false) => {
+    const currentState = get();
+    
+    // 只有在非靜默模式且為初次載入時才顯示載入動畫
+    if (!silent && currentState.isInitialLoad) {
+      set({ isLoading: true, error: null });
+    } else if (!silent) {
+      // 非初次載入但非靜默模式，只清除錯誤
+      set({ error: null });
+    }
     
     try {
       // 使用環境變數中的餐廳ID
@@ -113,12 +123,18 @@ export const useKDSStore = create<KDSStore>((set, get) => ({
         kitchenEfficiency: 85 // TODO: 從真實數據計算
       };
 
-      set({ orders, stats, isLoading: false });
+      set({ 
+        orders, 
+        stats, 
+        isLoading: false,
+        isInitialLoad: false  // 第一次載入完成後設為 false
+      });
     } catch (error) {
       console.error('❌ KDS Store: 獲取訂單失敗:', error);
       set({ 
         error: error instanceof Error ? error.message : '載入訂單失敗',
-        isLoading: false 
+        isLoading: false,
+        isInitialLoad: false  // 即使失敗也設為 false
       });
     }
   },

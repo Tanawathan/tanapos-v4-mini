@@ -5,6 +5,7 @@ import {
   MenuItemStatus,
   URGENCY_COLORS
 } from '../../../lib/kds-types';
+import { useKDSStore } from '../../../lib/kds-store';
 import { OrderSummary } from '../../../components/kds/OrderCard/OrderSummary';
 import { ExpandedOrderView } from '../../../components/kds/OrderCard/ExpandedOrderView';
 import { QuickActions } from '../../../components/kds/OrderCard/QuickActions';
@@ -25,6 +26,9 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
   columnType
 }) => {
   const [showQuickActions, setShowQuickActions] = useState(false);
+  
+  // 獲取 KDS store 的更新函數
+  const { updateMenuItemStatus } = useKDSStore();
 
   // 計算訂單進度
   const completedItems = (order.menuItems || []).filter(item => 
@@ -50,8 +54,9 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
 
   // 處理餐點狀態變更
   const handleItemStatusChange = (itemId: string, status: MenuItemStatus) => {
-    // TODO: 實作餐點狀態變更
     console.log('Update item status:', itemId, status);
+    // 調用 store 方法更新餐點狀態
+    updateMenuItemStatus(itemId, status);
   };
 
   // 快速操作處理

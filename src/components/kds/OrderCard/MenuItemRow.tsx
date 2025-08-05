@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { KDSMenuItem, MenuItemStatus } from '../../../lib/kds-types';
+import MenuItemTimerService from '../../../lib/menu-item-timer-service';
 
 interface MenuItemRowProps {
   item: KDSMenuItem;
@@ -13,6 +14,50 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
   const [isChecked, setIsChecked] = useState(
     item.status === MenuItemStatus.READY || item.status === MenuItemStatus.SERVED
   );
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
+
+  // 實時更新計時器
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (item.status === MenuItemStatus.PREPARING) {
+      // 檢查是否有保存的計時器狀態
+      const timerState = MenuItemTimerService.getTimerState(item.id);
+      
+      // 設置定時器每秒更新
+      interval = setInterval(() => {
+        if (timerState) {
+          const startTime = new Date(timerState.startTime).getTime();
+          const now = Date.now();
+          const elapsed = Math.floor((now - startTime) / 1000); // 轉換為秒數
+          setElapsedTime(elapsed);
+        } else if (item.preparation_started_at) {
+          // 回退到原始的準備開始時間
+          const startTime = new Date(item.preparation_started_at).getTime();
+          const now = Date.now();
+          const elapsed = Math.floor((now - startTime) / 1000); // 轉換為秒數
+          setElapsedTime(elapsed);
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [item.status, item.id, item.preparation_started_at]);
+
+  // 初始化計時器狀態
+  useEffect(() => {
+    if (item.status === MenuItemStatus.PREPARING) {
+      const timerState = MenuItemTimerService.getTimerState(item.id);
+      if (timerState) {
+        const startTime = new Date(timerState.startTime).getTime();
+        const now = Date.now();
+        const elapsed = Math.floor((now - startTime) / 1000); // 轉換為秒數
+        setElapsedTime(elapsed);
+      }
+    }
+  }, [item.id, item.status]);
 
   const getStatusIcon = () => {
     switch (item.status) {
@@ -64,16 +109,26 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
   };
 
   const handleStartPreparing = () => {
+    const now = new Date().toISOString();
+    // 保存計時器狀態
+    MenuItemTimerService.saveTimerState(item.id, now);
+    // 更新餐點狀態
     onStatusChange(item.id, MenuItemStatus.PREPARING);
   };
 
-  // 計算經過時間
-  const getElapsedTime = () => {
-    if (item.preparation_started_at) {
-      const now = new Date();
-      const startTime = new Date(item.preparation_started_at);
-      const elapsed = Math.floor((now.getTime() - startTime.getTime()) / (1000 * 60));
-      return `${elapsed}分鐘`;
+  const handleComplete = () => {
+    // 移除計時器狀態
+    MenuItemTimerService.removeTimerState(item.id);
+    // 更新餐點狀態
+    onStatusChange(item.id, MenuItemStatus.READY);
+  };
+
+  // 格式化時間顯示為 MM:SS 格式
+  const formatElapsedTime = () => {
+    if (item.status === MenuItemStatus.PREPARING) {
+      const minutes = Math.floor(elapsedTime / 60);
+      const seconds = elapsedTime % 60;
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }
     return null;
   };
@@ -129,8 +184,10 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
               {getStatusIcon()} {getStatusText()}
             </div>
             <div className="text-gray-500">
-              {item.status === MenuItemStatus.PREPARING && getElapsedTime() ? (
-                <span>已用時 {getElapsedTime()}</span>
+              {item.status === MenuItemStatus.PREPARING ? (
+                <span className="text-blue-600 font-medium">
+                  ⏱️ {formatElapsedTime()}
+                </span>
               ) : (
                 <span>預估 {item.estimated_prep_time || 0}分鐘</span>
               )}
@@ -144,16 +201,16 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
                 onClick={handleStartPreparing}
                 className="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded hover:bg-blue-200 transition-colors"
               >
-                開始
+                ▶️ 開始
               </button>
             )}
             
             {item.status === MenuItemStatus.PREPARING && (
               <button
-                onClick={() => onStatusChange(item.id, MenuItemStatus.READY)}
+                onClick={handleComplete}
                 className="px-2 py-1 bg-green-100 text-green-600 text-xs rounded hover:bg-green-200 transition-colors"
               >
-                完成
+                ✅ 完成
               </button>
             )}
 

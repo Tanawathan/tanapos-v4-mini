@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { 
   KDSOrder, 
+  KDSMenuItem,
   MenuItemStatus, 
   MenuCategory,
   CATEGORY_ICONS,
@@ -22,13 +23,14 @@ export const ExpandedOrderView: React.FC<ExpandedOrderViewProps> = ({
   );
 
   // 按分類分組餐點
-  const groupedItems = order.menuItems.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
+  const groupedItems = (order.menuItems || []).reduce((acc, item) => {
+    const category = item.category || MenuCategory.MAIN_COURSE;
+    if (!acc[category]) {
+      acc[category] = [];
     }
-    acc[item.category].push(item);
+    acc[category].push(item);
     return acc;
-  }, {} as Record<MenuCategory, typeof order.menuItems>);
+  }, {} as Record<MenuCategory, KDSMenuItem[]>);
 
   // 切換分類展開狀態
   const toggleCategory = (category: MenuCategory) => {

@@ -151,7 +151,7 @@ function App() {
       ) : currentPage === 'checkout' ? (
         <CheckoutPage onBack={() => setCurrentPage('home')} />
       ) : currentPage === 'kds' ? (
-        <KDSPage />
+        <KDSPage onNavigateToHome={() => setCurrentPage('home')} />
       ) : currentPage === 'settings' ? (
         <SettingsPage onBack={() => setCurrentPage('home')} />
       ) : currentPage === 'menu' ? (

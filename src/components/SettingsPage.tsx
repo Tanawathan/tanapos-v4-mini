@@ -2,13 +2,14 @@ import React, { useState } from 'react'
 import { useTheme } from '../lib/theme-store'
 import ConnectionTest from './ConnectionTest'
 import DiagnosticPanel from './DiagnosticPanel'
+import { TodoPanel } from './common/TodoPanel'
 
 interface SettingsPageProps {
   onBack: () => void
 }
 
 // 設定頁面類型定義
-type SettingsTab = 'appearance' | 'system' | 'restaurant' | 'notifications' | 'account' | 'about'
+type SettingsTab = 'appearance' | 'system' | 'restaurant' | 'notifications' | 'todo' | 'account' | 'about'
 
 export default function SettingsPage({ onBack }: SettingsPageProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab>('appearance')
@@ -41,6 +42,12 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
       description: '系統通知、KDS 提醒'
     },
     { 
+      id: 'todo' as SettingsTab, 
+      label: 'TODO 管理', 
+      icon: '📝',
+      description: '任務管理、計時器功能'
+    },
+    { 
       id: 'account' as SettingsTab, 
       label: '帳戶設定', 
       icon: '👤',
@@ -65,6 +72,8 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
         return <RestaurantSettings />
       case 'notifications':
         return <NotificationSettings />
+      case 'todo':
+        return <TodoSettings />
       case 'account':
         return <AccountSettings />
       case 'about':
@@ -432,6 +441,13 @@ const NotificationSettings: React.FC = () => (
   <div className="p-6">
     <h2 className="text-xl font-semibold text-ui-primary mb-4">🔔 通知設定</h2>
     <p className="text-ui-muted">通知設定功能開發中...</p>
+  </div>
+)
+
+const TodoSettings: React.FC = () => (
+  <div className="p-6">
+    <h2 className="text-xl font-semibold text-ui-primary mb-4">📝 TODO 管理</h2>
+    <TodoPanel />
   </div>
 )
 
