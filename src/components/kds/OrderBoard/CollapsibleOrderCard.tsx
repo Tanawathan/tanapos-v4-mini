@@ -27,24 +27,21 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
   const [showQuickActions, setShowQuickActions] = useState(false);
 
   // 計算訂單進度
-  const completedItems = order.menuItems.filter(item => 
+  const completedItems = (order.menuItems || []).filter(item => 
     item.status === MenuItemStatus.READY || 
     item.status === MenuItemStatus.SERVED
   ).length;
 
-  const totalItems = order.menuItems.length;
+  const totalItems = (order.menuItems || []).length;
   const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   // 計算預估剩餘時間
-  const estimatedTimeRemaining = order.menuItems
+  const estimatedTimeRemaining = (order.menuItems || [])
     .filter(item => item.status !== MenuItemStatus.READY && item.status !== MenuItemStatus.SERVED)
-    .reduce((total, item) => total + item.estimatedTime, 0);
+    .reduce((total, item) => total + (item.estimated_prep_time || 0), 0);
 
-  // 計算緊急程度
-  const now = new Date();
-  const orderTime = new Date(order.createdAt);
-  const elapsedMinutes = (now.getTime() - orderTime.getTime()) / (1000 * 60);
-  const urgencyLevel = elapsedMinutes > 30 ? 'high' : elapsedMinutes > 15 ? 'medium' : 'low';
+  // 使用預計算的緊急程度
+  const urgencyLevel = order.urgencyLevel || 'low';
 
   // 處理狀態變更
   const handleStatusChange = (newStatus: OrderStatus) => {
@@ -114,12 +111,12 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
               <span className="text-lg">🏷️</span>
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  訂單 #{order.orderNumber}
+                  訂單 #{order.order_number}
                 </h3>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
-                  <span>桌號: T{order.tableNumber?.toString().padStart(2, '0')}</span>
-                  <span>⏰ {order.createdAt.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}</span>
-                  <span>👥 {order.customerCount}人</span>
+                  <span>桌號: T{order.table_number?.toString().padStart(2, '0')}</span>
+                  <span>⏰ {new Date(order.created_at).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>👥 {order.party_size || 0}人</span>
                 </div>
               </div>
             </div>

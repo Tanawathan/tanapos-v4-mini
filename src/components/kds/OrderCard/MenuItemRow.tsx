@@ -69,9 +69,10 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
 
   // 計算經過時間
   const getElapsedTime = () => {
-    if (item.startedAt) {
+    if (item.preparation_started_at) {
       const now = new Date();
-      const elapsed = Math.floor((now.getTime() - item.startedAt.getTime()) / (1000 * 60));
+      const startTime = new Date(item.preparation_started_at);
+      const elapsed = Math.floor((now.getTime() - startTime.getTime()) / (1000 * 60));
       return `${elapsed}分鐘`;
     }
     return null;
@@ -98,12 +99,12 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
           <div className="flex-1">
             <div className="flex items-center space-x-2">
               <span className="font-medium text-gray-900">
-                {item.productName}
+                {item.product_name}
               </span>
               <span className="text-gray-500">x{item.quantity}</span>
               
               {/* 套餐標識 */}
-              {item.isComboItem && (
+              {item.combo_id && (
                 <span className="px-2 py-0.5 bg-purple-100 text-purple-600 text-xs rounded-full">
                   套餐
                 </span>
@@ -111,24 +112,12 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
             </div>
 
             {/* 特殊說明 */}
-            {item.specialInstructions && (
+            {item.special_instructions && (
               <p className="text-sm text-yellow-700 mt-1">
-                📝 {item.specialInstructions}
+                📝 {item.special_instructions}
               </p>
             )}
 
-            {/* 套餐選擇 */}
-            {item.comboSelections && item.comboSelections.length > 0 && (
-              <div className="mt-1 text-sm text-gray-600">
-                <span className="text-purple-600">└ </span>
-                {item.comboSelections.map((selection, index) => (
-                  <span key={selection.id}>
-                    {selection.productName}
-                    {index < item.comboSelections!.length - 1 && ', '}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -143,7 +132,7 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
               {item.status === MenuItemStatus.PREPARING && getElapsedTime() ? (
                 <span>已用時 {getElapsedTime()}</span>
               ) : (
-                <span>預估 {item.estimatedTime}分鐘</span>
+                <span>預估 {item.estimated_prep_time || 0}分鐘</span>
               )}
             </div>
           </div>
@@ -175,12 +164,12 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
                   // TODO: 實作品質檢查邏輯
                 }}
                 className={`px-2 py-1 text-xs rounded transition-colors ${
-                  item.qualityChecked 
+                  item.quality_checked 
                     ? 'bg-green-100 text-green-600' 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                {item.qualityChecked ? '✓ 已檢' : '品檢'}
+                {item.quality_checked ? '✓ 已檢' : '品檢'}
               </button>
             )}
           </div>

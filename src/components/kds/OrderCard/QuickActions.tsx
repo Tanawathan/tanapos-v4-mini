@@ -42,7 +42,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
             </button>
           </div>
           <div className="text-sm text-gray-500">
-            訂單 #{order.orderNumber} | 桌號 T{order.tableNumber?.toString().padStart(2, '0')}
+            訂單 #{order.order_number} | 桌號 T{order.table_number?.toString().padStart(2, '0')}
           </div>
         </div>
         

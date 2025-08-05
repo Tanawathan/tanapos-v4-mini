@@ -34,70 +34,103 @@ export enum MenuCategory {
 // 緊急程度
 export type UrgencyLevel = 'low' | 'medium' | 'high';
 
-// KDS 訂單介面 (基於 orders 表)
+// KDS 訂單介面 (基於 orders 表 - 已更新至真實結構)
 export interface KDSOrder {
-  id: string;                    // orders.id
-  orderNumber: string;           // orders.order_number
-  tableId?: string;              // orders.table_id
-  tableNumber?: number;          // orders.table_number
-  customerName?: string;         // orders.customer_name
-  customerPhone?: string;        // orders.customer_phone
-  customerCount: number;         // orders.customer_count
-  subtotal: number;              // orders.subtotal
-  taxAmount: number;             // orders.tax_amount
-  totalAmount: number;           // orders.total_amount
-  status: OrderStatus;           // orders.status
-  paymentStatus: string;         // orders.payment_status
-  paymentMethod?: string;        // orders.payment_method
-  notes?: string;                // orders.notes
-  createdBy?: string;            // orders.created_by
-  servedAt?: Date;              // orders.served_at
-  completedAt?: Date;           // orders.completed_at
-  createdAt: Date;              // orders.created_at
-  updatedAt: Date;              // orders.updated_at
+  id: string;                       // orders.id
+  restaurant_id: string;            // orders.restaurant_id
+  table_id?: string;                // orders.table_id
+  session_id?: string;              // orders.session_id
+  order_number: string;             // orders.order_number
+  order_type: string;               // orders.order_type (dine_in, takeout, delivery)
+  customer_name?: string;           // orders.customer_name
+  customer_phone?: string;          // orders.customer_phone
+  customer_email?: string;          // orders.customer_email
+  table_number?: number;            // orders.table_number
+  party_size: number;               // orders.party_size
+  subtotal: number;                 // orders.subtotal
+  discount_amount: number;          // orders.discount_amount
+  tax_amount: number;               // orders.tax_amount
+  service_charge: number;           // orders.service_charge
+  total_amount: number;             // orders.total_amount
+  status: OrderStatus;              // orders.status
+  payment_method?: string;          // orders.payment_method
+  payment_status: string;           // orders.payment_status
   
-  // KDS 專用欄位
-  estimatedPrepTime?: number;    // orders.ai_estimated_prep_time
-  aiRecommendations?: any;       // orders.ai_recommendations
-  menuItems: KDSMenuItem[];      // 關聯的訂單項目
+  // 時間追蹤欄位
+  ordered_at: string;               // orders.ordered_at
+  confirmed_at?: string;            // orders.confirmed_at
+  preparation_started_at?: string;  // orders.preparation_started_at
+  ready_at?: string;                // orders.ready_at
+  served_at?: string;               // orders.served_at
+  completed_at?: string;            // orders.completed_at
   
-  // KDS 狀態管理
-  isExpanded: boolean;           // 卡片是否展開
-  urgencyLevel: UrgencyLevel;    // 緊急程度
-  totalItems: number;            // 總項目數
-  completedItems: number;        // 已完成項目數
+  // 預估時間
+  estimated_ready_time?: string;    // orders.estimated_ready_time
+  estimated_prep_time?: number;     // orders.estimated_prep_time
+  actual_prep_time?: number;        // orders.actual_prep_time
+  
+  // AI 功能
+  ai_optimized: boolean;            // orders.ai_optimized
+  ai_estimated_prep_time?: number;  // orders.ai_estimated_prep_time
+  ai_recommendations?: any;         // orders.ai_recommendations
+  ai_complexity_score?: number;     // orders.ai_complexity_score
+  ai_efficiency_score?: number;     // orders.ai_efficiency_score
+  
+  // 其他欄位
+  notes?: string;                   // orders.notes
+  special_instructions?: string;    // orders.special_instructions
+  source: string;                   // orders.source
+  created_by?: string;              // orders.created_by
+  updated_by?: string;              // orders.updated_by
+  created_at: string;               // orders.created_at
+  updated_at: string;               // orders.updated_at
+  metadata?: any;                   // orders.metadata
+  
+  // KDS 計算欄位 (非數據庫欄位)
+  menuItems?: KDSMenuItem[];        // 關聯的訂單項目
+  isExpanded?: boolean;             // 卡片是否展開
+  urgencyLevel?: UrgencyLevel;      // 緊急程度
+  totalItems?: number;              // 總項目數
+  completedItems?: number;          // 已完成項目數
 }
 
-// KDS 餐點介面 (基於 order_items 表)
+// KDS 餐點介面 (基於 order_items 表 - 已更新至真實結構)
 export interface KDSMenuItem {
-  id: string;                    // order_items.id
-  orderId: string;              // order_items.order_id
-  productId?: string;           // order_items.product_id
-  productName: string;          // order_items.product_name
-  productSku?: string;          // order_items.product_sku
-  quantity: number;             // order_items.quantity
-  unitPrice: number;            // order_items.unit_price
-  totalPrice: number;           // order_items.total_price
-  specialInstructions?: string; // order_items.special_instructions
-  status: MenuItemStatus;       // order_items.status
-  createdAt: Date;              // order_items.created_at
-  updatedAt: Date;              // order_items.updated_at
+  id: string;                       // order_items.id
+  order_id: string;                 // order_items.order_id
+  product_id?: string;              // order_items.product_id
+  combo_id?: string;                // order_items.combo_id
+  item_type: string;                // order_items.item_type
+  product_name: string;             // order_items.product_name
+  product_sku?: string;             // order_items.product_sku
+  variant_name?: string;            // order_items.variant_name
+  quantity: number;                 // order_items.quantity
+  unit_price: number;               // order_items.unit_price
+  total_price: number;              // order_items.total_price
+  cost_price: number;               // order_items.cost_price
+  status: MenuItemStatus;           // order_items.status
   
-  // KDS 專用欄位
-  category: MenuCategory;        // 從 products.category_id 關聯
-  estimatedTime: number;         // 從 products.prep_time_minutes
-  actualTime?: number;           // 實際製作時間
-  startedAt?: Date;             // 開始製作時間
-  completedAt?: Date;           // 完成時間
+  // 時間追蹤欄位
+  ordered_at: string;               // order_items.ordered_at
+  preparation_started_at?: string;  // order_items.preparation_started_at
+  ready_at?: string;                // order_items.ready_at
+  served_at?: string;               // order_items.served_at
+  estimated_prep_time?: number;     // order_items.estimated_prep_time
+  actual_prep_time?: number;        // order_items.actual_prep_time
   
-  // 套餐相關 (基於 combo_products 和相關表)
-  isComboItem: boolean;          // 是否為套餐項目
-  comboId?: string;             // combo_products.id
-  comboSelections?: KDSComboSelection[]; // 套餐選擇
+  // 廚房管理欄位
+  special_instructions?: string;    // order_items.special_instructions
+  modifiers?: any;                  // order_items.modifiers
+  kitchen_station?: string;         // order_items.kitchen_station
+  priority_level: number;           // order_items.priority_level
+  quality_checked: boolean;         // order_items.quality_checked
   
-  // KDS 狀態
-  qualityChecked: boolean;       // 品質檢查
-  notes?: string;               // 廚房備註
+  created_at: string;               // order_items.created_at
+  updated_at: string;               // order_items.updated_at
+  
+  // KDS 計算欄位
+  category?: MenuCategory;          // 從 products.category_id 關聯
+  urgencyLevel?: UrgencyLevel;      // 基於時間計算
 }
 
 // 套餐選擇 (基於 order_combo_selections 表)

@@ -50,15 +50,15 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
         <div className="flex items-center space-x-3">
           <span className="text-lg">{getStatusIcon()}</span>
           <div className="flex items-center space-x-2 text-sm">
-            <span className="font-semibold text-gray-900">#{order.orderNumber}</span>
+            <span className="font-semibold text-gray-900">#{order.order_number}</span>
             <span className="text-gray-500">|</span>
-            <span className="text-gray-700">T{order.tableNumber?.toString().padStart(2, '0')}</span>
+            <span className="text-gray-700">T{order.table_number?.toString().padStart(2, '0')}</span>
             <span className="text-gray-500">|</span>
             <span className="text-gray-600">
-              ⏰ {order.createdAt.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
+              ⏰ {new Date(order.created_at).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
             </span>
             <span className="text-gray-500">|</span>
-            <span className="text-gray-600">👥 {order.customerCount}人</span>
+            <span className="text-gray-600">👥 {order.party_size || 0}人</span>
             <span className="text-gray-500">|</span>
             <span className="text-gray-600">📦 {totalItems}項</span>
           </div>

@@ -37,11 +37,11 @@ export const KDSPage: React.FC = () => {
 
   // 分組訂單按狀態
   const groupedOrders = {
-    pending: orders.filter((order: any) => 
+    pending: orders.filter((order) => 
       order.status === OrderStatus.PENDING || order.status === OrderStatus.CONFIRMED
     ),
-    preparing: orders.filter((order: any) => order.status === OrderStatus.PREPARING),
-    completed: orders.filter((order: any) => 
+    preparing: orders.filter((order) => order.status === OrderStatus.PREPARING),
+    completed: orders.filter((order) => 
       order.status === OrderStatus.READY || 
       order.status === OrderStatus.SERVED || 
       order.status === OrderStatus.COMPLETED
@@ -61,7 +61,7 @@ export const KDSPage: React.FC = () => {
 
   // 批量展開/收縮
   const handleExpandAll = () => {
-    setExpandedOrders(new Set(orders.map((order: any) => order.id)));
+    setExpandedOrders(new Set(orders.map((order) => order.id)));
   };
 
   const handleCollapseAll = () => {
