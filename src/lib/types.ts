@@ -130,26 +130,42 @@ export interface Order {
   id: string
   restaurant_id?: string
   table_id?: string
+  session_id?: string | null
   order_number: string
-  table_number?: number
+  order_type?: string
   customer_name?: string
   customer_phone?: string
+  customer_email?: string | null
+  table_number?: number | null
+  party_size?: number
   subtotal?: number
+  discount_amount?: number
   tax_amount?: number
+  service_charge?: number
   total_amount?: number
   status?: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'served' | 'completed' | 'cancelled'
   payment_status?: 'unpaid' | 'partial' | 'paid' | 'refunded'
-  payment_method?: string
-  notes?: string
-  created_by?: string
+  ordered_at?: string
+  confirmed_at?: string
+  preparation_started_at?: string
+  ready_at?: string
   served_at?: string
   completed_at?: string
-  created_at?: string
-  updated_at?: string
+  estimated_ready_time?: string
+  estimated_prep_time?: string
+  actual_prep_time?: string
   ai_optimized?: boolean
   ai_estimated_prep_time?: number
   ai_recommendations?: any
-  customer_count?: number
+  ai_efficiency_score?: any
+  notes?: string
+  special_instructions?: string
+  source?: string
+  created_by?: string
+  updated_by?: string
+  created_at?: string
+  updated_at?: string
+  metadata?: any
 }
 
 export interface OrderItem {

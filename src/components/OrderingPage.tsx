@@ -13,6 +13,7 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
     tables,
     cartItems,
     selectedTable,
+    currentRestaurant,
     setSelectedTable,
     addToCart,
     updateCartQuantity,
@@ -72,19 +73,24 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
       return
     }
 
+    if (!currentRestaurant) {
+      alert('❌ 餐廳資訊載入中，請稍後再試。')
+      return
+    }
+
     // 準備訂單資料
     const orderData = {
-      restaurant_id: '1',
+      restaurant_id: currentRestaurant.id,
       table_id: selectedTable,
       table_number: selectedTableInfo?.table_number || 0,
       customer_name: '', // 可以添加客戶輸入
       customer_phone: '', // 可以添加客戶輸入
       subtotal: getCartTotal(),
-      tax_amount: Math.round(getCartTotal() * 0.1), // 10% 稅率
-      total_amount: getCartTotal() + Math.round(getCartTotal() * 0.1),
+      tax_amount: Math.round(getCartTotal() * (currentRestaurant.tax_rate || 0.1)),
+      total_amount: getCartTotal() + Math.round(getCartTotal() * (currentRestaurant.tax_rate || 0.1)),
       status: 'pending' as const,
       payment_status: 'unpaid' as const,
-      customer_count: 1, // 可以添加人數選擇
+      party_size: 1, // 可以添加人數選擇
       notes: '',
       created_at: new Date().toISOString(),
       items: cartItems.map(item => ({
@@ -98,6 +104,14 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
       }))
     }
 
+    console.log('📋 準備建立訂單:', {
+      餐廳ID: orderData.restaurant_id,
+      桌台ID: orderData.table_id,
+      桌號: orderData.table_number,
+      總金額: orderData.total_amount,
+      商品數量: orderData.items.length
+    })
+
     try {
       // 使用整合功能創建訂單並更新桌況
       const newOrder = await createOrderWithTableUpdate(orderData)
@@ -105,11 +119,13 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
       if (newOrder) {
         // 顯示成功訊息
         alert(`✅ 訂單已成功建立！\n訂單編號：${newOrder.order_number}\n桌台狀態已更新為佔用\n\n請查看控制台以查看完整訂單資訊。`)
+        console.log('✅ 訂單建立成功:', newOrder)
       } else {
         alert('❌ 訂單建立失敗，請稍後再試。')
+        console.error('❌ createOrderWithTableUpdate 返回 null')
       }
     } catch (error) {
-      console.error('訂單建立錯誤:', error)
+      console.error('❌ 訂單建立錯誤:', error)
       alert('❌ 訂單建立時發生錯誤，請稍後再試。')
     }
   }

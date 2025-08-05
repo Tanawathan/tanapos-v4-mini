@@ -650,23 +650,47 @@ export const usePOSStore = create<POSStore>((set, get) => ({
     try {
       set({ loading: true, error: null })
       
-      // 1. 準備完整的訂單資料
+      // 1. 準備完整的訂單資料（匹配實際資料庫結構）
       const newOrder: Order = {
         id: crypto.randomUUID(),
         order_number: `ORD-${Date.now()}`,
         restaurant_id: orderData.restaurant_id,
         table_id: orderData.table_id,
+        session_id: null,
+        order_type: 'dine_in',
         customer_name: orderData.customer_name || '',
         customer_phone: orderData.customer_phone || '',
-        customer_count: orderData.customer_count || 1,
+        customer_email: null,
+        table_number: orderData.table_number || null,
+        party_size: orderData.party_size || 1,
         subtotal: orderData.subtotal,
+        discount_amount: 0,
         tax_amount: orderData.tax_amount,
+        service_charge: 0,
         total_amount: orderData.total_amount,
         status: 'pending',
         payment_status: 'unpaid',
+        ordered_at: new Date().toISOString(),
+        confirmed_at: undefined,
+        preparation_started_at: undefined,
+        ready_at: undefined,
+        served_at: undefined,
+        completed_at: undefined,
+        estimated_ready_time: undefined,
+        estimated_prep_time: undefined,
+        actual_prep_time: undefined,
+        ai_optimized: false,
+        ai_estimated_prep_time: undefined,
+        ai_recommendations: undefined,
+        ai_efficiency_score: undefined,
         notes: orderData.notes || '',
+        special_instructions: undefined,
+        source: 'pos',
+        created_by: undefined,
+        updated_by: undefined,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        metadata: null
       }
       
       // 2. 更新本地訂單狀態
@@ -677,23 +701,79 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       // 3. 更新桌台狀態為佔用
       updateTableStatus(orderData.table_id, 'occupied', {
         orderId: newOrder.id,
-        customer_count: orderData.customer_count || 1,
+        customer_count: orderData.party_size || 1,
         seated_at: new Date().toISOString(),
         order_number: newOrder.order_number
       })
       
-      // 4. 這裡可以調用實際的 Supabase API 保存訂單
-      // const { error } = await supabase.from('orders').insert([newOrder])
-      // if (error) throw error
+      // 4. 保存訂單到 Supabase 資料庫
+      console.log('💾 正在保存訂單到資料庫...')
+      const { error: orderError } = await supabase
+        .from('orders')
+        .insert([newOrder])
       
-      // 5. 處理訂單項目（實際環境中也需要保存到資料庫）
-      console.log('📋 訂單項目將保存:', orderData.items)
+      if (orderError) {
+        console.error('❌ 訂單保存失敗:', orderError)
+        throw new Error(`訂單保存失敗: ${orderError.message}`)
+      }
       
-      // 6. 清空購物車和重置桌台選擇
+      console.log('✅ 訂單已保存到資料庫')
+      
+      // 5. 保存訂單項目到 order_items 資料表
+      if (orderData.items && orderData.items.length > 0) {
+        console.log('� 正在保存訂單項目...')
+        const orderItems = orderData.items.map((item: any) => ({
+          id: crypto.randomUUID(),
+          order_id: newOrder.id,
+          product_id: item.product_id,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          total_price: item.total_price,
+          special_instructions: item.special_instructions || '',
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }))
+        
+        const { error: itemsError } = await supabase
+          .from('order_items')
+          .insert(orderItems)
+        
+        if (itemsError) {
+          console.error('❌ 訂單項目保存失敗:', itemsError)
+          // 即使項目保存失敗，訂單仍然有效，所以不拋出錯誤
+          console.warn('⚠️ 訂單已保存但項目保存失敗，請手動檢查')
+        } else {
+          console.log(`✅ ${orderItems.length} 個訂單項目已保存到資料庫`)
+        }
+      }
+      
+      // 6. 更新桌台狀態到資料庫
+      console.log('💾 正在更新桌台狀態...')
+      const { error: tableError } = await supabase
+        .from('tables')
+        .update({ 
+          status: 'occupied',
+          current_session_id: null, // 暫時設為 null 避免外鍵約束問題
+          last_occupied_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', orderData.table_id)
+      
+      if (tableError) {
+        console.error('❌ 桌台狀態更新失敗:', tableError)
+        // 桌台狀態更新失敗不影響訂單建立
+        console.warn('⚠️ 訂單已建立但桌台狀態更新失敗')
+      } else {
+        console.log('✅ 桌台狀態已更新為佔用')
+      }
+      
+      // 7. 清空購物車和重置桌台選擇
       clearCart()
       setSelectedTable(null)
       
-      // 7. 輸出完整訂單資訊
+      // 8. 輸出完整訂單資訊
       console.log('🍽️ 新訂單已建立並更新桌況：', newOrder)
       console.log('🪑 桌台狀態已更新為佔用')
       console.log('📋 訂單摘要：')
