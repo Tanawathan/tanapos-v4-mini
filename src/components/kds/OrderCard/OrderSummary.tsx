@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { KDSOrder, UrgencyLevel } from '../../../lib/kds-types';
 
 interface OrderSummaryProps {
@@ -18,6 +18,33 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
   urgencyLevel,
   progressPercentage
 }) => {
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  // 每分鐘更新一次時間，確保持續時間顯示準確
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000); // 每60秒更新一次
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // 計算訂單持續時間（分鐘）
+  const calculateOrderDuration = (createdAt: string): number => {
+    const orderTime = new Date(createdAt).getTime();
+    return Math.floor((currentTime - orderTime) / (1000 * 60)); // 轉換為分鐘
+  };
+
+  // 格式化持續時間顯示
+  const formatDuration = (minutes: number): string => {
+    if (minutes < 60) {
+      return `${minutes}分鐘`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}小時${remainingMinutes}分鐘`;
+  };
+
   const getStatusIcon = () => {
     switch (order.status) {
       case 'pending':
@@ -55,7 +82,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
             <span className="text-gray-700">T{order.table_number?.toString().padStart(2, '0')}</span>
             <span className="text-gray-500">|</span>
             <span className="text-gray-600">
-              ⏰ {new Date(order.created_at).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
+              ⏰ {formatDuration(calculateOrderDuration(order.created_at))}
             </span>
             <span className="text-gray-500">|</span>
             <span className="text-gray-600">👥 {order.party_size || 0}人</span>

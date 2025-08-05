@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { OrderStatus, SortOption, SortDirection } from '../lib/kds-types';
+import { OrderStatus, SortOption, SortDirection, KDSOrder, MenuItemStatus } from '../lib/kds-types';
 import { StatsPanel } from './kds/Header/StatsPanel';
 import { SortControl } from './kds/Header/SortControl';
 import { NotificationPanel } from './kds/Header/NotificationPanel';
@@ -23,7 +23,7 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
     updateSettings
   } = useKDSStore();
 
-  const [sortBy, setSortBy] = useState<SortOption>('time');
+  const [sortBy, setSortBy] = useState<SortOption>('priority');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
@@ -41,17 +41,80 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
     return () => clearInterval(interval);
   }, [fetchOrders, settings.autoRefreshInterval]);
 
-  // 分組訂單按狀態
+  // 計算訂單完成進度 (0-1)
+  const calculateOrderProgress = (order: KDSOrder): number => {
+    if (!order.menuItems || order.menuItems.length === 0) return 0;
+    
+    const completedItems = order.menuItems.filter((item) => 
+      item.status === MenuItemStatus.READY || item.status === MenuItemStatus.SERVED
+    ).length;
+    
+    return completedItems / order.menuItems.length;
+  };
+
+  // 排序訂單 - 距離完成越近越優先，相同進度時訂單時間較早的優先
+  const sortOrders = (orders: KDSOrder[]): KDSOrder[] => {
+    return [...orders].sort((a, b) => {
+      // 計算完成進度
+      const progressA = calculateOrderProgress(a);
+      const progressB = calculateOrderProgress(b);
+      
+      // 根據排序選項處理
+      if (sortBy === 'priority') {
+        // 優先級排序：距離完成越近越優先
+        if (progressA !== progressB) {
+          const result = sortDirection === 'asc' ? progressB - progressA : progressA - progressB;
+          console.log(`🎯 優先級排序: 訂單${a.id.slice(-4)} (進度${(progressA*100).toFixed(0)}%) vs 訂單${b.id.slice(-4)} (進度${(progressB*100).toFixed(0)}%) = ${result}`);
+          return result;
+        }
+        // 相同進度時，按訂單時間排序（較早的優先）
+        const timeA = new Date(a.created_at).getTime();
+        const timeB = new Date(b.created_at).getTime();
+        const result = sortDirection === 'asc' ? timeA - timeB : timeB - timeA;
+        console.log(`⏰ 時間排序: 訂單${a.id.slice(-4)} vs 訂單${b.id.slice(-4)} = ${result}`);
+        return result;
+      } else if (sortBy === 'time') {
+        // 時間排序
+        const timeA = new Date(a.created_at).getTime();
+        const timeB = new Date(b.created_at).getTime();
+        return sortDirection === 'asc' ? timeA - timeB : timeB - timeA;
+      } else if (sortBy === 'table') {
+        // 桌號排序
+        const tableA = a.table_number || 0;
+        const tableB = b.table_number || 0;
+        if (tableA !== tableB) {
+          return sortDirection === 'asc' ? tableA - tableB : tableB - tableA;
+        }
+        // 相同桌號時按時間排序
+        const timeA = new Date(a.created_at).getTime();
+        const timeB = new Date(b.created_at).getTime();
+        return timeA - timeB;
+      } else if (sortBy === 'status') {
+        // 狀態排序 - 按餐點進度
+        if (progressA !== progressB) {
+          return sortDirection === 'asc' ? progressA - progressB : progressB - progressA;
+        }
+        // 相同進度時按時間排序
+        const timeA = new Date(a.created_at).getTime();
+        const timeB = new Date(b.created_at).getTime();
+        return timeA - timeB;
+      }
+      
+      return 0;
+    });
+  };
+
+  // 分組訂單按狀態（應用排序）
   const groupedOrders = {
-    pending: orders.filter((order) => 
+    pending: sortOrders(orders.filter((order) => 
       order.status === OrderStatus.PENDING || order.status === OrderStatus.CONFIRMED
-    ),
-    preparing: orders.filter((order) => order.status === OrderStatus.PREPARING),
-    completed: orders.filter((order) => 
+    )),
+    preparing: sortOrders(orders.filter((order) => order.status === OrderStatus.PREPARING)),
+    completed: sortOrders(orders.filter((order) => 
       order.status === OrderStatus.READY || 
       order.status === OrderStatus.SERVED || 
       order.status === OrderStatus.COMPLETED
-    )
+    ))
   };
 
   // 處理訂單展開/收縮

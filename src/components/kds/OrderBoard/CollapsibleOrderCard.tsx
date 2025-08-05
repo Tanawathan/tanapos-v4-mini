@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   KDSOrder, 
   OrderStatus, 
@@ -26,9 +26,19 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
   columnType
 }) => {
   const [showQuickActions, setShowQuickActions] = useState(false);
+  const [currentTime, setCurrentTime] = useState(Date.now());
   
   // 獲取 KDS store 的更新函數
   const { updateMenuItemStatus } = useKDSStore();
+
+  // 每分鐘更新一次時間，確保持續時間顯示準確
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000); // 每60秒更新一次
+
+    return () => clearInterval(interval);
+  }, []);
 
   // 計算訂單進度
   const completedItems = (order.menuItems || []).filter(item => 
@@ -38,6 +48,22 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
 
   const totalItems = (order.menuItems || []).length;
   const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+  // 計算訂單持續時間（分鐘）
+  const calculateOrderDuration = (createdAt: string): number => {
+    const orderTime = new Date(createdAt).getTime();
+    return Math.floor((currentTime - orderTime) / (1000 * 60)); // 轉換為分鐘
+  };
+
+  // 格式化持續時間顯示
+  const formatDuration = (minutes: number): string => {
+    if (minutes < 60) {
+      return `${minutes}分鐘`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}小時${remainingMinutes}分鐘`;
+  };
 
   // 計算預估剩餘時間
   const estimatedTimeRemaining = (order.menuItems || [])
@@ -120,7 +146,7 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
                 </h3>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <span>桌號: T{order.table_number?.toString().padStart(2, '0')}</span>
-                  <span>⏰ {new Date(order.created_at).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>⏰ {formatDuration(calculateOrderDuration(order.created_at))}</span>
                   <span>👥 {order.party_size || 0}人</span>
                 </div>
               </div>
