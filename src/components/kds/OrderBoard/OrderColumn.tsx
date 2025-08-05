@@ -1,5 +1,5 @@
-import React from 'react';
-import { KDSOrder, OrderStatus } from '../../../lib/kds-types';
+import React, { useState } from 'react';
+import { KDSOrder, OrderStatus, KDSMenuItem } from '../../../lib/kds-types';
 import { CollapsibleOrderCard } from '../../../components/kds/OrderBoard/CollapsibleOrderCard';
 
 interface OrderColumnProps {
@@ -21,6 +21,34 @@ export const OrderColumn: React.FC<OrderColumnProps> = ({
   onStatusChange,
   columnType
 }) => {
+  const [showItemSummary, setShowItemSummary] = useState(false);
+
+  // 計算餐點的統計摘要（待處理和製作中都需要）
+  const calculateItemSummary = () => {
+    if (columnType !== 'preparing' && columnType !== 'pending') return {};
+    
+    const itemSummary: { [key: string]: number } = {};
+    
+    orders.forEach(order => {
+      if (order.menuItems) {
+        order.menuItems.forEach((item: KDSMenuItem) => {
+          const itemName = item.product_name;
+          const quantity = item.quantity || 1;
+          
+          if (itemSummary[itemName]) {
+            itemSummary[itemName] += quantity;
+          } else {
+            itemSummary[itemName] = quantity;
+          }
+        });
+      }
+    });
+    
+    return itemSummary;
+  };
+
+  const itemSummary = calculateItemSummary();
+  const hasItems = Object.keys(itemSummary).length > 0;
   const getColumnIcon = () => {
     switch (columnType) {
       case 'pending': return '📦';
@@ -51,14 +79,61 @@ export const OrderColumn: React.FC<OrderColumnProps> = ({
               <p className="text-sm text-gray-500">{subtitle}</p>
             </div>
           </div>
-          <div className={`px-2 py-1 rounded-full text-sm font-medium ${
-            columnType === 'pending' ? 'bg-orange-100 text-orange-600' :
-            columnType === 'preparing' ? 'bg-blue-100 text-blue-600' :
-            'bg-green-100 text-green-600'
-          }`}>
-            {orders.length}
+          <div className="flex items-center space-x-2">
+            {/* 餐點統計按鈕 - 待處理和製作中都顯示 */}
+            {(columnType === 'preparing' || columnType === 'pending') && hasItems && (
+              <button
+                onClick={() => setShowItemSummary(!showItemSummary)}
+                className={`p-2 hover:bg-opacity-80 rounded-md transition-colors ${
+                  columnType === 'preparing' 
+                    ? 'text-blue-600 hover:bg-blue-100' 
+                    : 'text-orange-600 hover:bg-orange-100'
+                }`}
+                title={columnType === 'preparing' ? "顯示製作統計" : "顯示備料統計"}
+              >
+                📊
+              </button>
+            )}
+            <div className={`px-2 py-1 rounded-full text-sm font-medium ${
+              columnType === 'pending' ? 'bg-orange-100 text-orange-600' :
+              columnType === 'preparing' ? 'bg-blue-100 text-blue-600' :
+              'bg-green-100 text-green-600'
+            }`}>
+              {orders.length}
+            </div>
           </div>
         </div>
+        
+        {/* 餐點統計摘要 - 待處理和製作中都顯示 */}
+        {(columnType === 'preparing' || columnType === 'pending') && showItemSummary && hasItems && (
+          <div className={`mt-3 p-3 rounded-md border ${
+            columnType === 'preparing' 
+              ? 'bg-blue-50 border-blue-200' 
+              : 'bg-orange-50 border-orange-200'
+          }`}>
+            <h3 className={`text-sm font-semibold mb-2 ${
+              columnType === 'preparing' 
+                ? 'text-blue-800' 
+                : 'text-orange-800'
+            }`}>
+              📊 {columnType === 'preparing' ? '製作中餐點統計' : '待處理餐點統計（備料參考）'}
+            </h3>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {Object.entries(itemSummary).map(([itemName, quantity]) => (
+                <div key={itemName} className="flex justify-between items-center py-1">
+                  <span className="text-gray-700">{itemName}</span>
+                  <span className={`font-semibold ${
+                    columnType === 'preparing' 
+                      ? 'text-blue-600' 
+                      : 'text-orange-600'
+                  }`}>
+                    x{quantity}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 訂單列表 */}
