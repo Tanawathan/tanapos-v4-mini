@@ -7,9 +7,7 @@ import CheckoutPage from './components/CheckoutPage'
 import SettingsPage from './components/SettingsPage'
 import MenuManagementPage from './components/MenuManagementPage'
 import { KDSPage } from './components/KDSPage'
-import DiagnosticPanel from './components/DiagnosticPanel'
 import LoginPage from './components/LoginPage'
-import ConnectionTest from './components/ConnectionTest'
 import { useThemeInitializer } from './hooks/useThemeInitializer'
 import { supabase } from './lib/supabase'
 import './utils/frontend-diagnosis'
@@ -29,7 +27,6 @@ function App() {
   } = usePOSStore()
 
   const [currentPage, setCurrentPage] = useState<'home' | 'ordering' | 'orders' | 'tables' | 'checkout' | 'kds' | 'settings' | 'menu'>('home')
-  const [showDiagnostic, setShowDiagnostic] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null) // null = 檢查中
   const [currentUser, setCurrentUser] = useState<any>(null)
 
@@ -196,13 +193,6 @@ function App() {
                     🚪 登出
                   </button>
                   
-                  <button
-                    onClick={() => setShowDiagnostic(true)}
-                    className="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 transition-colors"
-                    title="系統診斷"
-                  >
-                    🔧 診斷
-                  </button>
                   <span className="text-sm text-gray-500">
                     {new Date().toLocaleDateString('zh-TW')}
                   </span>
@@ -322,14 +312,6 @@ function App() {
         </>
       )}
 
-      {/* 診斷面板 */}
-      <DiagnosticPanel 
-        isOpen={showDiagnostic} 
-        onClose={() => setShowDiagnostic(false)} 
-      />
-      
-      {/* 連接測試組件 - 開發環境顯示 */}
-      {import.meta.env.DEV && <ConnectionTest />}
     </div>
   )
 }

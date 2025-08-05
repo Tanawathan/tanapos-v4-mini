@@ -110,7 +110,7 @@ export default function ConnectionTest() {
   }
 
   return (
-    <div className="fixed top-4 right-4 w-96 bg-white dark:bg-gray-800 shadow-lg rounded-lg border z-50">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           Supabase 連接測試

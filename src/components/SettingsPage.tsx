@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { useTheme } from '../lib/theme-store'
+import ConnectionTest from './ConnectionTest'
+import DiagnosticPanel from './DiagnosticPanel'
 
 interface SettingsPageProps {
   onBack: () => void
@@ -358,6 +360,8 @@ const AppearanceSettings: React.FC = () => {
 
 // 暫時的佔位組件
 const SystemSettings: React.FC = () => {
+  const [showDiagnostic, setShowDiagnostic] = useState(false)
+
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -366,6 +370,27 @@ const SystemSettings: React.FC = () => {
       </div>
 
       <div className="space-y-8">
+        {/* Supabase 連線測試 */}
+        <div className="border border-ui rounded-lg p-6">
+          <h3 className="text-lg font-medium text-ui-primary mb-4">📡 資料庫連線測試</h3>
+          <p className="text-ui-muted mb-4">檢查 Supabase 資料庫連線狀態</p>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+            <ConnectionTest />
+          </div>
+        </div>
+
+        {/* 系統診斷工具 */}
+        <div className="border border-ui rounded-lg p-6">
+          <h3 className="text-lg font-medium text-ui-primary mb-4">🔧 系統診斷工具</h3>
+          <p className="text-ui-muted mb-4">檢查系統狀態、效能和錯誤診斷</p>
+          <button
+            onClick={() => setShowDiagnostic(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            🔧 開啟診斷面板
+          </button>
+        </div>
+
         {/* 簡化版本 - 避免複雜的組件造成崩潰 */}
         <div className="border border-ui rounded-lg p-6">
           <h3 className="text-lg font-medium text-ui-primary mb-4">🌍 語言與地區</h3>
@@ -386,6 +411,12 @@ const SystemSettings: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* 診斷面板 */}
+      <DiagnosticPanel 
+        isOpen={showDiagnostic} 
+        onClose={() => setShowDiagnostic(false)} 
+      />
     </div>
   )
 }
