@@ -215,7 +215,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                             {order.order_number}
                           </div>
                           <div className="text-sm text-gray-600">
-                            客人數：{order.customer_count || 1} 人
+                            客人數：{order.party_size || 1} 人
                           </div>
                           <div className="text-lg font-bold text-green-600">
                             NT$ {(order.subtotal || 0).toLocaleString()}
@@ -260,7 +260,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     </div>
                     <div>
                       <div className="text-sm text-gray-600">客人數量</div>
-                      <div className="font-semibold">{selectedOrder.customer_count || 1} 人</div>
+                      <div className="font-semibold">{selectedOrder.party_size || 1} 人</div>
                     </div>
                     <div>
                       <div className="text-sm text-gray-600">用餐時間</div>

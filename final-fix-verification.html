@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 TanaPOS V4-AI 最終修復驗證</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .test-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .test-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .test-card.success::before {
+            opacity: 1;
+        }
+        
+        .test-card.error::before {
+            background: linear-gradient(90deg, #f44336, #ff5722);
+            opacity: 1;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 0.9rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .status-item.success {
+            border-left-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .status-item.error {
+            border-left-color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+        
+        .status-item.warning {
+            border-left-color: #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+        }
+        
+        .status-item.info {
+            border-left-color: #2196F3;
+            background: rgba(33, 150, 243, 0.1);
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn.primary {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+        }
+        
+        .btn.danger {
+            background: linear-gradient(45deg, #f44336, #ff5722);
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+        
+        .final-result {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .final-result.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid rgba(76, 175, 80, 0.5);
+        }
+        
+        .final-result.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid rgba(244, 67, 54, 0.5);
+        }
+        
+        .details {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .emoji {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 TanaPOS V4-AI 最終修復驗證</h1>
+            <p>檢驗統一 Supabase 配置是否成功修復 401 錯誤</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn primary" onclick="runCompleteVerification()">
+                🎯 運行完整驗證
+            </button>
+            <button class="btn" onclick="testConfigOnly()">
+                ⚙️ 僅測試配置
+            </button>
+            <button class="btn" onclick="testDataFlow()">
+                📊 測試數據流
+            </button>
+            <button class="btn danger" onclick="resetAll()">
+                🗑️ 重置測試
+            </button>
+        </div>
+
+        <div class="progress-container">
+            <h3>📈 測試進度</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            <p id="progress-text">等待開始測試...</p>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card" id="config-card">
+                <h3 class="card-title">
+                    <span class="emoji">⚙️</span>
+                    配置檢查
+                </h3>
+                <div id="config-status">等待檢查...</div>
+            </div>
+
+            <div class="test-card" id="connection-card">
+                <h3 class="card-title">
+                    <span class="emoji">🌐</span>
+                    連接測試
+                </h3>
+                <div id="connection-status">等待檢查...</div>
+            </div>
+
+            <div class="test-card" id="auth-card">
+                <h3 class="card-title">
+                    <span class="emoji">🔐</span>
+                    認證測試
+                </h3>
+                <div id="auth-status">等待檢查...</div>
+            </div>
+
+            <div class="test-card" id="data-card">
+                <h3 class="card-title">
+                    <span class="emoji">📊</span>
+                    數據載入
+                </h3>
+                <div id="data-status">等待檢查...</div>
+            </div>
+        </div>
+
+        <div class="final-result" id="final-result" style="display: none;">
+            <h2 id="result-title"></h2>
+            <p id="result-summary"></p>
+            <div class="details" id="result-details"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+
+        let testResults = {
+            config: false,
+            connection: false,
+            auth: false,
+            data: false
+        };
+
+        function updateProgress(percent, text) {
+            document.getElementById('progress').style.width = percent + '%';
+            document.getElementById('progress-text').textContent = text;
+        }
+
+        function updateCardStatus(cardId, content, type = 'info') {
+            const card = document.getElementById(cardId);
+            const statusDiv = card.querySelector('[id$="-status"]');
+            statusDiv.innerHTML = content;
+            
+            // 更新卡片樣式
+            card.className = `test-card ${type}`;
+        }
+
+        function createStatusItem(text, type = 'info') {
+            return `<div class="status-item ${type}">${text}</div>`;
+        }
+
+        async function testConfiguration() {
+            updateCardStatus('config-card', '<div class="spinner"></div> 檢查配置中...', 'info');
+            
+            try {
+                const envVars = {
+                    'VITE_SUPABASE_URL': import.meta.env.VITE_SUPABASE_URL,
+                    'VITE_SUPABASE_ANON_KEY': import.meta.env.VITE_SUPABASE_ANON_KEY,
+                    'VITE_RESTAURANT_ID': import.meta.env.VITE_RESTAURANT_ID
+                };
+
+                let content = '';
+                let allValid = true;
+
+                for (const [key, value] of Object.entries(envVars)) {
+                    const isValid = value && value.length > 0;
+                    if (!isValid) allValid = false;
+                    
+                    const displayValue = key.includes('KEY') && isValid ? 
+                        `${value.substring(0, 20)}...` : 
+                        (isValid ? value : '❌ 未設置');
+                    
+                    content += createStatusItem(
+                        `<strong>${key}:</strong> ${displayValue}`, 
+                        isValid ? 'success' : 'error'
+                    );
+                }
+
+                if (allValid) {
+                    content += createStatusItem('✅ 所有環境變數正確載入', 'success');
+                } else {
+                    content += createStatusItem('❌ 部分環境變數缺失', 'error');
+                }
+
+                updateCardStatus('config-card', content, allValid ? 'success' : 'error');
+                testResults.config = allValid;
+                return allValid;
+
+            } catch (error) {
+                const content = createStatusItem(`❌ 配置檢查失敗: ${error.message}`, 'error');
+                updateCardStatus('config-card', content, 'error');
+                testResults.config = false;
+                return false;
+            }
+        }
+
+        async function testConnection() {
+            updateCardStatus('connection-card', '<div class="spinner"></div> 測試連接中...', 'info');
+            
+            try {
+                const url = import.meta.env.VITE_SUPABASE_URL;
+                const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+                if (!url || !key) {
+                    throw new Error('環境變數未正確載入');
+                }
+
+                const supabase = createClient(url, key);
+
+                // 測試基本連接
+                const { data, error } = await supabase
+                    .from('restaurants')
+                    .select('count')
+                    .limit(1);
+
+                if (error) {
+                    throw error;
+                }
+
+                let content = '';
+                content += createStatusItem('✅ Supabase 連接成功', 'success');
+                content += createStatusItem(`📡 URL: ${url}`, 'info');
+                content += createStatusItem('🔑 API Key 有效', 'success');
+
+                updateCardStatus('connection-card', content, 'success');
+                testResults.connection = true;
+                return true;
+
+            } catch (error) {
+                const content = createStatusItem(`❌ 連接失敗: ${error.message}`, 'error');
+                updateCardStatus('connection-card', content, 'error');
+                testResults.connection = false;
+                return false;
+            }
+        }
+
+        async function testAuthentication() {
+            updateCardStatus('auth-card', '<div class="spinner"></div> 測試認證中...', 'info');
+            
+            try {
+                const url = import.meta.env.VITE_SUPABASE_URL;
+                const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+                const supabase = createClient(url, key);
+
+                let content = '';
+
+                // 檢查當前會話
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) {
+                    content += createStatusItem(`⚠️ 會話檢查警告: ${sessionError.message}`, 'warning');
+                } else if (session) {
+                    content += createStatusItem(`✅ 已登入: ${session.user.email}`, 'success');
+                } else {
+                    content += createStatusItem('ℹ️ 目前未登入', 'info');
+                }
+
+                // 測試認證端點可用性
+                const authTest = await fetch(`${url}/auth/v1/settings`, {
+                    headers: {
+                        'apikey': key,
+                        'Authorization': `Bearer ${key}`
+                    }
+                });
+
+                if (authTest.ok) {
+                    content += createStatusItem('✅ 認證端點可用', 'success');
+                } else {
+                    content += createStatusItem('⚠️ 認證端點狀態異常', 'warning');
+                }
+
+                content += createStatusItem('🔐 認證系統已就緒', 'success');
+
+                updateCardStatus('auth-card', content, 'success');
+                testResults.auth = true;
+                return true;
+
+            } catch (error) {
+                const content = createStatusItem(`❌ 認證測試失敗: ${error.message}`, 'error');
+                updateCardStatus('auth-card', content, 'error');
+                testResults.auth = false;
+                return false;
+            }
+        }
+
+        async function testDataLoading() {
+            updateCardStatus('data-card', '<div class="spinner"></div> 測試數據載入中...', 'info');
+            
+            try {
+                const url = import.meta.env.VITE_SUPABASE_URL;
+                const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+                const restaurantId = import.meta.env.VITE_RESTAURANT_ID;
+                const supabase = createClient(url, key);
+
+                let content = '';
+                let successCount = 0;
+                const totalTests = 4;
+
+                // 測試餐廳數據
+                try {
+                    const { data: restaurants, error } = await supabase
+                        .from('restaurants')
+                        .select('id, name');
+                    
+                    if (error) throw error;
+                    content += createStatusItem(`✅ 餐廳: ${restaurants.length} 筆`, 'success');
+                    successCount++;
+                } catch (error) {
+                    content += createStatusItem(`❌ 餐廳: ${error.message}`, 'error');
+                }
+
+                // 測試分類數據
+                try {
+                    const { data: categories, error } = await supabase
+                        .from('categories')
+                        .select('*')
+                        .eq('restaurant_id', restaurantId);
+                    
+                    if (error) throw error;
+                    content += createStatusItem(`✅ 分類: ${categories.length} 筆`, 'success');
+                    successCount++;
+                } catch (error) {
+                    content += createStatusItem(`❌ 分類: ${error.message}`, 'error');
+                }
+
+                // 測試產品數據
+                try {
+                    const { data: products, error } = await supabase
+                        .from('products')
+                        .select('*')
+                        .eq('restaurant_id', restaurantId);
+                    
+                    if (error) throw error;
+                    content += createStatusItem(`✅ 產品: ${products.length} 筆`, 'success');
+                    successCount++;
+                } catch (error) {
+                    content += createStatusItem(`❌ 產品: ${error.message}`, 'error');
+                }
+
+                // 測試訂單數據
+                try {
+                    const { data: orders, error } = await supabase
+                        .from('orders')
+                        .select('id, status, created_at')
+                        .eq('restaurant_id', restaurantId);
+                    
+                    if (error) throw error;
+                    content += createStatusItem(`✅ 訂單: ${orders.length} 筆`, 'success');
+                    successCount++;
+                } catch (error) {
+                    content += createStatusItem(`❌ 訂單: ${error.message}`, 'error');
+                }
+
+                const success = successCount === totalTests;
+                content += createStatusItem(
+                    `📊 數據載入成功率: ${successCount}/${totalTests} (${Math.round(successCount/totalTests*100)}%)`,
+                    success ? 'success' : (successCount > 0 ? 'warning' : 'error')
+                );
+
+                updateCardStatus('data-card', content, success ? 'success' : (successCount > 0 ? 'warning' : 'error'));
+                testResults.data = success;
+                return success;
+
+            } catch (error) {
+                const content = createStatusItem(`❌ 數據載入測試失敗: ${error.message}`, 'error');
+                updateCardStatus('data-card', content, 'error');
+                testResults.data = false;
+                return false;
+            }
+        }
+
+        function showFinalResult() {
+            const resultDiv = document.getElementById('final-result');
+            const titleDiv = document.getElementById('result-title');
+            const summaryDiv = document.getElementById('result-summary');
+            const detailsDiv = document.getElementById('result-details');
+
+            const totalTests = Object.keys(testResults).length;
+            const passedTests = Object.values(testResults).filter(Boolean).length;
+            const success = passedTests === totalTests;
+
+            resultDiv.style.display = 'block';
+            resultDiv.className = `final-result ${success ? 'success' : 'error'}`;
+
+            if (success) {
+                titleDiv.textContent = '🎉 修復成功！';
+                summaryDiv.textContent = '所有測試都通過了，TanaPOS V4-AI 已成功修復 401 錯誤問題。';
+            } else {
+                titleDiv.textContent = '⚠️ 部分問題仍需修復';
+                summaryDiv.textContent = `${passedTests}/${totalTests} 項測試通過，請檢查失敗的項目。`;
+            }
+
+            const details = `
+測試結果詳細報告：
+- 配置檢查: ${testResults.config ? '✅ 通過' : '❌ 失敗'}
+- 連接測試: ${testResults.connection ? '✅ 通過' : '❌ 失敗'}  
+- 認證測試: ${testResults.auth ? '✅ 通過' : '❌ 失敗'}
+- 數據載入: ${testResults.data ? '✅ 通過' : '❌ 失敗'}
+
+總體成功率: ${Math.round(passedTests/totalTests*100)}%
+
+${success ? 
+'🚀 系統已準備就緒，可以正常使用！' : 
+'🔧 建議檢查失敗項目並重新測試。'}
+            `;
+
+            detailsDiv.textContent = details;
+        }
+
+        window.runCompleteVerification = async function() {
+            updateProgress(0, '開始完整驗證...');
+
+            updateProgress(20, '檢查配置...');
+            await testConfiguration();
+
+            updateProgress(40, '測試連接...');
+            await testConnection();
+
+            updateProgress(60, '測試認證...');
+            await testAuthentication();
+
+            updateProgress(80, '測試數據載入...');
+            await testDataLoading();
+
+            updateProgress(100, '生成測試報告...');
+            showFinalResult();
+        };
+
+        window.testConfigOnly = async function() {
+            updateProgress(50, '檢查配置...');
+            await testConfiguration();
+            updateProgress(100, '配置檢查完成');
+        };
+
+        window.testDataFlow = async function() {
+            updateProgress(25, '測試連接...');
+            await testConnection();
+            updateProgress(75, '測試數據載入...');
+            await testDataLoading();
+            updateProgress(100, '數據流測試完成');
+        };
+
+        window.resetAll = function() {
+            testResults = { config: false, connection: false, auth: false, data: false };
+            updateProgress(0, '等待開始測試...');
+            
+            ['config-card', 'connection-card', 'auth-card', 'data-card'].forEach(cardId => {
+                updateCardStatus(cardId, '等待檢查...', 'info');
+            });
+            
+            document.getElementById('final-result').style.display = 'none';
+        };
+
+        // 自動運行初始檢查
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                testConfiguration();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -189,178 +189,117 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   loadOrders: async () => {
     set({ loading: true, error: null })
     try {
-      // 暫時使用模擬資料，稍後連接真實資料庫
-      const mockOrders: Order[] = [
-        {
-          id: '1',
-          restaurant_id: '1',
-          table_id: '1',
-          order_number: 'ORD-001',
-          table_number: 1,
-          customer_name: '王小明',
-          customer_phone: '0912345678',
-          subtotal: 320,
-          tax_amount: 32,
-          total_amount: 352,
-          status: 'preparing',
-          payment_status: 'unpaid',
-          payment_method: 'cash',
-          notes: '不要洋蔥',
-          customer_count: 2,
-          created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30分鐘前
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          restaurant_id: '1',
-          table_id: '3',
-          order_number: 'ORD-002',
-          table_number: 3,
-          customer_name: '李小華',
-          customer_phone: '0987654321',
-          subtotal: 580,
-          tax_amount: 58,
-          total_amount: 638,
-          status: 'ready',
-          payment_status: 'paid',
-          payment_method: 'card',
-          customer_count: 4,
-          created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(), // 45分鐘前
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '3',
-          restaurant_id: '1',
-          table_id: '5',
-          order_number: 'ORD-003',
-          table_number: 5,
-          customer_name: '張大偉',
-          customer_phone: '0923456789',
-          subtotal: 1200,
-          tax_amount: 120,
-          total_amount: 1320,
-          status: 'completed',
-          payment_status: 'paid',
-          payment_method: 'mobile',
-          notes: '慶生聚餐',
-          customer_count: 8,
-          served_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-          completed_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-          created_at: new Date(Date.now() - 90 * 60 * 1000).toISOString(), // 90分鐘前
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: 'ord_001',
-          restaurant_id: '1',
-          table_id: '11',
-          order_number: 'ORD-1733292000001',
-          table_number: 11,
-          customer_name: '陳美玲',
-          customer_phone: '0934567890',
-          subtotal: 605,
-          tax_amount: 61,
-          total_amount: 666,
-          status: 'served',
-          payment_status: 'unpaid',
-          payment_method: 'cash',
-          notes: '慶祝生日，請準備蠟燭',
-          customer_count: 4,
-          created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30分鐘前
-          updated_at: new Date().toISOString()
-        }
-      ]
+      const state = get()
+      const restaurantId = state.currentRestaurant?.id
 
-      const mockOrderItems: OrderItem[] = [
-        {
-          id: '1',
-          order_id: '1',
-          product_id: '1',
-          product_name: '牛肉麵',
-          quantity: 1,
-          unit_price: 180,
-          total_price: 180,
-          status: 'preparing',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          order_id: '1',
-          product_id: '2',
-          product_name: '滷肉飯',
-          quantity: 1,
-          unit_price: 120,
-          total_price: 120,
-          special_instructions: '不要洋蔥',
-          status: 'preparing',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '3',
-          order_id: '1',
-          product_id: '7',
-          product_name: '可樂',
-          quantity: 2,
-          unit_price: 10,
-          total_price: 20,
-          status: 'ready',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '4',
-          order_id: '2',
-          product_id: '1',
-          product_name: '牛肉麵',
-          quantity: 2,
-          unit_price: 180,
-          total_price: 360,
-          status: 'ready',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '5',
-          order_id: '2',
-          product_id: '3',
-          product_name: '雞肉飯',
-          quantity: 2,
-          unit_price: 110,
-          total_price: 220,
-          status: 'ready',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '6',
-          order_id: 'ord_001',
-          product_id: '1',
-          product_name: '牛肉漢堡',
-          quantity: 2,
-          unit_price: 280,
-          total_price: 560,
-          special_instructions: '不要洋蔥',
-          status: 'served',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '7',
-          order_id: 'ord_001',
-          product_id: '7',
-          product_name: '可樂',
-          quantity: 1,
-          unit_price: 45,
-          total_price: 45,
-          status: 'served',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ]
+      if (!restaurantId) {
+        console.log('❌ 無餐廳 ID，載入模擬訂單資料')
+        // 如果沒有餐廳 ID，使用模擬資料
+        const mockOrders: Order[] = [
+          {
+            id: '1',
+            restaurant_id: '1',
+            table_id: '1',
+            order_number: 'ORD-001',
+            table_number: 1,
+            customer_name: '王小明',
+            customer_phone: '0912345678',
+            subtotal: 320,
+            tax_amount: 32,
+            total_amount: 352,
+            status: 'preparing',
+            payment_status: 'unpaid',
+            notes: '不要洋蔥',
+            party_size: 2,
+            created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ]
 
-      set({ orders: mockOrders, orderItems: mockOrderItems })
+        const mockOrderItems: OrderItem[] = [
+          {
+            id: '1',
+            order_id: '1',
+            product_id: '1',
+            product_name: '牛肉麵',
+            quantity: 1,
+            unit_price: 180,
+            total_price: 180,
+            status: 'preparing',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ]
+
+        set({ orders: mockOrders, orderItems: mockOrderItems })
+        return
+      }
+
+      console.log('🏪 從資料庫載入訂單資料...', restaurantId)
+
+      // 載入訂單資料
+      const { data: ordersData, error: ordersError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('restaurant_id', restaurantId)
+        .order('created_at', { ascending: false })
+
+      if (ordersError) {
+        throw new Error(`載入訂單失敗: ${ordersError.message}`)
+      }
+
+      // 載入訂單項目資料
+      const { data: orderItemsData, error: orderItemsError } = await supabase
+        .from('order_items')
+        .select(`
+          *,
+          products (name, sku)
+        `)
+        .in('order_id', (ordersData || []).map((order: any) => order.id))
+
+      if (orderItemsError) {
+        throw new Error(`載入訂單項目失敗: ${orderItemsError.message}`)
+      }
+
+      // 處理訂單項目資料，確保有商品名稱
+      const processedOrderItems: OrderItem[] = (orderItemsData || []).map((item: any) => ({
+        id: item.id,
+        order_id: item.order_id,
+        product_id: item.product_id,
+        product_name: item.products?.name || item.product_name || '未知商品',
+        product_sku: item.products?.sku || item.product_sku,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total_price: item.total_price,
+        special_instructions: item.special_instructions,
+        status: item.status,
+        created_at: item.created_at,
+        updated_at: item.updated_at
+      }))
+
+      // 載入桌台資料以獲取桌台號碼
+      const { data: tablesData } = await supabase
+        .from('tables')
+        .select('id, table_number')
+        .eq('restaurant_id', restaurantId)
+
+      const tableMap = new Map((tablesData || []).map((table: any) => [table.id, table.table_number]))
+
+      // 處理訂單資料，確保有桌台號碼
+      const processedOrders: Order[] = (ordersData || []).map((order: any) => ({
+        ...order,
+        table_number: tableMap.get(order.table_id) || order.table_number || 0
+      }))
+
+      console.log('✅ 成功載入訂單:', processedOrders.length, '筆')
+      console.log('✅ 成功載入訂單項目:', processedOrderItems.length, '筆')
+
+      set({ 
+        orders: processedOrders, 
+        orderItems: processedOrderItems 
+      })
     } catch (error) {
+      console.error('❌ 載入訂單失敗:', error)
       set({ error: (error as Error).message })
     } finally {
       set({ loading: false })
@@ -525,28 +464,49 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   updateOrderStatus: async (orderId, status) => {
     set({ loading: true, error: null })
     try {
+      const updates: any = {
+        status, 
+        updated_at: new Date().toISOString()
+      }
+
+      // 根據狀態添加相應的時間戳
+      switch (status) {
+        case 'confirmed':
+          updates.confirmed_at = new Date().toISOString()
+          break
+        case 'preparing':
+          updates.preparation_started_at = new Date().toISOString()
+          break
+        case 'ready':
+          updates.ready_at = new Date().toISOString()
+          break
+        case 'served':
+          updates.served_at = new Date().toISOString()
+          break
+        case 'completed':
+          updates.completed_at = new Date().toISOString()
+          break
+      }
+
       const { error } = await supabase
         .from('orders')
-        .update({ 
-          status, 
-          updated_at: new Date().toISOString(),
-          completed_at: status === 'completed' ? new Date().toISOString() : undefined
-        })
+        .update(updates)
         .eq('id', orderId)
 
       if (error) throw error
+
+      console.log('✅ 訂單狀態更新成功:', orderId, status)
 
       // 更新本地狀態
       set((state) => ({
         orders: state.orders.map(order =>
           order.id === orderId ? { 
             ...order, 
-            status,
-            completed_at: status === 'completed' ? new Date().toISOString() : order.completed_at
+            ...updates
           } : order
         ),
         currentOrder: state.currentOrder?.id === orderId 
-          ? { ...state.currentOrder, status }
+          ? { ...state.currentOrder, ...updates }
           : state.currentOrder
       }))
     } catch (error) {

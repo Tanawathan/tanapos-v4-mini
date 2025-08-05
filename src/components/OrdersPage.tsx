@@ -221,9 +221,9 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
                           </span>
                         </div>
                         
-                        {order.customer_count && (
+                        {order.party_size && (
                           <span className="text-xs text-gray-500">
-                            {order.customer_count} 人
+                            {order.party_size} 人
                           </span>
                         )}
                       </div>
@@ -277,11 +277,11 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
                     </div>
                     <div>
                       <span className="text-gray-600">人數:</span>
-                      <div className="font-medium">{selectedOrder.customer_count || 1} 人</div>
+                      <div className="font-medium">{selectedOrder.party_size || 1} 人</div>
                     </div>
                     <div>
-                      <span className="text-gray-600">付款方式:</span>
-                      <div className="font-medium">{selectedOrder.payment_method || '未指定'}</div>
+                      <span className="text-gray-600">訂單類型:</span>
+                      <div className="font-medium">{selectedOrder.order_type || '內用'}</div>
                     </div>
                   </div>
                   

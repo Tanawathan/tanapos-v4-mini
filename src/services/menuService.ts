@@ -406,7 +406,7 @@ export class MenuService {
         .eq('combo_id', id)
 
       if (rules && rules.length > 0) {
-        const ruleIds = rules.map(rule => rule.id)
+        const ruleIds = rules.map((rule: any) => rule.id)
         
         // 刪除相關的選擇選項
         await supabase
