@@ -9,8 +9,10 @@ import MenuManagementPage from './components/MenuManagementPage'
 import { KDSPage } from './components/KDSPage'
 import DiagnosticPanel from './components/DiagnosticPanel'
 import LoginPage from './components/LoginPage'
+import ConnectionTest from './components/ConnectionTest'
 import { useThemeInitializer } from './hooks/useThemeInitializer'
 import { supabase } from './lib/supabase'
+import './utils/frontend-diagnosis'
 
 function App() {
   // 初始化主題系統
@@ -51,7 +53,7 @@ function App() {
     checkAuth()
 
     // 監聽認證狀態變化
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: any) => {
       if (event === 'SIGNED_IN') {
         setIsAuthenticated(true)
         setCurrentUser(session?.user || null)
@@ -325,6 +327,9 @@ function App() {
         isOpen={showDiagnostic} 
         onClose={() => setShowDiagnostic(false)} 
       />
+      
+      {/* 連接測試組件 - 開發環境顯示 */}
+      {import.meta.env.DEV && <ConnectionTest />}
     </div>
   )
 }

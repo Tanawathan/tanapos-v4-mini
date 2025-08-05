@@ -30,26 +30,55 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
     console.log('🔐 開始登入流程...')
     console.log('Email:', email)
+    console.log('Password:', password ? '已設定' : '未設定')
 
     try {
+      // 首先測試 Supabase 連接
+      console.log('🧪 測試 Supabase 連接...')
+      const { error: testError } = await supabase
+        .from('restaurants')
+        .select('count')
+        .limit(1)
+      
+      if (testError) {
+        console.error('❌ Supabase 連接失敗:', testError)
+        setError('資料庫連接失敗: ' + testError.message)
+        return
+      }
+      
+      console.log('✅ Supabase 連接正常')
+
+      // 嘗試登入
+      console.log('🚀 嘗試登入...')
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+        email: email.trim(),
+        password: password.trim()
       })
 
       if (error) {
-        setError(error.message)
         console.error('❌ 登入失敗:', error)
         console.error('錯誤狀態:', error.status)
         console.error('錯誤代碼:', error.code)
+        
+        // 更詳細的錯誤處理
+        if (error.message.includes('Invalid login credentials')) {
+          setError('登入憑證無效，請檢查電子郵件和密碼')
+        } else if (error.message.includes('Invalid API key')) {
+          setError('API Key 配置錯誤，請聯繫系統管理員')
+        } else if (error.message.includes('Email not confirmed')) {
+          setError('電子郵件尚未驗證')
+        } else {
+          setError('登入失敗: ' + error.message)
+        }
       } else {
-        console.log('✅ 登入成功:', data.user.email)
-        console.log('用戶角色:', data.user.user_metadata.role)
+        console.log('✅ 登入成功:', data.user?.email)
+        console.log('用戶 ID:', data.user?.id)
+        console.log('Session 狀態:', data.session ? '已建立' : '未建立')
         onLoginSuccess()
       }
     } catch (err: any) {
-      setError('登入過程發生錯誤: ' + err.message)
-      console.error('❌ 登入錯誤:', err)
+      console.error('❌ 登入過程發生錯誤:', err)
+      setError('系統錯誤: ' + err.message)
     } finally {
       setLoading(false)
     }
