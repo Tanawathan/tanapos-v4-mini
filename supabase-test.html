@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 連接測試</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; }
+        .error { background: #ffe6e6; color: #cc0000; }
+        .success { background: #e6ffe6; color: #008800; }
+    </style>
+</head>
+<body>
+    <h1>🔗 Supabase 連接測試</h1>
+    
+    <div id="logs"></div>
+
+    <script type="module">
+        import { supabase } from './src/lib/supabase.js';
+        
+        const logsEl = document.getElementById('logs');
+        
+        function addLog(message, type = 'log') {
+            const logEl = document.createElement('div');
+            logEl.className = `log ${type}`;
+            logEl.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsEl.appendChild(logEl);
+            console.log(message);
+        }
+        
+        async function testConnection() {
+            try {
+                addLog('🔍 開始測試 Supabase 連接...');
+                
+                // 測試 1: 基本連接
+                addLog('📡 測試基本連接...');
+                
+                // 測試 2: 查詢餐廳
+                addLog('🏪 查詢餐廳資料...');
+                const { data: restaurants, error: restaurantError } = await supabase
+                    .from('restaurants')
+                    .select('*')
+                    .limit(5);
+                
+                if (restaurantError) {
+                    addLog(`❌ 餐廳查詢失敗: ${restaurantError.message}`, 'error');
+                    return;
+                }
+                
+                addLog(`✅ 找到 ${restaurants.length} 個餐廳`, 'success');
+                restaurants.forEach(r => {
+                    addLog(`   - ${r.name} (${r.id})`);
+                });
+                
+                // 測試 3: 查詢訂單
+                const restaurantId = '11111111-1111-1111-1111-111111111111';
+                addLog(`📋 查詢餐廳 ${restaurantId} 的訂單...`);
+                
+                const { data: orders, error: ordersError } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('restaurant_id', restaurantId)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+                
+                if (ordersError) {
+                    addLog(`❌ 訂單查詢失敗: ${ordersError.message}`, 'error');
+                    return;
+                }
+                
+                addLog(`✅ 找到 ${orders.length} 筆訂單`, 'success');
+                orders.forEach(order => {
+                    addLog(`   - ${order.order_number} (${order.status}) - ${order.total_amount}`);
+                });
+                
+                // 測試 4: 查詢有效訂單（KDS 應顯示的）
+                addLog('🔥 查詢有效狀態的訂單...');
+                
+                const { data: activeOrders, error: activeError } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('restaurant_id', restaurantId)
+                    .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
+                    .order('created_at', { ascending: false });
+                
+                if (activeError) {
+                    addLog(`❌ 有效訂單查詢失敗: ${activeError.message}`, 'error');
+                    return;
+                }
+                
+                addLog(`🎯 找到 ${activeOrders.length} 筆有效訂單（KDS應顯示）`, 'success');
+                activeOrders.forEach(order => {
+                    addLog(`   - ${order.order_number} (${order.status}) 桌號:${order.table_number} 時間:${new Date(order.created_at).toLocaleString()}`);
+                });
+                
+                if (activeOrders.length === 0) {
+                    addLog('⚠️ 沒有找到有效訂單！這就是為什麼KDS沒有顯示訂單的原因。', 'error');
+                } else {
+                    addLog('✅ 有效訂單存在，KDS應該能夠顯示這些訂單', 'success');
+                }
+                
+            } catch (error) {
+                addLog(`❌ 測試失敗: ${error.message}`, 'error');
+            }
+        }
+        
+        // 開始測試
+        testConnection();
+    </script>
+</body>
+</html>

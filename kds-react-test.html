@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDS React 測試</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; font-weight: bold; }
+        .loading { background: #e3f2fd; color: #1976d2; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        .order-card { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px; background: #fafafa; }
+        .logs { background: #f5f5f5; padding: 15px; margin: 15px 0; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+        .item-list { margin-left: 20px; }
+        .status-badge { padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d4edda; color: #155724; }
+        .status-preparing { background: #cce5ff; color: #004085; }
+        .status-ready { background: #f8d7da; color: #721c24; }
+    </style>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        function KDSTestApp() {
+            const [orders, setOrders] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+            const [logs, setLogs] = useState([]);
+
+            const addLog = (message) => {
+                console.log(message);
+                setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
+            };
+
+            const testSupabaseQuery = async () => {
+                try {
+                    setLoading(true);
+                    setError(null);
+                    setLogs([]);
+                    
+                    addLog('🔍 開始 KDS 訂單測試...');
+                    
+                    const supabaseUrl = 'https://arksfwmcmwnyxvlcpskm.supabase.co';
+                    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFya3Nmd21jbXdueXh2bGNwc2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMzM3MTAsImV4cCI6MjA2OTkwOTcxMH0.7ifP1Un1mZvtazPjeLAQEPnpO_G75VmxrI3NdkaaYCU';
+                    
+                    addLog('📡 初始化 Supabase 客戶端...');
+                    
+                    const restaurantId = '11111111-1111-1111-1111-111111111111';
+                    addLog(`📍 餐廳ID: ${restaurantId}`);
+                    
+                    // 構建查詢 URL
+                    const baseUrl = `${supabaseUrl}/rest/v1/orders`;
+                    const query = new URLSearchParams({
+                        select: '*,order_items(*,products(name,category_id,categories(name)))',
+                        restaurant_id: `eq.${restaurantId}`,
+                        status: 'in.(pending,confirmed,preparing,ready)',
+                        order: 'created_at.desc'
+                    });
+                    
+                    const url = `${baseUrl}?${query}`;
+                    addLog(`🌐 查詢 URL: ${url.substring(0, 100)}...`);
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'apikey': supabaseKey,
+                            'Authorization': `Bearer ${supabaseKey}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    addLog(`✅ 成功獲取回應，訂單數量: ${data.length}`);
+                    
+                    if (data.length === 0) {
+                        addLog('⚠️ 沒有找到符合條件的訂單');
+                        addLog('📋 查詢條件: 餐廳ID=' + restaurantId + ', 狀態=pending|confirmed|preparing|ready');
+                    } else {
+                        data.forEach((order, index) => {
+                            addLog(`📋 訂單 ${index + 1}: ${order.order_number} (${order.status}) 桌號:${order.table_number} 項目:${order.order_items?.length || 0}`);
+                        });
+                    }
+                    
+                    setOrders(data);
+                    
+                } catch (err) {
+                    addLog(`❌ 錯誤: ${err.message}`);
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            useEffect(() => {
+                testSupabaseQuery();
+            }, []);
+
+            const getStatusBadgeClass = (status) => {
+                switch (status) {
+                    case 'pending': return 'status-badge status-pending';
+                    case 'confirmed': return 'status-badge status-confirmed';
+                    case 'preparing': return 'status-badge status-preparing';
+                    case 'ready': return 'status-badge status-ready';
+                    default: return 'status-badge';
+                }
+            };
+
+            return (
+                <div className="container">
+                    <h1>🍳 KDS 訂單系統測試</h1>
+                    
+                    <div className={`status ${loading ? 'loading' : error ? 'error' : 'success'}`}>
+                        {loading && '🔄 載入中...'}
+                        {error && `❌ 錯誤: ${error}`}
+                        {!loading && !error && `✅ 成功載入 ${orders.length} 筆訂單`}
+                    </div>
+                    
+                    <button 
+                        onClick={testSupabaseQuery}
+                        style={{
+                            padding: '10px 20px',
+                            background: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            marginBottom: '20px'
+                        }}
+                    >
+                        🔄 重新測試
+                    </button>
+                    
+                    <div>
+                        <h2>📝 執行日誌</h2>
+                        <div className="logs">
+                            {logs.map((log, index) => (
+                                <div key={index}>{log}</div>
+                            ))}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h2>📋 訂單列表 ({orders.length})</h2>
+                        {orders.length === 0 ? (
+                            <div style={{padding: '20px', textAlign: 'center', color: '#666'}}>
+                                暫無有效訂單
+                            </div>
+                        ) : (
+                            orders.map(order => (
+                                <div key={order.id} className="order-card">
+                                    <h3>📋 訂單 {order.order_number}</h3>
+                                    <p><strong>桌號:</strong> {order.table_number || '未指定'}</p>
+                                    <p><strong>狀態:</strong> <span className={getStatusBadgeClass(order.status)}>{order.status}</span></p>
+                                    <p><strong>總金額:</strong> ${order.total_amount}</p>
+                                    <p><strong>下單時間:</strong> {new Date(order.created_at).toLocaleString()}</p>
+                                    <p><strong>客戶:</strong> {order.customer_name || '未提供'}</p>
+                                    
+                                    {order.order_items && order.order_items.length > 0 && (
+                                        <div>
+                                            <h4>🍜 訂單項目 ({order.order_items.length})</h4>
+                                            <div className="item-list">
+                                                {order.order_items.map(item => (
+                                                    <div key={item.id}>
+                                                        • {item.product_name} x{item.quantity}
+                                                        {item.special_instructions && (
+                                                            <span style={{color: '#666', marginLeft: '10px'}}>
+                                                                (備註: {item.special_instructions})
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<KDSTestApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>

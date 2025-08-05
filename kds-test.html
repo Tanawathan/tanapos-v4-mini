@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDS 測試頁面</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .loading { background: #f0f0f0; }
+        .error { background: #ffe6e6; color: #cc0000; }
+        .success { background: #e6ffe6; color: #008800; }
+        .order-card { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .debug-info { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🍳 KDS 系統測試</h1>
+    
+    <div id="status" class="status loading">載入中...</div>
+    
+    <div id="debug" class="debug-info"></div>
+    
+    <div id="orders-container">
+        <h2>訂單列表</h2>
+        <div id="orders"></div>
+    </div>
+
+    <script type="module">
+        import { useKDSStore } from './src/lib/kds-store.js';
+        
+        const statusEl = document.getElementById('status');
+        const debugEl = document.getElementById('debug');
+        const ordersEl = document.getElementById('orders');
+        
+        // 監聽 store 狀態變化
+        const unsubscribe = useKDSStore.subscribe((state) => {
+            console.log('🔄 KDS Store 狀態更新:', state);
+            
+            // 更新狀態顯示
+            if (state.isLoading) {
+                statusEl.className = 'status loading';
+                statusEl.textContent = '載入中...';
+            } else if (state.error) {
+                statusEl.className = 'status error';
+                statusEl.textContent = `錯誤: ${state.error}`;
+            } else {
+                statusEl.className = 'status success';
+                statusEl.textContent = `成功載入 ${state.orders.length} 筆訂單`;
+            }
+            
+            // 更新調試信息
+            debugEl.innerHTML = `
+                <h3>調試信息</h3>
+                <p><strong>訂單數量:</strong> ${state.orders.length}</p>
+                <p><strong>統計數據:</strong> 待處理: ${state.stats.pendingOrders}, 製作中: ${state.stats.inProgressOrders}, 已完成: ${state.stats.completedOrders}</p>
+                <p><strong>載入狀態:</strong> ${state.isLoading ? '載入中' : '完成'}</p>
+                <p><strong>錯誤:</strong> ${state.error || '無'}</p>
+            `;
+            
+            // 更新訂單列表
+            ordersEl.innerHTML = '';
+            if (state.orders.length === 0) {
+                ordersEl.innerHTML = '<p>暫無訂單</p>';
+            } else {
+                state.orders.forEach(order => {
+                    const orderEl = document.createElement('div');
+                    orderEl.className = 'order-card';
+                    orderEl.innerHTML = `
+                        <h3>訂單 ${order.order_number}</h3>
+                        <p><strong>桌號:</strong> ${order.table_number}</p>
+                        <p><strong>狀態:</strong> ${order.status}</p>
+                        <p><strong>總金額:</strong> $${order.total_amount}</p>
+                        <p><strong>下單時間:</strong> ${new Date(order.created_at).toLocaleString()}</p>
+                        <p><strong>項目數量:</strong> ${order.menuItems?.length || 0}</p>
+                    `;
+                    ordersEl.appendChild(orderEl);
+                });
+            }
+        });
+        
+        // 初始化
+        try {
+            console.log('🚀 開始載入 KDS 數據...');
+            const { fetchOrders } = useKDSStore.getState();
+            await fetchOrders();
+            console.log('✅ KDS 數據載入完成');
+        } catch (error) {
+            console.error('❌ KDS 數據載入失敗:', error);
+            statusEl.className = 'status error';
+            statusEl.textContent = `載入失敗: ${error.message}`;
+        }
+    </script>
+</body>
+</html>
