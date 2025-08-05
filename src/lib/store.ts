@@ -11,6 +11,9 @@ import type {
   CartItem 
 } from './types'
 
+// 從環境變數取得餐廳ID，用於模擬資料
+const MOCK_RESTAURANT_ID = import.meta.env.VITE_RESTAURANT_ID || '11111111-1111-1111-1111-111111111111'
+
 interface POSStore {
   // 基本資料
   currentRestaurant: Restaurant | null
@@ -94,7 +97,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       const mockCategories: Category[] = [
         {
           id: '1',
-          restaurant_id: '1',
+          restaurant_id: MOCK_RESTAURANT_ID,
           name: '主餐',
           description: '各式主餐料理',
           sort_order: 1,
@@ -104,7 +107,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
         },
         {
           id: '2',
-          restaurant_id: '1',
+          restaurant_id: MOCK_RESTAURANT_ID,
           name: '飲品',
           description: '各式飲品',
           sort_order: 2,

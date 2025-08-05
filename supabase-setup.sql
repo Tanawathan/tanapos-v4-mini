@@ -23,13 +23,39 @@ CREATE EXTENSION IF NOT EXISTS "btree_gin";
 -- 2. 安全性設置
 -- ================================
 
--- 啟用行級安全 (Row Level Security)
-ALTER TABLE IF EXISTS public.restaurants ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS public.categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS public.products ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS public.tables ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS public.orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS public.order_items ENABLE ROW LEVEL SECURITY;
+-- 啟用行級安全 (Row Level Security) - 只有當資料表存在時
+DO $$
+BEGIN
+    -- 檢查並啟用餐廳表的 RLS
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'restaurants') THEN
+        ALTER TABLE public.restaurants ENABLE ROW LEVEL SECURITY;
+    END IF;
+    
+    -- 檢查並啟用分類表的 RLS
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'categories') THEN
+        ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+    END IF;
+    
+    -- 檢查並啟用商品表的 RLS
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'products') THEN
+        ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+    END IF;
+    
+    -- 檢查並啟用桌台表的 RLS
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'tables') THEN
+        ALTER TABLE public.tables ENABLE ROW LEVEL SECURITY;
+    END IF;
+    
+    -- 檢查並啟用訂單表的 RLS
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'orders') THEN
+        ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+    END IF;
+    
+    -- 檢查並啟用訂單項目表的 RLS
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'order_items') THEN
+        ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+    END IF;
+END $$;
 
 -- ================================
 -- 3. 權限設置
@@ -58,55 +84,67 @@ GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO service_role;
 -- 餐廳資料隔離政策
 DO $$
 BEGIN
-    -- 檢查政策是否存在，不存在則創建
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'restaurant_isolation' AND tablename = 'restaurants') THEN
-        CREATE POLICY "restaurant_isolation" ON public.restaurants
-            FOR ALL USING (true);
+    -- 檢查資料表是否存在，並且政策不存在時才創建
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'restaurants') THEN
+        IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'restaurant_isolation' AND tablename = 'restaurants') THEN
+            CREATE POLICY "restaurant_isolation" ON public.restaurants
+                FOR ALL USING (true);
+        END IF;
     END IF;
 END $$;
 
 -- 分類資料隔離政策
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'categories_restaurant_access' AND tablename = 'categories') THEN
-        CREATE POLICY "categories_restaurant_access" ON public.categories
-            FOR ALL USING (true);
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'categories') THEN
+        IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'categories_restaurant_access' AND tablename = 'categories') THEN
+            CREATE POLICY "categories_restaurant_access" ON public.categories
+                FOR ALL USING (true);
+        END IF;
     END IF;
 END $$;
 
 -- 商品資料隔離政策
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'products_restaurant_access' AND tablename = 'products') THEN
-        CREATE POLICY "products_restaurant_access" ON public.products
-            FOR ALL USING (true);
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'products') THEN
+        IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'products_restaurant_access' AND tablename = 'products') THEN
+            CREATE POLICY "products_restaurant_access" ON public.products
+                FOR ALL USING (true);
+        END IF;
     END IF;
 END $$;
 
 -- 桌台資料隔離政策
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'tables_restaurant_access' AND tablename = 'tables') THEN
-        CREATE POLICY "tables_restaurant_access" ON public.tables
-            FOR ALL USING (true);
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'tables') THEN
+        IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'tables_restaurant_access' AND tablename = 'tables') THEN
+            CREATE POLICY "tables_restaurant_access" ON public.tables
+                FOR ALL USING (true);
+        END IF;
     END IF;
 END $$;
 
 -- 訂單資料隔離政策
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'orders_restaurant_access' AND tablename = 'orders') THEN
-        CREATE POLICY "orders_restaurant_access" ON public.orders
-            FOR ALL USING (true);
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'orders') THEN
+        IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'orders_restaurant_access' AND tablename = 'orders') THEN
+            CREATE POLICY "orders_restaurant_access" ON public.orders
+                FOR ALL USING (true);
+        END IF;
     END IF;
 END $$;
 
 -- 訂單項目資料隔離政策
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'order_items_access' AND tablename = 'order_items') THEN
-        CREATE POLICY "order_items_access" ON public.order_items
-            FOR ALL USING (true);
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'order_items') THEN
+        IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'order_items_access' AND tablename = 'order_items') THEN
+            CREATE POLICY "order_items_access" ON public.order_items
+                FOR ALL USING (true);
+        END IF;
     END IF;
 END $$;
 
@@ -123,12 +161,34 @@ BEGIN;
   CREATE PUBLICATION supabase_realtime;
 END;
 
--- 為關鍵表格啟用即時更新
-ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.order_items;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.tables;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.table_sessions;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.payments;
+-- 為關鍵表格啟用即時更新（只有當資料表存在時）
+DO $$
+BEGIN
+    -- 檢查並加入 orders 表
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'orders') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
+    END IF;
+    
+    -- 檢查並加入 order_items 表
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'order_items') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.order_items;
+    END IF;
+    
+    -- 檢查並加入 tables 表
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'tables') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.tables;
+    END IF;
+    
+    -- 檢查並加入 table_sessions 表
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'table_sessions') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.table_sessions;
+    END IF;
+    
+    -- 檢查並加入 payments 表
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'payments') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.payments;
+    END IF;
+END $$;
 
 -- ================================
 -- 6. 自定義函數
@@ -351,9 +411,12 @@ ORDER BY oi.priority_level DESC, oi.created_at ASC;
 -- 檢查桌台容量約束
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'tables_capacity_check') THEN
-        ALTER TABLE public.tables ADD CONSTRAINT tables_capacity_check 
-        CHECK (capacity >= min_capacity AND (max_capacity IS NULL OR capacity <= max_capacity));
+    -- 只有當 tables 表存在時才加入約束
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'tables') THEN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'tables_capacity_check') THEN
+            ALTER TABLE public.tables ADD CONSTRAINT tables_capacity_check 
+            CHECK (capacity >= min_capacity AND (max_capacity IS NULL OR capacity <= max_capacity));
+        END IF;
     END IF;
 EXCEPTION WHEN duplicate_object THEN
     -- 約束已存在，跳過
@@ -363,9 +426,12 @@ END $$;
 -- 檢查訂單金額約束
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'orders_amount_check') THEN
-        ALTER TABLE public.orders ADD CONSTRAINT orders_amount_check 
-        CHECK (subtotal >= 0 AND total_amount >= 0);
+    -- 只有當 orders 表存在時才加入約束
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'orders') THEN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'orders_amount_check') THEN
+            ALTER TABLE public.orders ADD CONSTRAINT orders_amount_check 
+            CHECK (subtotal >= 0 AND total_amount >= 0);
+        END IF;
     END IF;
 EXCEPTION WHEN duplicate_object THEN
     NULL;
@@ -375,76 +441,91 @@ END $$;
 -- 11. 測試資料載入（可選）
 -- ================================
 
--- 插入測試餐廳（如果不存在）
-INSERT INTO public.restaurants (
-    id, 
-    name, 
-    address, 
-    phone, 
-    email, 
-    tax_rate, 
-    service_charge_rate,
-    currency, 
-    timezone,
-    business_hours,
-    is_active
-) VALUES (
-    '11111111-1111-1111-1111-111111111111',
-    'TanaPOS 示範餐廳',
-    '台北市信義區信義路五段7號',
-    '02-1234-5678',
-    'demo@tanapos.com',
-    0.05,
-    0.10,
-    'TWD',
-    'Asia/Taipei',
-    '{"monday": {"open": "09:00", "close": "22:00"}, "tuesday": {"open": "09:00", "close": "22:00"}}',
-    true
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    updated_at = NOW();
+-- 插入測試餐廳（如果不存在且資料表存在）
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'restaurants') THEN
+        INSERT INTO public.restaurants (
+            id, 
+            name, 
+            address, 
+            phone, 
+            email, 
+            tax_rate, 
+            service_charge_rate,
+            currency, 
+            timezone,
+            business_hours,
+            is_active
+        ) VALUES (
+            '11111111-1111-1111-1111-111111111111',
+            'TanaPOS 示範餐廳',
+            '台北市信義區信義路五段7號',
+            '02-1234-5678',
+            'demo@tanapos.com',
+            0.05,
+            0.10,
+            'TWD',
+            'Asia/Taipei',
+            '{"monday": {"open": "09:00", "close": "22:00"}, "tuesday": {"open": "09:00", "close": "22:00"}}',
+            true
+        ) ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            updated_at = NOW();
+    END IF;
+END $$;
 
 -- 插入測試分類
-WITH restaurant_id AS (SELECT '11111111-1111-1111-1111-111111111111'::uuid as id)
-INSERT INTO public.categories (restaurant_id, name, description, sort_order, color, icon, is_active) 
-SELECT 
-    r.id,
-    category_data.name,
-    category_data.description,
-    category_data.sort_order,
-    category_data.color,
-    category_data.icon,
-    true
-FROM restaurant_id r,
-(VALUES 
-    ('主餐', '主要餐點', 1, '#3B82F6', '🍽️'),
-    ('飲品', '各式飲品', 2, '#10B981', '🥤'),
-    ('甜點', '精緻甜點', 3, '#F59E0B', '🍰'),
-    ('前菜', '開胃小菜', 4, '#EF4444', '🥗'),
-    ('湯品', '湯類料理', 5, '#8B5CF6', '🍲')
-) AS category_data(name, description, sort_order, color, icon)
-ON CONFLICT DO NOTHING;
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'categories') THEN
+        WITH restaurant_id AS (SELECT '11111111-1111-1111-1111-111111111111'::uuid as id)
+        INSERT INTO public.categories (restaurant_id, name, description, sort_order, color, icon, is_active) 
+        SELECT 
+            r.id,
+            category_data.name,
+            category_data.description,
+            category_data.sort_order,
+            category_data.color,
+            category_data.icon,
+            true
+        FROM restaurant_id r,
+        (VALUES 
+            ('主餐', '主要餐點', 1, '#3B82F6', '🍽️'),
+            ('飲品', '各式飲品', 2, '#10B981', '🥤'),
+            ('甜點', '精緻甜點', 3, '#F59E0B', '🍰'),
+            ('前菜', '開胃小菜', 4, '#EF4444', '🥗'),
+            ('湯品', '湯類料理', 5, '#8B5CF6', '🍲')
+        ) AS category_data(name, description, sort_order, color, icon)
+        ON CONFLICT DO NOTHING;
+    END IF;
+END $$;
 
 -- 插入測試桌台
-WITH restaurant_id AS (SELECT '11111111-1111-1111-1111-111111111111'::uuid as id)
-INSERT INTO public.tables (restaurant_id, table_number, name, capacity, status, floor_level, zone, is_active)
-SELECT 
-    r.id,
-    table_data.table_number,
-    '桌台 ' || table_data.table_number,
-    table_data.capacity,
-    'available',
-    1,
-    CASE WHEN table_data.table_number <= 5 THEN '用餐區A' ELSE '用餐區B' END,
-    true
-FROM restaurant_id r,
-(VALUES 
-    (1, 4), (2, 4), (3, 6), (4, 2), (5, 4),
-    (6, 6), (7, 8), (8, 4), (9, 2), (10, 4)
-) AS table_data(table_number, capacity)
-ON CONFLICT (restaurant_id, table_number) DO UPDATE SET
-    capacity = EXCLUDED.capacity,
-    updated_at = NOW();
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'tables') THEN
+        WITH restaurant_id AS (SELECT '11111111-1111-1111-1111-111111111111'::uuid as id)
+        INSERT INTO public.tables (restaurant_id, table_number, name, capacity, status, floor_level, zone, is_active)
+        SELECT 
+            r.id,
+            table_data.table_number,
+            '桌台 ' || table_data.table_number,
+            table_data.capacity,
+            'available',
+            1,
+            CASE WHEN table_data.table_number <= 5 THEN '用餐區A' ELSE '用餐區B' END,
+            true
+        FROM restaurant_id r,
+        (VALUES 
+            (1, 4), (2, 4), (3, 6), (4, 2), (5, 4),
+            (6, 6), (7, 8), (8, 4), (9, 2), (10, 4)
+        ) AS table_data(table_number, capacity)
+        ON CONFLICT (restaurant_id, table_number) DO UPDATE SET
+            capacity = EXCLUDED.capacity,
+            updated_at = NOW();
+    END IF;
+END $$;
 
 -- ================================
 -- 12. 效能監控

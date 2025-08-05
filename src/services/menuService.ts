@@ -21,7 +21,7 @@ import type {
 
 export class MenuService {
   private static instance: MenuService
-  private restaurantId: string = 'a8fff0de-a2dd-4749-a80c-08a6102de734' // TanawatThai 餐廳ID
+  private restaurantId: string = import.meta.env.VITE_RESTAURANT_ID || '11111111-1111-1111-1111-111111111111' // 從環境變數取得餐廳ID
 
   static getInstance(): MenuService {
     if (!MenuService.instance) {

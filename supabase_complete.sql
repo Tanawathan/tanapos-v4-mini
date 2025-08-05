@@ -103,7 +103,7 @@ CREATE TABLE public.products (
   -- 製作時間
   prep_time_minutes integer DEFAULT 15,
   cook_time_minutes integer DEFAULT 0,
-  total_time_minutes integer GENERATED ALWAYS AS (prep_time_minutes + cook_time_minutes) STORED,
+  total_time_minutes integer DEFAULT 15,
   
   -- 營養資訊
   calories integer,
@@ -319,7 +319,7 @@ CREATE TABLE public.table_reservations (
   party_size integer NOT NULL,
   reservation_time timestamp with time zone NOT NULL,
   duration_minutes integer DEFAULT 120,
-  estimated_end_time timestamp with time zone GENERATED ALWAYS AS (reservation_time + (duration_minutes * interval '1 minute')) STORED,
+  estimated_end_time timestamp with time zone,
   
   -- 狀態管理
   status character varying(50) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'seated', 'completed', 'cancelled', 'no_show')),
