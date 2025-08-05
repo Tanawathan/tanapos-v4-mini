@@ -30,6 +30,7 @@ interface POSStore {
   currentOrder: Order | null
   orderItems: OrderItem[]
   orders: Order[]
+  ordersLoaded: boolean
   
   // 載入狀態
   loading: boolean
@@ -82,6 +83,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   currentOrder: null,
   orderItems: [],
   orders: [],
+  ordersLoaded: false,
   loading: false,
   error: null,
 
@@ -187,9 +189,16 @@ export const usePOSStore = create<POSStore>((set, get) => ({
 
   // 載入訂單
   loadOrders: async () => {
+    const state = get()
+    
+    // 檢查是否已經載入過，避免重複載入
+    if (state.ordersLoaded && state.orders.length > 0) {
+      console.log('✅ 訂單已載入，跳過重複載入')
+      return
+    }
+    
     set({ loading: true, error: null })
     try {
-      const state = get()
       const restaurantId = state.currentRestaurant?.id
 
       if (!restaurantId) {
@@ -231,7 +240,11 @@ export const usePOSStore = create<POSStore>((set, get) => ({
           }
         ]
 
-        set({ orders: mockOrders, orderItems: mockOrderItems })
+        set({ 
+          orders: mockOrders, 
+          orderItems: mockOrderItems,
+          ordersLoaded: true 
+        })
         return
       }
 
@@ -296,7 +309,8 @@ export const usePOSStore = create<POSStore>((set, get) => ({
 
       set({ 
         orders: processedOrders, 
-        orderItems: processedOrderItems 
+        orderItems: processedOrderItems,
+        ordersLoaded: true 
       })
     } catch (error) {
       console.error('❌ 載入訂單失敗:', error)
@@ -510,7 +524,9 @@ export const usePOSStore = create<POSStore>((set, get) => ({
           : state.currentOrder
       }))
     } catch (error) {
+      console.error('❌ 訂單狀態更新失敗:', error)
       set({ error: (error as Error).message })
+      throw error // 重新拋出錯誤，讓調用方能處理
     } finally {
       set({ loading: false })
     }

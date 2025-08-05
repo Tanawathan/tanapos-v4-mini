@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import usePOSStore from '../lib/store'
 import { Order, OrderItem } from '../lib/types'
 
@@ -6,22 +6,50 @@ interface OrdersPageProps {
   onBack: () => void
 }
 
-export default function OrdersPage({ onBack }: OrdersPageProps) {
-  const { 
-    orders, 
-    orderItems, 
-    loadOrders, 
-    updateOrderStatus,
-    loading 
-  } = usePOSStore()
+const OrdersPage = memo(({ onBack }: OrdersPageProps) => {
+  // 使用 selector 模式分別獲取數據和函數，優化性能
+  const orders = usePOSStore(state => state.orders)
+  const orderItems = usePOSStore(state => state.orderItems)
+  const loading = usePOSStore(state => state.loading)
+  const error = usePOSStore(state => state.error)
+  const ordersLoaded = usePOSStore(state => state.ordersLoaded)
+  const loadOrders = usePOSStore(state => state.loadOrders)
+  const updateOrderStatus = usePOSStore(state => state.updateOrderStatus)
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [dateFilter, setDateFilter] = useState<string>('today')
 
-  useEffect(() => {
+  // 使用 useCallback 穩定重新載入函數
+  const handleRefresh = useCallback(() => {
+    // 強制重新載入
+    usePOSStore.setState({ ordersLoaded: false })
     loadOrders()
   }, [loadOrders])
+
+  // 優化的狀態更新處理
+  const handleStatusUpdate = useCallback(async (orderId: string, newStatus: Order['status']) => {
+    try {
+      await updateOrderStatus(orderId, newStatus)
+      // 狀態更新成功後，如果當前選中的訂單是被更新的訂單，更新選中訂單
+      if (selectedOrder?.id === orderId) {
+        const updatedOrder = orders.find(order => order.id === orderId)
+        if (updatedOrder) {
+          setSelectedOrder(updatedOrder)
+        }
+      }
+    } catch (error) {
+      console.error('更新訂單狀態失敗:', error)
+      // 可以在這裡添加錯誤提示
+    }
+  }, [updateOrderStatus, selectedOrder, orders])
+
+  useEffect(() => {
+    // 只在還沒載入過訂單時才載入
+    if (!ordersLoaded) {
+      loadOrders()
+    }
+  }, []) // 移除依賴項，避免無限循環
 
   // 過濾訂單
   const filteredOrders = orders.filter(order => {
@@ -101,6 +129,17 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
             </div>
             
             <div className="flex items-center space-x-4">
+              <button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="flex items-center space-x-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                title="重新載入訂單"
+              >
+                <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>刷新</span>
+              </button>
               <span className="text-sm text-ui-muted">
                 總計 {filteredOrders.length} 筆訂單
               </span>
@@ -110,6 +149,27 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* 錯誤提示 */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-red-800">載入訂單時發生錯誤</h3>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
+              <button
+                onClick={handleRefresh}
+                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+              >
+                重試
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 左側：訂單列表 */}
           <div className="lg:col-span-2 space-y-6">
@@ -376,7 +436,7 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
                     {['confirmed', 'preparing', 'ready', 'served', 'completed'].map(status => (
                       <button
                         key={status}
-                        onClick={() => updateOrderStatus(selectedOrder.id, status as Order['status'])}
+                        onClick={() => handleStatusUpdate(selectedOrder.id, status as Order['status'])}
                         disabled={selectedOrder.status === status}
                         className={`px-3 py-2 text-xs rounded-lg transition-colors ${
                           selectedOrder.status === status
@@ -421,4 +481,8 @@ export default function OrdersPage({ onBack }: OrdersPageProps) {
       </div>
     </div>
   )
-}
+})
+
+OrdersPage.displayName = 'OrdersPage'
+
+export default OrdersPage
