@@ -6,6 +6,7 @@ import TableManagementPage from './components/TableManagementPage'
 import CheckoutPage from './components/CheckoutPage'
 import SettingsPage from './components/SettingsPage'
 import MenuManagementPage from './components/MenuManagementPage'
+import MobileOrderingPage from './components/MobileOrderingPage'
 import { KDSPage } from './components/KDSPage'
 import LoginPage from './components/LoginPage'
 import { useThemeInitializer } from './hooks/useThemeInitializer'
@@ -26,7 +27,7 @@ function App() {
     error 
   } = usePOSStore()
 
-  const [currentPage, setCurrentPage] = useState<'home' | 'ordering' | 'orders' | 'tables' | 'checkout' | 'kds' | 'settings' | 'menu'>('home')
+  const [currentPage, setCurrentPage] = useState<'home' | 'ordering' | 'orders' | 'tables' | 'checkout' | 'kds' | 'settings' | 'menu' | 'mobile'>('home')
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null) // null = 檢查中
   const [currentUser, setCurrentUser] = useState<any>(null)
 
@@ -156,6 +157,8 @@ function App() {
         <SettingsPage onBack={() => setCurrentPage('home')} />
       ) : currentPage === 'menu' ? (
         <MenuManagementPage onBack={() => setCurrentPage('home')} />
+      ) : currentPage === 'mobile' ? (
+        <MobileOrderingPage onBack={() => setCurrentPage('home')} />
       ) : (
         <>
           {/* 頂部標題列 */}
@@ -212,7 +215,19 @@ function App() {
                   餐廳：{currentRestaurant.name}
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                  <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-4">📱</div>
+                    <h3 className="text-xl font-semibold mb-2">手機點餐</h3>
+                    <p className="text-gray-600 mb-4">顧客自助點餐系統</p>
+                    <button 
+                      onClick={() => setCurrentPage('mobile')}
+                      className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 w-full transition-colors"
+                    >
+                      手機點餐
+                    </button>
+                  </div>
+
                   <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
                     <div className="text-4xl mb-4">📋</div>
                     <h3 className="text-xl font-semibold mb-2">點餐系統</h3>
