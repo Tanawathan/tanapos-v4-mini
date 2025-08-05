@@ -175,10 +175,39 @@ export const usePOSStore = create<POSStore>((set, get) => ({
     
     set({ loading: true, error: null })
     try {
+      // 獲取當前登入的使用者
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError) {
+        console.log('⚠️ 使用者未登入，使用預設餐廳 ID')
+      }
+
+      // 優先使用使用者的餐廳 ID，否則使用預設值
+      let restaurantId = MOCK_RESTAURANT_ID
+      
+      if (user?.user_metadata?.restaurant_id) {
+        restaurantId = user.user_metadata.restaurant_id
+        console.log('✅ 使用登入使用者的餐廳 ID:', restaurantId)
+      } else if (user?.email) {
+        // 如果使用者有 email，嘗試從 profiles 或 staff 表查找餐廳關聯
+        const { data: profileData } = await supabase
+          .from('staff')
+          .select('restaurant_id')
+          .eq('email', user.email)
+          .single()
+          
+        if (profileData?.restaurant_id) {
+          restaurantId = profileData.restaurant_id
+          console.log('✅ 從職員表找到餐廳 ID:', restaurantId)
+        }
+      }
+
+      console.log('🏪 載入餐廳桌台:', restaurantId)
+
       const { data, error } = await supabase
         .from('tables')
         .select('*')
-        .eq('restaurant_id', MOCK_RESTAURANT_ID)
+        .eq('restaurant_id', restaurantId)
         .eq('is_active', true)
         .order('table_number', { ascending: true })
 
@@ -212,53 +241,31 @@ export const usePOSStore = create<POSStore>((set, get) => ({
     
     set({ loading: true, error: null })
     try {
-      const restaurantId = state.currentRestaurant?.id
+      // 獲取當前登入的使用者
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError) {
+        console.log('⚠️ 使用者未登入，使用預設餐廳 ID')
+      }
 
-      if (!restaurantId) {
-        console.log('❌ 無餐廳 ID，載入模擬訂單資料')
-        // 如果沒有餐廳 ID，使用模擬資料
-        const mockOrders: Order[] = [
-          {
-            id: '1',
-            restaurant_id: '1',
-            table_id: '1',
-            order_number: 'ORD-001',
-            table_number: 1,
-            customer_name: '王小明',
-            customer_phone: '0912345678',
-            subtotal: 320,
-            tax_amount: 32,
-            total_amount: 352,
-            status: 'preparing',
-            payment_status: 'unpaid',
-            notes: '不要洋蔥',
-            party_size: 2,
-            created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        ]
-
-        const mockOrderItems: OrderItem[] = [
-          {
-            id: '1',
-            order_id: '1',
-            product_id: '1',
-            product_name: '牛肉麵',
-            quantity: 1,
-            unit_price: 180,
-            total_price: 180,
-            status: 'preparing',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        ]
-
-        set({ 
-          orders: mockOrders, 
-          orderItems: mockOrderItems,
-          ordersLoaded: true 
-        })
-        return
+      // 優先使用使用者的餐廳 ID，否則使用預設值
+      let restaurantId = MOCK_RESTAURANT_ID
+      
+      if (user?.user_metadata?.restaurant_id) {
+        restaurantId = user.user_metadata.restaurant_id
+        console.log('✅ 使用登入使用者的餐廳 ID:', restaurantId)
+      } else if (user?.email) {
+        // 如果使用者有 email，嘗試從 staff 表查找餐廳關聯
+        const { data: profileData } = await supabase
+          .from('staff')
+          .select('restaurant_id')
+          .eq('email', user.email)
+          .single()
+          
+        if (profileData?.restaurant_id) {
+          restaurantId = profileData.restaurant_id
+          console.log('✅ 從職員表找到餐廳 ID:', restaurantId)
+        }
       }
 
       console.log('🏪 從資料庫載入訂單資料...', restaurantId)
@@ -268,6 +275,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
         .from('orders')
         .select('*')
         .eq('restaurant_id', restaurantId)
+        .in('status', ['pending', 'confirmed', 'preparing', 'ready', 'served'])
         .order('created_at', { ascending: false })
 
       if (ordersError) {
@@ -555,29 +563,50 @@ export const usePOSStore = create<POSStore>((set, get) => ({
     try {
       const now = new Date().toISOString()
       
-      // 更新訂單為已完成並記錄支付資訊
+      // 更新訂單為已完成並記錄支付方式
       const { error: orderError } = await supabase
         .from('orders')
         .update({ 
           status: 'completed',
           completed_at: now,
-          payment_method: paymentData.payment_method,
-          received_amount: paymentData.received_amount,
-          change_amount: paymentData.change_amount,
+          payment_status: 'paid',
           updated_at: now
         })
         .eq('id', orderId)
 
       if (orderError) throw orderError
 
+      // 創建付款記錄 - 首先獲取訂單總金額
+      const { data: orderData, error: fetchError } = await supabase
+        .from('orders')
+        .select('total_amount')
+        .eq('id', orderId)
+        .single()
+
+      if (fetchError) throw fetchError
+
+      const { error: paymentError } = await supabase
+        .from('payments')
+        .insert({
+          order_id: orderId,
+          payment_method: paymentData.payment_method,
+          amount: orderData.total_amount || 0,
+          received_amount: paymentData.received_amount,
+          change_amount: paymentData.change_amount,
+          status: 'completed',
+          processed_at: now,
+          confirmed_at: now
+        })
+
+      if (paymentError) throw paymentError
+
       // 更新桌台狀態為清潔中
       const { error: tableError } = await supabase
         .from('tables')
         .update({ 
           status: 'cleaning',
-          cleaning_started: now,
-          checkout_completed: now,
-          last_order_id: orderId,
+          last_cleaned_at: now,
+          current_session_id: null, // 清除當前會話
           updated_at: now
         })
         .eq('id', tableId)
@@ -591,18 +620,15 @@ export const usePOSStore = create<POSStore>((set, get) => ({
             ...order, 
             status: 'completed' as const,
             completed_at: now,
-            payment_method: paymentData.payment_method,
-            received_amount: paymentData.received_amount,
-            change_amount: paymentData.change_amount
+            payment_status: 'paid' as const
           } : order
         ),
         tables: state.tables.map(table =>
           table.id === tableId ? {
             ...table,
             status: 'cleaning' as const,
-            cleaning_started: now,
-            checkout_completed: now,
-            last_order_id: orderId
+            last_cleaned_at: now,
+            current_session_id: undefined
           } : table
         )
       }))

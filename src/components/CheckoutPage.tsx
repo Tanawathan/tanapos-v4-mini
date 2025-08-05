@@ -7,15 +7,17 @@ interface CheckoutPageProps {
 }
 
 export default function CheckoutPage({ onBack }: CheckoutPageProps) {
-  const {
-    tables,
-    orders,
-    orderItems,
-    loadTables,
-    loadOrders,
-    processCheckout,
-    loading
-  } = usePOSStore()
+  // 使用 selector 模式避免無限渲染
+  const tables = usePOSStore(state => state.tables)
+  const orders = usePOSStore(state => state.orders)
+  const orderItems = usePOSStore(state => state.orderItems)
+  const loading = usePOSStore(state => state.loading)
+  const error = usePOSStore(state => state.error)
+  const tablesLoaded = usePOSStore(state => state.tablesLoaded)
+  const ordersLoaded = usePOSStore(state => state.ordersLoaded)
+  const loadTables = usePOSStore(state => state.loadTables)
+  const loadOrders = usePOSStore(state => state.loadOrders)
+  const processCheckout = usePOSStore(state => state.processCheckout)
 
   const [selectedTable, setSelectedTable] = useState<Table | null>(null)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
@@ -24,10 +26,17 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
 
+  // 只在未載入時觸發資料載入，避免無限渲染
   useEffect(() => {
-    loadTables()
-    loadOrders()
-  }, [loadTables, loadOrders])
+    if (!tablesLoaded) {
+      console.log('🔄 CheckoutPage: 載入桌台資料...')
+      loadTables()
+    }
+    if (!ordersLoaded) {
+      console.log('🔄 CheckoutPage: 載入訂單資料...')
+      loadOrders()
+    }
+  }, [tablesLoaded, ordersLoaded, loadTables, loadOrders]) // 包含所有依賴但有條件執行避免無限渲染
 
   // 取得有活躍訂單的桌台
   const getOccupiedTables = () => {
@@ -151,6 +160,8 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => {
+                  // 重置 loaded 狀態以觸發重新載入
+                  usePOSStore.setState({ tablesLoaded: false, ordersLoaded: false })
                   loadTables()
                   loadOrders()
                 }}
@@ -167,6 +178,18 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <span className="text-red-700 font-medium">載入錯誤：{error}</span>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* 左側：桌台選擇 */}
           <div className="bg-ui-primary rounded-lg shadow-sm border border-ui p-6">
@@ -223,9 +246,9 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                         </div>
                       )}
                       
-                      {table.seated_at && (
+                      {table.last_occupied_at && (
                         <div className="text-xs text-gray-500 mt-2">
-                          入座：{new Date(table.seated_at).toLocaleTimeString()}
+                          入座：{new Date(table.last_occupied_at).toLocaleTimeString()}
                         </div>
                       )}
                     </button>
@@ -265,8 +288,8 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     <div>
                       <div className="text-sm text-gray-600">用餐時間</div>
                       <div className="font-semibold">
-                        {selectedTable.seated_at
-                          ? Math.round((Date.now() - new Date(selectedTable.seated_at).getTime()) / 60000)
+                        {selectedTable.last_occupied_at
+                          ? Math.round((Date.now() - new Date(selectedTable.last_occupied_at).getTime()) / 60000)
                           : 0
                         } 分鐘
                       </div>
