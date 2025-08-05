@@ -70,17 +70,19 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
     setReceivedAmount('')
   }
 
-  // 計算最終金額（包含服務費）
+  // 計算最終金額（包含稅額和服務費）
   const getFinalAmount = () => {
     if (!selectedOrder) return 0
-    const baseAmount = selectedOrder.subtotal || 0
     
-    // 行動支付加收5%服務費
+    // 使用訂單的總金額 (已包含稅額)
+    const baseAmount = selectedOrder.total_amount || 0
+    
+    // 行動支付額外加收5%服務費
     if (paymentMethod === 'mobile') {
-      return baseAmount * 1.05
+      return baseAmount + (baseAmount * 0.05)
     }
     
-    // 其他支付方式不加費用
+    // 其他支付方式使用原總金額
     return baseAmount
   }
 
@@ -318,7 +320,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                   </div>
                 </div>
 
-                {/* 金額明細（移除稅額，加入行動支付服務費） */}
+                {/* 金額明細 */}
                 <div className="bg-green-50 rounded-lg p-4">
                   <h3 className="font-semibold text-gray-900 mb-3">金額明細</h3>
                   <div className="space-y-2">
@@ -326,10 +328,14 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                       <span className="text-gray-600">小計</span>
                       <span>NT$ {(selectedOrder.subtotal || 0).toLocaleString()}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">稅額</span>
+                      <span>NT$ {(selectedOrder.tax_amount || 0).toLocaleString()}</span>
+                    </div>
                     {paymentMethod === 'mobile' && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">服務費 (5%)</span>
-                        <span>NT$ {((selectedOrder.subtotal || 0) * 0.05).toLocaleString()}</span>
+                        <span>NT$ {((selectedOrder.total_amount || 0) * 0.05).toLocaleString()}</span>
                       </div>
                     )}
                     <div className="border-t pt-2 flex justify-between font-bold text-lg">

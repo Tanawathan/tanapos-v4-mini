@@ -428,8 +428,8 @@ export const usePOSStore = create<POSStore>((set, get) => ({
         order_number: orderNumber,
         table_number: table.table_number,
         subtotal: total,
-        tax_amount: total * (currentRestaurant?.tax_rate || 0.1),
-        total_amount: total + (total * (currentRestaurant?.tax_rate || 0.1)),
+        tax_amount: total * (currentRestaurant?.tax_rate || 0),
+        total_amount: total + (total * (currentRestaurant?.tax_rate || 0)),
         status: 'pending',
         payment_status: 'unpaid'
       }

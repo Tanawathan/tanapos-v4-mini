@@ -603,8 +603,8 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                   <span>NT$ {(selectedOrder.subtotal || 605).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">稅額 (10%)</span>
-                  <span>NT$ {(selectedOrder.tax_amount || 61).toLocaleString()}</span>
+                  <span className="text-gray-600">稅額</span>
+                  <span>NT$ {(selectedOrder.tax_amount || 0).toLocaleString()}</span>
                 </div>
                 <div className="border-t pt-2 flex justify-between font-bold text-lg">
                   <span>總計</span>

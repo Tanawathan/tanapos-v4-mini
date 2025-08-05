@@ -86,8 +86,8 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
       customer_name: '', // 可以添加客戶輸入
       customer_phone: '', // 可以添加客戶輸入
       subtotal: getCartTotal(),
-      tax_amount: Math.round(getCartTotal() * (currentRestaurant.tax_rate || 0.1)),
-      total_amount: getCartTotal() + Math.round(getCartTotal() * (currentRestaurant.tax_rate || 0.1)),
+      tax_amount: Math.round(getCartTotal() * (currentRestaurant.tax_rate || 0)),
+      total_amount: getCartTotal() + Math.round(getCartTotal() * (currentRestaurant.tax_rate || 0)),
       status: 'pending' as const,
       payment_status: 'unpaid' as const,
       party_size: 1, // 可以添加人數選擇
