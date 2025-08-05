@@ -70,20 +70,53 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
     setReceivedAmount('')
   }
 
+  // 計算稅額（根據付款方式）
+  const getTaxAmount = () => {
+    if (!selectedOrder) return 0
+    const subtotal = selectedOrder.subtotal || 0
+    
+    // 現金付款：不收稅金
+    if (paymentMethod === 'cash') {
+      return 0
+    }
+    
+    // 行動支付：收3%稅金
+    if (paymentMethod === 'mobile') {
+      return subtotal * 0.03
+    }
+    
+    return 0
+  }
+
+  // 計算服務費（基於含稅金額）
+  const getServiceFee = () => {
+    if (!selectedOrder) return 0
+    
+    // 現金付款：不收服務費
+    if (paymentMethod === 'cash') {
+      return 0
+    }
+    
+    // 行動支付：收2%服務費（基於含稅金額）
+    if (paymentMethod === 'mobile') {
+      const subtotal = selectedOrder.subtotal || 0
+      const taxAmount = getTaxAmount()
+      return (subtotal + taxAmount) * 0.02
+    }
+    
+    return 0
+  }
+
   // 計算最終金額（包含稅額和服務費）
   const getFinalAmount = () => {
     if (!selectedOrder) return 0
     
-    // 使用訂單的總金額 (已包含稅額)
-    const baseAmount = selectedOrder.total_amount || 0
+    const subtotal = selectedOrder.subtotal || 0
+    const taxAmount = getTaxAmount()
+    const serviceFee = getServiceFee()
     
-    // 行動支付額外加收5%服務費
-    if (paymentMethod === 'mobile') {
-      return baseAmount + (baseAmount * 0.05)
-    }
-    
-    // 其他支付方式使用原總金額
-    return baseAmount
+    // 總金額 = 小計 + 稅額 + 服務費
+    return subtotal + taxAmount + serviceFee
   }
 
   // 計算找零
@@ -116,9 +149,22 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       })
 
       const finalAmount = getFinalAmount()
-      const serviceFeeText = paymentMethod === 'mobile' ? `\n服務費(5%)：NT$ ${((selectedOrder.subtotal || 0) * 0.05).toLocaleString()}` : ''
+      const taxAmount = getTaxAmount()
+      const serviceFee = getServiceFee()
+      const subtotal = selectedOrder.subtotal || 0
       
-      alert(`✅ 結帳成功！\n桌號：${selectedTable.table_number}\n訂單：${selectedOrder.order_number}\n金額：NT$ ${finalAmount.toLocaleString()}${serviceFeeText}\n${paymentMethod === 'cash' ? `找零：NT$ ${calculateChange().toLocaleString()}` : ''}`)
+      // 建立詳細的金額說明
+      let amountDetails = `\n小計：NT$ ${subtotal.toLocaleString()}`
+      
+      if (paymentMethod === 'mobile') {
+        amountDetails += `\n稅額(3%)：NT$ ${taxAmount.toLocaleString()}`
+        amountDetails += `\n服務費(2%)：NT$ ${serviceFee.toLocaleString()}`
+      } else {
+        amountDetails += `\n稅額：NT$ 0 (現金免稅)`
+        amountDetails += `\n服務費：NT$ 0 (現金免服務費)`
+      }
+      
+      alert(`✅ 結帳成功！\n桌號：${selectedTable.table_number}\n訂單：${selectedOrder.order_number}${amountDetails}\n總計：NT$ ${finalAmount.toLocaleString()}\n${paymentMethod === 'cash' ? `找零：NT$ ${calculateChange().toLocaleString()}` : ''}`)
 
       setSelectedTable(null)
       setSelectedOrder(null)
@@ -329,13 +375,15 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                       <span>NT$ {(selectedOrder.subtotal || 0).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">稅額</span>
-                      <span>NT$ {(selectedOrder.tax_amount || 0).toLocaleString()}</span>
+                      <span className="text-gray-600">
+                        稅額 {paymentMethod === 'mobile' ? '(3%)' : '(0%)'}
+                      </span>
+                      <span>NT$ {getTaxAmount().toLocaleString()}</span>
                     </div>
                     {paymentMethod === 'mobile' && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">服務費 (5%)</span>
-                        <span>NT$ {((selectedOrder.total_amount || 0) * 0.05).toLocaleString()}</span>
+                        <span className="text-gray-600">服務費 (2%)</span>
+                        <span>NT$ {getServiceFee().toLocaleString()}</span>
                       </div>
                     )}
                     <div className="border-t pt-2 flex justify-between font-bold text-lg">
