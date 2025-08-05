@@ -93,45 +93,24 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   loadCategories: async () => {
     set({ loading: true, error: null })
     try {
-      // 暫時使用模擬資料，稍後連接真實資料庫
-      const mockCategories: Category[] = [
-        {
-          id: '1',
-          restaurant_id: MOCK_RESTAURANT_ID,
-          name: '主餐',
-          description: '各式主餐料理',
-          sort_order: 1,
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          restaurant_id: MOCK_RESTAURANT_ID,
-          name: '飲品',
-          description: '各式飲品',
-          sort_order: 2,
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '3',
-          restaurant_id: '1',
-          name: '甜點',
-          description: '各式甜點',
-          sort_order: 3,
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ]
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('restaurant_id', MOCK_RESTAURANT_ID)
+        .order('sort_order', { ascending: true })
 
-      setTimeout(() => {
-        set({ categories: mockCategories, loading: false })
-      }, 500) // 模擬網路延遲
+      if (error) throw error
+
+      set({ 
+        categories: data || [],
+        loading: false
+      })
     } catch (error) {
-      set({ error: (error as Error).message, loading: false })
+      console.error('載入分類失敗:', error)
+      set({ 
+        error: error instanceof Error ? error.message : '載入分類失敗',
+        loading: false 
+      })
     }
   },
 
@@ -139,105 +118,25 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   loadProducts: async () => {
     set({ loading: true, error: null })
     try {
-      // 暫時使用模擬資料
-      const mockProducts: Product[] = [
-        {
-          id: '1',
-          restaurant_id: '1',
-          category_id: '1',
-          name: '牛肉漢堡',
-          description: '新鮮牛肉搭配生菜、番茄',
-          price: 180,
-          cost: 80,
-          image_url: '',
-          is_available: true,
-          is_active: true,
-          sort_order: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          restaurant_id: '1',
-          category_id: '1',
-          name: '雞肉義大利麵',
-          description: '白醬雞肉義大利麵',
-          price: 220,
-          cost: 100,
-          image_url: '',
-          is_available: true,
-          is_active: true,
-          sort_order: 2,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '3',
-          restaurant_id: '1',
-          category_id: '1',
-          name: '鮭魚排',
-          description: '烤鮭魚排佐檸檬奶油醬',
-          price: 320,
-          cost: 150,
-          image_url: '',
-          is_available: true,
-          is_active: true,
-          sort_order: 3,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '4',
-          restaurant_id: '1',
-          category_id: '2',
-          name: '美式咖啡',
-          description: '香濃美式咖啡',
-          price: 120,
-          cost: 30,
-          image_url: '',
-          is_available: true,
-          is_active: true,
-          sort_order: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '5',
-          restaurant_id: '1',
-          category_id: '2',
-          name: '檸檬汽水',
-          description: '清爽檸檬汽水',
-          price: 80,
-          cost: 25,
-          image_url: '',
-          is_available: true,
-          is_active: true,
-          sort_order: 2,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '6',
-          restaurant_id: '1',
-          category_id: '3',
-          name: '提拉米蘇',
-          description: '經典義式提拉米蘇',
-          price: 150,
-          cost: 60,
-          image_url: '',
-          is_available: true,
-          is_active: true,
-          sort_order: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ]
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('restaurant_id', MOCK_RESTAURANT_ID)
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
 
-      setTimeout(() => {
-        set({ products: mockProducts, loading: false })
-      }, 600) // 模擬網路延遲
+      if (error) throw error
+
+      set({ 
+        products: data || [],
+        loading: false
+      })
     } catch (error) {
-      set({ error: (error as Error).message, loading: false })
+      console.error('載入產品失敗:', error)
+      set({ 
+        error: error instanceof Error ? error.message : '載入產品失敗',
+        loading: false 
+      })
     }
   },
 
@@ -264,152 +163,25 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   loadTables: async () => {
     set({ loading: true, error: null })
     try {
-      // 暫時使用模擬資料
-      const mockTables: Table[] = [
-        {
-          id: '1',
-          restaurant_id: '1',
-          table_number: 1,
-          name: 'A01',
-          capacity: 2,
-          status: 'available',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          restaurant_id: '1',
-          table_number: 2,
-          name: 'A02',
-          capacity: 4,
-          status: 'available',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '3',
-          restaurant_id: '1',
-          table_number: 3,
-          name: 'A03',
-          capacity: 6,
-          status: 'occupied',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '4',
-          restaurant_id: '1',
-          table_number: 4,
-          name: 'B01',
-          capacity: 2,
-          status: 'available',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '5',
-          restaurant_id: '1',
-          table_number: 5,
-          name: 'B02',
-          capacity: 4,
-          status: 'cleaning',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '6',
-          restaurant_id: '1',
-          table_number: 6,
-          name: 'B03',
-          capacity: 8,
-          status: 'available',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '7',
-          restaurant_id: '1',
-          table_number: 7,
-          name: 'C01',
-          capacity: 2,
-          status: 'occupied',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '8',
-          restaurant_id: '1',
-          table_number: 8,
-          name: 'C02',
-          capacity: 6,
-          status: 'available',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '9',
-          restaurant_id: '1',
-          table_number: 9,
-          name: 'C03',
-          capacity: 4,
-          status: 'reserved',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '10',
-          restaurant_id: '1',
-          table_number: 10,
-          name: 'D01',
-          capacity: 2,
-          status: 'maintenance',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '11',
-          restaurant_id: '1',
-          table_number: 11,
-          name: 'D02',
-          capacity: 6,
-          status: 'occupied',
-          seated_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30分鐘前入座
-          customer_count: 4,
-          orderId: 'ord_001',
-          order_number: 'ORD-1733292000001',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '12',
-          restaurant_id: '1',
-          table_number: 12,
-          name: 'D03',
-          capacity: 8,
-          status: 'cleaning',
-          cleaning_started: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10分鐘前開始清潔
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ]
+      const { data, error } = await supabase
+        .from('tables')
+        .select('*')
+        .eq('restaurant_id', MOCK_RESTAURANT_ID)
+        .eq('is_active', true)
+        .order('table_number', { ascending: true })
 
-      setTimeout(() => {
-        set({ tables: mockTables, loading: false })
-      }, 300) // 模擬網路延遲
+      if (error) throw error
+
+      set({ 
+        tables: data || [],
+        loading: false
+      })
     } catch (error) {
-      set({ error: (error as Error).message, loading: false })
+      console.error('載入桌台失敗:', error)
+      set({ 
+        error: error instanceof Error ? error.message : '載入桌台失敗',
+        loading: false 
+      })
     }
   },
 

@@ -7,6 +7,7 @@ import CheckoutPage from './components/CheckoutPage'
 import SettingsPage from './components/SettingsPage'
 import MenuManagementPage from './components/MenuManagementPage'
 import { KDSPage } from './components/KDSPage'
+import DiagnosticPanel from './components/DiagnosticPanel'
 import { useThemeInitializer } from './hooks/useThemeInitializer'
 
 function App() {
@@ -24,31 +25,28 @@ function App() {
   } = usePOSStore()
 
   const [currentPage, setCurrentPage] = useState<'home' | 'ordering' | 'orders' | 'tables' | 'checkout' | 'kds' | 'settings' | 'menu'>('home')
+  const [showDiagnostic, setShowDiagnostic] = useState(false)
+
+  // 從環境變數獲取餐廳 ID
+  const restaurantId = import.meta.env.VITE_RESTAURANT_ID
 
   useEffect(() => {
-    // 模擬餐廳資料（實際應用中會從資料庫載入）
-    const mockRestaurant = {
-      id: '1',
-      name: 'TanaPOS 餐廳',
-      address: '台北市中正區',
-      phone: '02-1234-5678',
-      email: 'info@tanapos.com',
-      tax_rate: 0.1,
-      service_charge_rate: 0.1,
-      currency: 'TWD',
-      timezone: 'Asia/Taipei',
-      is_active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+    // 檢查環境變數
+    if (!restaurantId) {
+      console.error('❌ 缺少環境變數 VITE_RESTAURANT_ID')
+      return
     }
 
-    setCurrentRestaurant(mockRestaurant)
+    console.log('🏪 載入餐廳資料...', restaurantId)
+    
+    // 設定餐廳 ID 並載入真實資料
+    setCurrentRestaurant({ id: restaurantId } as any)
     
     // 載入基本資料
     loadCategories()
     loadProducts()
     loadTables()
-  }, [])
+  }, [restaurantId])
 
   if (loading) {
     return (
@@ -121,6 +119,13 @@ function App() {
                   )}
                 </div>
                 <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setShowDiagnostic(true)}
+                    className="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 transition-colors"
+                    title="系統診斷"
+                  >
+                    🔧 診斷
+                  </button>
                   <span className="text-sm text-gray-500">
                     {new Date().toLocaleDateString('zh-TW')}
                   </span>
@@ -239,6 +244,12 @@ function App() {
           </main>
         </>
       )}
+
+      {/* 診斷面板 */}
+      <DiagnosticPanel 
+        isOpen={showDiagnostic} 
+        onClose={() => setShowDiagnostic(false)} 
+      />
     </div>
   )
 }
