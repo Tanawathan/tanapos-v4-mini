@@ -3,6 +3,20 @@ import { devtools } from 'zustand/middleware'
 import { supabase } from '../lib/supabase'
 import type { Product, Category } from '../lib/types'
 
+// UUID 生成函數（兼容性處理）
+const generateUUID = (): string => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  
+  // 後備方案：生成 UUID v4 格式
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
 // 用餐方式類型
 export type DiningMode = 'dine_in' | 'takeaway'
 
@@ -72,6 +86,7 @@ interface MobileOrderStore {
   // === UI 狀態 ===
   selectedCategory: string | null
   isCartOpen: boolean
+  isOrderInfoCollapsed: boolean
   loading: boolean
   error: string | null
   
@@ -82,6 +97,8 @@ interface MobileOrderStore {
   setPartySize: (size: number) => void
   setSelectedCategory: (categoryId: string | null) => void
   toggleCart: () => void
+  toggleOrderInfoCollapse: () => void
+  checkAndAutoCollapse: () => void
   
   // === 購物車操作 ===
   addToCart: (product: Product) => void
@@ -98,6 +115,7 @@ interface MobileOrderStore {
   loadCategories: () => Promise<void>
   loadProducts: () => Promise<void>
   loadTables: () => Promise<void>
+  updateTableStatus: (tableId: string, status: string) => Promise<void>
   
   // === 外帶功能 ===
   generateTakeawayNumber: () => Promise<TakeawayInfo>
@@ -131,6 +149,7 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
       cartItems: [],
       selectedCategory: null,
       isCartOpen: false,
+      isOrderInfoCollapsed: false,
       loading: false,
       error: null,
 
@@ -173,6 +192,11 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
             tableNumber
           }
         }))
+        
+        // 檢查是否需要自動折疊
+        setTimeout(() => {
+          get().checkAndAutoCollapse()
+        }, 100)
       },
 
       setPartySize: (size) => {
@@ -192,6 +216,32 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
         set((state) => ({
           isCartOpen: !state.isCartOpen
         }))
+      },
+
+      toggleOrderInfoCollapse: () => {
+        set((state) => ({
+          isOrderInfoCollapsed: !state.isOrderInfoCollapsed
+        }))
+      },
+
+      checkAndAutoCollapse: () => {
+        const { orderContext } = get()
+        
+        // 檢查是否所有必要資訊都已填寫完畢
+        let isComplete = false
+        
+        if (orderContext.diningMode === 'dine_in') {
+          // 內用模式：需要桌號
+          isComplete = !!orderContext.tableNumber
+        } else if (orderContext.diningMode === 'takeaway') {
+          // 外帶模式：需要客戶資訊
+          isComplete = !!(orderContext.takeawayInfo?.customerName && orderContext.takeawayInfo?.customerPhone)
+        }
+        
+        // 如果資訊完整且未折疊，則自動折疊
+        if (isComplete) {
+          set({ isOrderInfoCollapsed: true })
+        }
       },
 
       // === 購物車操作 ===
@@ -335,6 +385,37 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
         }
       },
 
+      updateTableStatus: async (tableId, status) => {
+        try {
+          const now = new Date().toISOString()
+          
+          // 更新 Supabase 資料庫中的桌台狀態
+          const { error } = await supabase
+            .from('tables')
+            .update({ 
+              status,
+              updated_at: now
+            })
+            .eq('id', tableId)
+
+          if (error) throw error
+
+          // 更新本地狀態
+          set((state) => ({
+            tables: state.tables.map(table => 
+              table.id === tableId 
+                ? { ...table, status }
+                : table
+            )
+          }))
+
+          console.log(`✅ 桌台狀態已更新: ${tableId} -> ${status}`)
+        } catch (error) {
+          console.error('更新桌台狀態失敗:', error)
+          throw error
+        }
+      },
+
       // === 外帶功能 ===
       generateTakeawayNumber: async () => {
         try {
@@ -407,17 +488,25 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
             }
           }
         }))
+        
+        // 檢查是否需要自動折疊
+        setTimeout(() => {
+          get().checkAndAutoCollapse()
+        }, 100)
       },
 
       // === 桌況檢查 ===
       checkTableStatus: async (tableNumber) => {
         try {
+          // 轉換字符串桌號為數字
+          const tableNumberInt = parseInt(tableNumber, 10)
+          
           // 查詢該桌台的現有訂單
           const { data: orders, error } = await supabase
             .from('orders')
             .select('id, status, order_number')
             .eq('restaurant_id', RESTAURANT_ID)
-            .eq('table_number', tableNumber)
+            .eq('table_number', tableNumberInt)
             .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
 
           if (error) throw error
@@ -463,7 +552,7 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
 
         try {
           const pricing = calculatePrice()
-          const orderId = crypto.randomUUID()
+          const orderId = generateUUID()
           
           // 生成訂單編號
           let orderNumber: string
@@ -473,11 +562,12 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
             const timestamp = Date.now()
             if (orderContext.orderMode === 'additional') {
               // 加點訂單：查詢同桌已有訂單數量
+              const tableNumberInt = parseInt(orderContext.tableNumber!, 10)
               const { data: existingOrders } = await supabase
                 .from('orders')
                 .select('id')
                 .eq('restaurant_id', RESTAURANT_ID)
-                .eq('table_number', orderContext.tableNumber)
+                .eq('table_number', tableNumberInt)
                 .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
 
               const sequence = (existingOrders?.length || 0) + 1
@@ -493,7 +583,7 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
             order_number: orderNumber,
             restaurant_id: RESTAURANT_ID,
             order_type: orderContext.diningMode,
-            table_number: orderContext.tableNumber || null,
+            table_number: orderContext.tableNumber ? parseInt(orderContext.tableNumber, 10) : null,
             party_size: orderContext.partySize || null,
             customer_name: orderContext.takeawayInfo?.customerName || '',
             customer_phone: orderContext.takeawayInfo?.customerPhone || '',
@@ -517,7 +607,7 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
 
           // 插入訂單項目
           const orderItems = cartItems.map(item => ({
-            id: crypto.randomUUID(),
+            id: generateUUID(),
             order_id: orderId,
             product_id: item.product_id,
             product_name: item.name,
@@ -535,6 +625,26 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
             .insert(orderItems)
 
           if (itemsError) throw itemsError
+
+          // 如果是內用訂單，更新桌台狀態
+          if (orderContext.diningMode === 'dine_in' && orderContext.tableNumber) {
+            try {
+              // 找到對應的桌台 ID
+              const selectedTable = get().tables.find(
+                table => table.table_number === orderContext.tableNumber
+              )
+              
+              if (selectedTable) {
+                // 根據訂單模式決定桌台狀態
+                const newStatus = orderContext.orderMode === 'new' ? 'occupied' : selectedTable.status
+                await get().updateTableStatus(selectedTable.id, newStatus)
+                console.log(`✅ 桌台 ${orderContext.tableNumber} 狀態已更新為: ${newStatus}`)
+              }
+            } catch (tableError) {
+              console.error('更新桌台狀態失敗:', tableError)
+              // 不影響訂單提交，只記錄錯誤
+            }
+          }
 
           // 清空購物車
           clearCart()

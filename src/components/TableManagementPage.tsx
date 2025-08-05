@@ -41,12 +41,13 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     return table.status === statusFilter
   })
 
-  // 取得桌台相關的訂單
-  const getTableOrder = (tableId: string) => {
-    return orders.find(order => 
-      order.table_id === tableId && 
+  // 取得桌台相關的所有未結帳訂單
+  const getTableOrders = (tableNumber: string | number) => {
+    const tableNumberStr = String(tableNumber)
+    return orders.filter(order => 
+      String(order.table_number) === tableNumberStr && 
       ['pending', 'confirmed', 'preparing', 'ready', 'served'].includes(order.status || '')
-    )
+    ).sort((a, b) => new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime())
   }
 
   // 取得訂單的項目
@@ -333,7 +334,7 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredTables.map(table => {
-                const tableOrder = getTableOrder(table.id)
+                const tableOrders = getTableOrders(table.table_number || '')
                 
                 return (
                   <div
@@ -367,29 +368,35 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                       </div>
                       
                       {/* 訂單資訊（如果有） */}
-                      {tableOrder && (
-                        <button
-                          onClick={() => openOrderModal(tableOrder)}
-                          className="w-full bg-white bg-opacity-70 hover:bg-opacity-90 rounded-lg p-3 mb-3 text-left transition-all duration-200 hover:shadow-md border border-transparent hover:border-blue-200"
-                        >
-                          <div className="text-xs font-semibold text-gray-800 mb-1">
-                            📋 {tableOrder.order_number}
+                      {tableOrders.length > 0 && (
+                        <div className="space-y-2 mb-3">
+                          <div className="text-xs font-semibold text-gray-800 mb-2">
+                            📋 未結帳訂單 ({tableOrders.length})
                           </div>
-                          <div className="text-xs text-gray-600">
-                            總額: NT$ {(tableOrder.total_amount || 0).toLocaleString()}
+                          {tableOrders.map((order, index) => (
+                            <button
+                              key={order.id}
+                              onClick={() => openOrderModal(order)}
+                              className="w-full bg-white bg-opacity-70 hover:bg-opacity-90 rounded-lg p-2 text-left transition-all duration-200 hover:shadow-md border border-transparent hover:border-blue-200"
+                            >
+                              <div className="text-xs font-semibold text-gray-800 mb-1">
+                                {index === 0 ? '🍽️' : '➕'} {order.order_number}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                NT$ {(order.total_amount || 0).toLocaleString()} · {order.status}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {new Date(order.created_at || '').toLocaleTimeString('zh-TW', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </div>
+                            </button>
+                          ))}
+                          <div className="text-xs text-blue-600 font-medium text-center pt-1">
+                            👆 點擊訂單查看詳情
                           </div>
-                          <div className="text-xs text-gray-600">
-                            狀態: {tableOrder.status}
-                          </div>
-                          {table.last_occupied_at && (
-                            <div className="text-xs text-gray-600">
-                              最後佔用: {new Date(table.last_occupied_at).toLocaleTimeString()}
-                            </div>
-                          )}
-                          <div className="text-xs text-blue-600 font-medium mt-1">
-                            👆 點擊查看詳情
-                          </div>
-                        </button>
+                        </div>
                       )}
                       
                       {/* 管理按鈕 */}
