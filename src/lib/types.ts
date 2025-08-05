@@ -99,30 +99,49 @@ export interface ComboSelectionOption {
 
 export interface Table {
   id: string
-  restaurant_id?: string
+  restaurant_id: string
   table_number: number
   name?: string
   capacity?: number
-  status?: 'available' | 'occupied' | 'reserved' | 'cleaning' | 'maintenance'
-  qr_code?: string
+  min_capacity?: number
+  max_capacity?: number
+  
+  // 狀態管理
+  status?: 'available' | 'occupied' | 'reserved' | 'cleaning' | 'maintenance' | 'inactive'
+  
+  // 位置資訊
+  floor_level?: number
+  zone?: string
   position_x?: number
   position_y?: number
+  
+  // 桌台屬性
   table_type?: string
-  floor_plan?: string
+  features?: any // jsonb
+  
+  // QR Code 點餐
+  qr_code?: string
+  qr_enabled?: boolean
+  
+  // 智能分配
+  ai_assignment_priority?: number
+  ai_features_score?: any // jsonb
+  
+  // 狀態追蹤
+  current_session_id?: string
+  last_occupied_at?: string
+  last_cleaned_at?: string
+  cleaning_duration_minutes?: number
+  
   is_active?: boolean
   created_at?: string
   updated_at?: string
-  ai_assigned?: boolean
-  ai_assignment_reason?: string
-  customer_count?: number
-  seated_at?: string
-  estimated_duration?: number
-  // 動態屬性用於桌台管理
-  orderId?: string
+  
+  // 預留擴展欄位
+  metadata?: any // jsonb
+  
+  // 動態屬性（桌台管理頁面使用）
   order_number?: string
-  cleaning_started?: string
-  maintenance_started?: string
-  reserved_at?: string
   [key: string]: any // 允許額外的動態屬性
 }
 

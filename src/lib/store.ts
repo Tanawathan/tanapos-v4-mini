@@ -31,6 +31,7 @@ interface POSStore {
   orderItems: OrderItem[]
   orders: Order[]
   ordersLoaded: boolean
+  tablesLoaded: boolean
   
   // 載入狀態
   loading: boolean
@@ -67,7 +68,7 @@ interface POSStore {
   }) => Promise<void>
   
   // 桌況管理
-  updateTableStatus: (tableId: string, status: Table['status'], metadata?: any) => void
+  updateTableStatus: (tableId: string, status: Table['status'], metadata?: any) => Promise<void>
   createOrderWithTableUpdate: (orderData: any) => Promise<Order | null>
 }
 
@@ -84,6 +85,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   orderItems: [],
   orders: [],
   ordersLoaded: false,
+  tablesLoaded: false,
   loading: false,
   error: null,
 
@@ -163,6 +165,14 @@ export const usePOSStore = create<POSStore>((set, get) => ({
 
   // 載入桌台
   loadTables: async () => {
+    const state = get()
+    
+    // 檢查是否已經載入過，避免重複載入
+    if (state.tablesLoaded && state.tables.length > 0) {
+      console.log('✅ 桌台已載入，跳過重複載入')
+      return
+    }
+    
     set({ loading: true, error: null })
     try {
       const { data, error } = await supabase
@@ -174,8 +184,11 @@ export const usePOSStore = create<POSStore>((set, get) => ({
 
       if (error) throw error
 
+      console.log('✅ 成功載入桌台:', data?.length || 0, '筆')
+
       set({ 
         tables: data || [],
+        tablesLoaded: true,
         loading: false
       })
     } catch (error) {
@@ -605,18 +618,79 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   },
 
   // 更新桌台狀態
-  updateTableStatus: (tableId, status, metadata = {}) => {
-    set((state) => ({
-      tables: state.tables.map(table => 
-        table.id === tableId 
-          ? { 
-              ...table, 
-              status,
-              ...metadata // 可以包含訂單ID、開始時間等
-            }
-          : table
-      )
-    }))
+  updateTableStatus: async (tableId, status, metadata = {}) => {
+    set({ loading: true, error: null })
+    
+    try {
+      const now = new Date().toISOString()
+      
+      // 準備更新數據
+      const updateData: any = {
+        status,
+        updated_at: now
+      }
+      
+      // 根據狀態添加相應的時間戳和資訊
+      switch (status) {
+        case 'available':
+          updateData.last_cleaned_at = now
+          updateData.current_session_id = null
+          updateData.last_occupied_at = null
+          break
+        case 'occupied':
+          updateData.last_occupied_at = now
+          if (metadata.sessionId) {
+            updateData.current_session_id = metadata.sessionId
+          }
+          break
+        case 'cleaning':
+          updateData.last_cleaned_at = now
+          updateData.current_session_id = null
+          break
+        case 'maintenance':
+          updateData.current_session_id = null
+          break
+        case 'reserved':
+          // 預約狀態的處理
+          break
+      }
+
+      // 同步到 Supabase 數據庫
+      const { error: dbError } = await supabase
+        .from('tables')
+        .update(updateData)
+        .eq('id', tableId)
+
+      if (dbError) {
+        throw new Error(`更新桌台狀態失敗: ${dbError.message}`)
+      }
+
+      // 更新本地狀態
+      set((state) => ({
+        tables: state.tables.map(table => 
+          table.id === tableId 
+            ? { 
+                ...table, 
+                status,
+                updated_at: now,
+                ...updateData,
+                ...metadata
+              }
+            : table
+        ),
+        loading: false
+      }))
+
+      console.log(`✅ 桌台 ${tableId} 狀態已更新為 ${status}`)
+      
+    } catch (error) {
+      console.error('❌ 更新桌台狀態失敗:', error)
+      set({ 
+        error: error instanceof Error ? error.message : '更新桌台狀態失敗',
+        loading: false 
+      })
+      throw error
+    }
   },
 
   // 創建訂單並更新桌況

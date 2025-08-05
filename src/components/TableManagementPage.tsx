@@ -7,15 +7,17 @@ interface TableManagementPageProps {
 }
 
 export default function TableManagementPage({ onBack }: TableManagementPageProps) {
-  const {
-    tables,
-    orders,
-    orderItems,
-    loadTables,
-    loadOrders,
-    updateTableStatus,
-    loading
-  } = usePOSStore()
+  // 使用 selector 模式避免無限渲染
+  const tables = usePOSStore(state => state.tables)
+  const orders = usePOSStore(state => state.orders)
+  const orderItems = usePOSStore(state => state.orderItems)
+  const loading = usePOSStore(state => state.loading)
+  const error = usePOSStore(state => state.error)
+  const tablesLoaded = usePOSStore(state => state.tablesLoaded)
+  const ordersLoaded = usePOSStore(state => state.ordersLoaded)
+  const loadTables = usePOSStore(state => state.loadTables)
+  const loadOrders = usePOSStore(state => state.loadOrders)
+  const updateTableStatus = usePOSStore(state => state.updateTableStatus)
 
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [selectedTable, setSelectedTable] = useState<Table | null>(null)
@@ -24,9 +26,14 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const [showOrderModal, setShowOrderModal] = useState(false)
 
   useEffect(() => {
-    loadTables()
-    loadOrders()
-  }, [loadTables, loadOrders])
+    // 只在還沒載入過時才載入，避免無限循環
+    if (!tablesLoaded) {
+      loadTables()
+    }
+    if (!ordersLoaded) {
+      loadOrders()
+    }
+  }, []) // 移除依賴項，避免無限循環
 
   // 過濾桌台
   const filteredTables = tables.filter(table => {
@@ -114,35 +121,43 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   }
 
   // 變更桌台狀態
-  const changeTableStatus = (newStatus: string) => {
+  const changeTableStatus = async (newStatus: string) => {
     if (!selectedTable) return
 
-    const metadata: any = {}
-    
-    // 根據新狀態設定相關資訊
-    switch (newStatus) {
-      case 'available':
-        // 清空所有相關資訊
-        metadata.orderId = null
-        metadata.customer_count = null
-        metadata.seated_at = null
-        metadata.order_number = null
-        break
-      case 'cleaning':
-        metadata.cleaning_started = new Date().toISOString()
-        break
-      case 'maintenance':
-        metadata.maintenance_started = new Date().toISOString()
-        break
-      case 'reserved':
-        metadata.reserved_at = new Date().toISOString()
-        break
-    }
+    try {
+      const metadata: any = {}
+      
+      // 根據新狀態設定相關資訊
+      switch (newStatus) {
+        case 'available':
+          // 清空所有相關資訊
+          metadata.sessionId = null
+          break
+        case 'cleaning':
+          // 清潔狀態不需要額外 metadata，資料庫欄位會自動處理
+          break
+        case 'maintenance':
+          // 維護狀態不需要額外 metadata，資料庫欄位會自動處理
+          break
+        case 'reserved':
+          // 預約狀態不需要額外 metadata，資料庫欄位會自動處理
+          break
+        case 'occupied':
+          // 可以設定 session ID 如果有的話
+          if (metadata.sessionId) {
+            metadata.sessionId = metadata.sessionId
+          }
+          break
+      }
 
-    updateTableStatus(selectedTable.id, newStatus as Table['status'], metadata)
-    closeStatusModal()
-    
-    console.log(`🪑 桌台 ${selectedTable.table_number} 狀態已更新為: ${getStatusText(newStatus)}`)
+      await updateTableStatus(selectedTable.id, newStatus as Table['status'], metadata)
+      closeStatusModal()
+      
+      console.log(`🪑 桌台 ${selectedTable.table_number} 狀態已更新為: ${getStatusText(newStatus)}`)
+    } catch (error) {
+      console.error('❌ 更新桌台狀態失敗:', error)
+      // 錯誤已經在 store 中處理，這裡不需要額外處理
+    }
   }
 
   // 開啟訂單詳情模態框
@@ -191,6 +206,8 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => {
+                  // 強制重新載入
+                  usePOSStore.setState({ tablesLoaded: false, ordersLoaded: false })
                   loadTables()
                   loadOrders()
                 }}
@@ -207,6 +224,17 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* 錯誤提示 */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span className="text-red-800 font-medium">載入錯誤：{error}</span>
+            </div>
+          </div>
+        )}
         {/* 統計卡片 - 可點擊篩選 */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           <button 
@@ -353,9 +381,9 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                           <div className="text-xs text-gray-600">
                             狀態: {tableOrder.status}
                           </div>
-                          {table.seated_at && (
+                          {table.last_occupied_at && (
                             <div className="text-xs text-gray-600">
-                              入座: {new Date(table.seated_at).toLocaleTimeString()}
+                              最後佔用: {new Date(table.last_occupied_at).toLocaleTimeString()}
                             </div>
                           )}
                           <div className="text-xs text-blue-600 font-medium mt-1">

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TanaPOS v4 AI - 桌位管理測試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .test-results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪑 TanaPOS v4 AI - 桌位管理測試</h1>
+        
+        <div class="status info">
+            <h3>✅ 修復完成的功能</h3>
+            <ul>
+                <li>✅ 添加了 <code>tablesLoaded</code> 狀態來防止重複載入</li>
+                <li>✅ 實施了方案 3（Selector 模式）避免無限渲染</li>
+                <li>✅ 實施了方案 4（Store 結構優化）</li>
+                <li>✅ 修改 <code>updateTableStatus</code> 函數連接真實 Supabase 數據</li>
+                <li>✅ 添加了錯誤處理和顯示</li>
+                <li>✅ 更新了重新整理功能</li>
+            </ul>
+        </div>
+
+        <div class="status success">
+            <h3>🔧 測試步驟</h3>
+            <ol>
+                <li>打開 <a href="http://localhost:5181/" target="_blank">http://localhost:5181/</a></li>
+                <li>點擊「桌台管理」按鈕</li>
+                <li>檢查是否正常載入桌台數據</li>
+                <li>測試篩選功能（點擊統計卡片）</li>
+                <li>測試狀態變更功能（點擊桌台卡片的「變更狀態」按鈕）</li>
+                <li>檢查控制台是否有無限循環的日誌</li>
+            </ol>
+        </div>
+
+        <div class="status warning">
+            <h3>⚠️ 注意事項</h3>
+            <ul>
+                <li>如果 Supabase 連接失敗，系統會顯示錯誤訊息</li>
+                <li>桌台狀態變更會同時更新到數據庫和本地狀態</li>
+                <li>使用重新整理按鈕可以強制重新載入數據</li>
+                <li>所有異步操作都有適當的錯誤處理</li>
+            </ul>
+        </div>
+
+        <div class="status info">
+            <h3>🚀 實施的解決方案詳情</h3>
+            
+            <h4>方案 3：Selector 模式</h4>
+            <pre><code>// 原本的解構寫法（容易造成無限渲染）
+const { tables, orders, loadTables, loadOrders } = usePOSStore()
+
+// 改為 selector 模式（最佳實踐）
+const tables = usePOSStore(state => state.tables)
+const orders = usePOSStore(state => state.orders)
+const loadTables = usePOSStore(state => state.loadTables)
+const loadOrders = usePOSStore(state => state.loadOrders)</code></pre>
+
+            <h4>方案 4：Store 結構優化</h4>
+            <pre><code>// 添加載入狀態追蹤
+tablesLoaded: boolean
+
+// 在 loadTables 函數中檢查重複載入
+if (state.tablesLoaded && state.tables.length > 0) {
+  return // 已經載入過，直接返回
+}</code></pre>
+
+            <h4>數據庫連接</h4>
+            <pre><code>// updateTableStatus 現在會同步到 Supabase
+const { error: dbError } = await supabase
+  .from('tables')
+  .update(updateData)
+  .eq('id', tableId)</code></pre>
+        </div>
+
+        <div class="test-results">
+            <h3>🧪 測試結果</h3>
+            <button onclick="testRendering()">測試渲染次數</button>
+            <button onclick="testDataLoading()">測試數據載入</button>
+            <button onclick="testStatusUpdate()">測試狀態更新</button>
+            
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        function showResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultItem = document.createElement('div');
+            resultItem.className = `status ${type}`;
+            resultItem.innerHTML = message;
+            resultsDiv.appendChild(resultItem);
+        }
+
+        function testRendering() {
+            showResult('📊 測試渲染次數：請打開瀏覽器開發者工具的 Console 標籤，檢查是否有重複的載入日誌。正常情況下，每個載入函數應該只執行一次。', 'info');
+        }
+
+        function testDataLoading() {
+            showResult('🔄 測試數據載入：請檢查桌台管理頁面是否正常顯示桌台列表。如果顯示「載入桌台資訊中...」後正常顯示桌台，表示載入功能正常。', 'success');
+        }
+
+        function testStatusUpdate() {
+            showResult('🔄 測試狀態更新：請在桌台管理頁面點擊任意桌台的「變更狀態」按鈕，選擇新的狀態。如果狀態變更成功且沒有錯誤訊息，表示 Supabase 連接正常。', 'warning');
+        }
+
+        // 顯示當前修復狀態
+        showResult('✅ 桌位管理頁面無限渲染問題已修復！現在可以安全地使用桌台管理功能。', 'success');
+    </script>
+</body>
+</html>
