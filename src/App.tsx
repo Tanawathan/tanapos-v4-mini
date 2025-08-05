@@ -8,7 +8,9 @@ import SettingsPage from './components/SettingsPage'
 import MenuManagementPage from './components/MenuManagementPage'
 import { KDSPage } from './components/KDSPage'
 import DiagnosticPanel from './components/DiagnosticPanel'
+import LoginPage from './components/LoginPage'
 import { useThemeInitializer } from './hooks/useThemeInitializer'
+import { supabase } from './lib/supabase'
 
 function App() {
   // 初始化主題系統
@@ -26,16 +28,47 @@ function App() {
 
   const [currentPage, setCurrentPage] = useState<'home' | 'ordering' | 'orders' | 'tables' | 'checkout' | 'kds' | 'settings' | 'menu'>('home')
   const [showDiagnostic, setShowDiagnostic] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null) // null = 檢查中
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   // 從環境變數獲取餐廳 ID
   const restaurantId = import.meta.env.VITE_RESTAURANT_ID
 
+  // 檢查認證狀態
   useEffect(() => {
-    // 檢查環境變數
-    if (!restaurantId) {
-      console.error('❌ 缺少環境變數 VITE_RESTAURANT_ID')
-      return
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        setIsAuthenticated(true)
+        setCurrentUser(session.user)
+        console.log('✅ 用戶已認證:', session.user.email)
+      } else {
+        setIsAuthenticated(false)
+        console.log('❌ 用戶未認證')
+      }
     }
+
+    checkAuth()
+
+    // 監聽認證狀態變化
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setIsAuthenticated(true)
+        setCurrentUser(session?.user || null)
+        console.log('✅ 用戶登入:', session?.user.email)
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false)
+        setCurrentUser(null)
+        console.log('👋 用戶登出')
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    // 只有在認證後才載入資料
+    if (!isAuthenticated || !restaurantId) return
 
     console.log('🏪 載入餐廳資料...', restaurantId)
     
@@ -46,7 +79,29 @@ function App() {
     loadCategories()
     loadProducts()
     loadTables()
-  }, [restaurantId])
+  }, [isAuthenticated, restaurantId])
+
+  // 認證狀態檢查中
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-ui-secondary flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-ui-primary mb-2">
+            檢查認證狀態...
+          </h2>
+          <p className="text-ui-muted">
+            正在驗證用戶身份
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // 未認證 - 顯示登入頁面
+  if (!isAuthenticated) {
+    return <LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />
+  }
 
   if (loading) {
     return (
@@ -119,6 +174,26 @@ function App() {
                   )}
                 </div>
                 <div className="flex items-center space-x-4">
+                  {/* 用戶資訊 */}
+                  {currentUser && (
+                    <div className="text-sm text-ui-muted">
+                      👤 {currentUser.email}
+                    </div>
+                  )}
+                  
+                  {/* 登出按鈕 */}
+                  <button
+                    onClick={async () => {
+                      await supabase.auth.signOut()
+                      setIsAuthenticated(false)
+                      setCurrentUser(null)
+                    }}
+                    className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
+                    title="登出系統"
+                  >
+                    🚪 登出
+                  </button>
+                  
                   <button
                     onClick={() => setShowDiagnostic(true)}
                     className="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 transition-colors"
