@@ -1,5 +1,24 @@
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
+-- ================================
+-- TanaPOS v4 AI - 完整資料庫架構
+-- ================================
+-- 設計日期: 2025-08-05
+-- 版本: v4.0
+-- 描述: 為 TanaPOS v4 AI 智慧餐廳管理系統設計的完整資料庫架構
+-- 注意: 此檔案已被 supabase_complete.sql 取代，保留作為參考
+
+-- 重要提示: 
+-- 請使用 supabase_complete.sql 作為完整的資料庫架構檔案
+-- 該檔案包含:
+-- - 35+ 個完整資料表
+-- - 優化的索引設計
+-- - 觸發器與函數
+-- - 安全性設定
+-- - 初始測試資料
+
+-- 如需使用完整架構，請執行:
+-- psql -h your-host -d your-database -f supabase_complete.sql
+
+-- 以下為原始架構的保留版本
 
 CREATE TABLE public.ai_analysis_logs (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
