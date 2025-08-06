@@ -200,6 +200,7 @@ export interface OrderItem {
   status?: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'served' | 'cancelled'
   created_at?: string
   updated_at?: string
+  combo_selections?: OrderComboSelection[]
 }
 
 export interface OrderComboSelection {
@@ -210,6 +211,15 @@ export interface OrderComboSelection {
   quantity?: number
   additional_price?: number
   created_at?: string
+  // 關聯資料
+  combo_selection_rules?: {
+    selection_name: string
+    description?: string
+  }
+  products?: {
+    name: string
+    price: number
+  }
 }
 
 export interface Payment {

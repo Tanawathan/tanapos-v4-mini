@@ -1,0 +1,17 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="180" height="180" rx="40" fill="#3b82f6"/>
+  <!-- 簡化的 POS 圖標 -->
+  <rect x="36" y="45" width="108" height="18" rx="9" fill="white"/>
+  <rect x="36" y="72" width="108" height="9" rx="4.5" fill="white" opacity="0.8"/>
+  <rect x="36" y="90" width="72" height="9" rx="4.5" fill="white" opacity="0.6"/>
+  
+  <!-- 訂單區域 -->
+  <rect x="36" y="108" width="108" height="54" rx="8" fill="white" opacity="0.1" stroke="white" stroke-width="1"/>
+  <rect x="45" y="117" width="90" height="6" rx="3" fill="white" opacity="0.6"/>
+  <rect x="45" y="131" width="67" height="6" rx="3" fill="white" opacity="0.4"/>
+  <rect x="45" y="145" width="45" height="6" rx="3" fill="white" opacity="0.3"/>
+  
+  <!-- T 標誌 -->
+  <circle cx="126" cy="135" r="18" fill="#fbbf24"/>
+  <text x="126" y="142" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial">T</text>
+</svg>

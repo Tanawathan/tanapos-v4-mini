@@ -131,18 +131,34 @@ export interface KDSMenuItem {
   // KDS 計算欄位
   category?: MenuCategory;          // 從 products.category_id 關聯
   urgencyLevel?: UrgencyLevel;      // 基於時間計算
+  
+  // 套餐選擇資料
+  combo_selections?: KDSComboSelection[];
+  
+  // 套餐組件相關字段
+  isComboComponent?: boolean;       // 是否為套餐組件
+  parentComboId?: string;           // 父套餐訂單項目ID
+  componentIndex?: number;          // 在套餐中的組件索引
 }
 
 // 套餐選擇 (基於 order_combo_selections 表)
 export interface KDSComboSelection {
-  id: string;                    // order_combo_selections.id
-  orderItemId: string;          // order_combo_selections.order_item_id
-  ruleId: string;               // order_combo_selections.rule_id
-  selectedProductId: string;     // order_combo_selections.selected_product_id
-  quantity: number;             // order_combo_selections.quantity
-  additionalPrice: number;      // order_combo_selections.additional_price
-  productName: string;          // 從 products 表關聯
-  status: MenuItemStatus;       // 選擇項目的狀態
+  id: string;                       // order_combo_selections.id
+  order_item_id: string;           // order_combo_selections.order_item_id
+  rule_id: string;                 // order_combo_selections.rule_id
+  selected_product_id: string;     // order_combo_selections.selected_product_id
+  quantity?: number;               // order_combo_selections.quantity
+  additional_price?: number;       // order_combo_selections.additional_price
+  created_at?: string;
+  // 關聯資料
+  combo_selection_rules?: {
+    selection_name: string;
+    description?: string;
+  };
+  products?: {
+    name: string;
+    price: number;
+  };
 }
 
 // 餐點分組 (用於 KDS 顯示)

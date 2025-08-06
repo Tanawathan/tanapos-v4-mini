@@ -7,7 +7,7 @@ import type { ComboProduct, ComboSelectionRule } from '../../lib/menu-types'
 
 interface ComboRuleEditorProps {
   combo: ComboProduct
-  onSave: (rules: ComboSelectionRule[]) => void
+  onSave: (rules: ComboSelectionRule[]) => Promise<boolean>
   onCancel: () => void
 }
 
@@ -20,7 +20,6 @@ export const ComboRuleEditor: React.FC<ComboRuleEditorProps> = ({
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
 
   const menuService = MenuService.getInstance()
 
@@ -34,7 +33,7 @@ export const ComboRuleEditor: React.FC<ComboRuleEditorProps> = ({
   const loadComboRules = async () => {
     if (!combo.id) return
     
-    setIsLoading(true)
+    setIsSaving(true)
     try {
       console.log('載入套餐規則:', combo.id)
       const response = await menuService.getComboWithRules(combo.id)
@@ -50,7 +49,7 @@ export const ComboRuleEditor: React.FC<ComboRuleEditorProps> = ({
       console.error('載入規則失敗:', error)
       setRules([])
     } finally {
-      setIsLoading(false)
+      setIsSaving(false)
     }
   }
 
@@ -60,6 +59,7 @@ export const ComboRuleEditor: React.FC<ComboRuleEditorProps> = ({
       id: `temp_${Date.now()}`,
       combo_id: combo.id,
       name: '新規則',
+      description: '',
       min_selections: 1,
       max_selections: 1,
       is_required: true,
@@ -144,8 +144,13 @@ export const ComboRuleEditor: React.FC<ComboRuleEditorProps> = ({
     }
 
     setIsSaving(true)
+    setErrors([])
     try {
-      await onSave(rules)
+      console.log('準備保存規則:', rules)
+      const success = await onSave(rules)
+      if (!success) {
+        setErrors(['儲存失敗，請稍後再試'])
+      }
     } catch (error) {
       console.error('儲存規則失敗:', error)
       setErrors(['儲存失敗，請稍後再試'])

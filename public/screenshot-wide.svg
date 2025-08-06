@@ -1,0 +1,28 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="720" fill="#f9fafb"/>
+  
+  <!-- 標題欄 -->
+  <rect x="0" y="0" width="1280" height="80" fill="#3b82f6"/>
+  <text x="64" y="50" fill="white" font-size="24" font-weight="bold" font-family="Arial">TanaPOS v4 - KDS 廚房顯示系統</text>
+  
+  <!-- 三欄佈局 -->
+  <rect x="40" y="120" width="360" height="560" rx="16" fill="white" stroke="#e5e7eb" stroke-width="2"/>
+  <rect x="440" y="120" width="360" height="560" rx="16" fill="white" stroke="#e5e7eb" stroke-width="2"/>
+  <rect x="840" y="120" width="360" height="560" rx="16" fill="white" stroke="#e5e7eb" stroke-width="2"/>
+  
+  <!-- 欄位標題 -->
+  <text x="220" y="160" text-anchor="middle" fill="#1f2937" font-size="20" font-weight="bold" font-family="Arial">待處理 (7)</text>
+  <text x="620" y="160" text-anchor="middle" fill="#1f2937" font-size="20" font-weight="bold" font-family="Arial">製作中 (3)</text>
+  <text x="1020" y="160" text-anchor="middle" fill="#1f2937" font-size="20" font-weight="bold" font-family="Arial">已完成 (0)</text>
+  
+  <!-- 訂單卡片示例 -->
+  <rect x="60" y="180" width="320" height="120" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+  <text x="80" y="210" fill="#1f2937" font-size="16" font-weight="bold" font-family="Arial">訂單 #ORD-175440770610</text>
+  <text x="80" y="235" fill="#6b7280" font-size="14" font-family="Arial">桌號: T06 • 3人 • 10分鐘</text>
+  <text x="80" y="260" fill="#374151" font-size="12" font-family="Arial">牛肉麵 x1, 滷蛋 x1, 小菜 x3</text>
+  
+  <rect x="460" y="180" width="320" height="120" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="480" y="210" fill="#1f2937" font-size="16" font-weight="bold" font-family="Arial">訂單 #ORD-175440786408</text>
+  <text x="480" y="235" fill="#6b7280" font-size="14" font-family="Arial">桌號: T07 • 1人 • 15分鐘</text>
+  <text x="480" y="260" fill="#374151" font-size="12" font-family="Arial">雞肉飯 x1, 湯 x1</text>
+</svg>

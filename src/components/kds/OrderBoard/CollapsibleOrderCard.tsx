@@ -125,7 +125,7 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
   };
 
   return (
-    <div className={getCardStyle()}>
+    <div className={`${getCardStyle()} kds-order-card kds-touchable`}>
       {/* 外帶訂單特別標示 */}
       {isTakeoutOrder(order.order_number) && (
         <div className="bg-orange-100 border-b border-orange-200 px-3 py-2">
@@ -140,7 +140,7 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
       {/* 收縮狀態 */}
       {!isExpanded && (
         <div 
-          className="p-2 md:p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+          className="p-2 md:p-3 cursor-pointer hover:bg-gray-50 transition-colors kds-order-card-compact"
           onClick={() => onToggleExpand(order.id)}
           onContextMenu={(e) => {
             e.preventDefault();
@@ -160,7 +160,7 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
 
       {/* 展開狀態 */}
       {isExpanded && (
-        <div className="p-2 md:p-4">
+        <div className="p-2 md:p-4 kds-order-card-expanded">
           {/* 訂單標題 */}
           <div 
             className="flex items-center justify-between cursor-pointer mb-3 md:mb-4"
@@ -226,7 +226,7 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
               {columnType === 'pending' && (
                 <button
                   onClick={() => handleStatusChange(OrderStatus.PREPARING)}
-                  className="px-2 md:px-3 py-1 bg-blue-600 text-white text-xs md:text-sm rounded-md hover:bg-blue-700 transition-colors"
+                  className="px-2 md:px-3 py-1 bg-blue-600 text-white text-xs md:text-sm rounded-md hover:bg-blue-700 transition-colors kds-button kds-touchable"
                 >
                   開始製作
                 </button>
@@ -236,13 +236,13 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
                 <>
                   <button
                     onClick={() => handleStatusChange(OrderStatus.READY)}
-                    className="px-2 md:px-3 py-1 bg-green-600 text-white text-xs md:text-sm rounded-md hover:bg-green-700 transition-colors"
+                    className="px-2 md:px-3 py-1 bg-green-600 text-white text-xs md:text-sm rounded-md hover:bg-green-700 transition-colors kds-button kds-touchable"
                   >
                     標記完成
                   </button>
                   <button
                     onClick={() => handleStatusChange(OrderStatus.PENDING)}
-                    className="px-2 md:px-3 py-1 bg-gray-600 text-white text-xs md:text-sm rounded-md hover:bg-gray-700 transition-colors"
+                    className="px-2 md:px-3 py-1 bg-gray-600 text-white text-xs md:text-sm rounded-md hover:bg-gray-700 transition-colors kds-button kds-touchable"
                   >
                     暫停
                   </button>
@@ -252,7 +252,7 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
               {columnType === 'completed' && (
                 <button
                   onClick={() => handleStatusChange(OrderStatus.SERVED)}
-                  className="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm rounded-md hover:bg-purple-700 transition-colors"
+                  className="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm rounded-md hover:bg-purple-700 transition-colors kds-button kds-touchable"
                 >
                   已送出
                 </button>
@@ -262,13 +262,13 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
             <div className="flex items-center space-x-1 md:space-x-2 flex-wrap gap-1">
               <button
                 onClick={() => handleQuickAction('add_note')}
-                className="px-2 md:px-3 py-1 text-gray-600 text-xs md:text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-2 md:px-3 py-1 text-gray-600 text-xs md:text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors kds-button kds-touchable"
               >
                 📝 備註
               </button>
               <button
                 onClick={() => handleQuickAction('report_issue')}
-                className="px-2 md:px-3 py-1 text-gray-600 text-xs md:text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-2 md:px-3 py-1 text-gray-600 text-xs md:text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors kds-button kds-touchable"
               >
                 ⚠️ 問題
               </button>

@@ -9,14 +9,17 @@ const ProductGrid: React.FC = () => {
   const filteredProducts: MenuItem[] = React.useMemo(() => {
     let filtered = products
 
-    // 首先根據商品類型過濾
+    // 首先過濾掉暫停供應的商品
+    filtered = filtered.filter(item => item.is_available !== false)
+
+    // 然後根據商品類型過濾
     if (productFilter === 'products') {
       filtered = filtered.filter(item => item.type === 'product')
     } else if (productFilter === 'combos') {
       filtered = filtered.filter(item => item.type === 'combo')
     }
 
-    // 然後根據分類過濾
+    // 最後根據分類過濾
     if (selectedCategory) {
       filtered = filtered.filter(item => item.category_id === selectedCategory)
     }

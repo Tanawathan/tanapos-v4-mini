@@ -287,7 +287,22 @@ export const usePOSStore = create<POSStore>((set, get) => ({
         .from('order_items')
         .select(`
           *,
-          products (name, sku)
+          products (name, sku),
+          order_combo_selections (
+            id,
+            rule_id,
+            selected_product_id,
+            quantity,
+            additional_price,
+            combo_selection_rules (
+              selection_name,
+              description
+            ),
+            products:selected_product_id (
+              name,
+              price
+            )
+          )
         `)
         .in('order_id', (ordersData || []).map((order: any) => order.id))
 
@@ -308,7 +323,8 @@ export const usePOSStore = create<POSStore>((set, get) => ({
         special_instructions: item.special_instructions,
         status: item.status,
         created_at: item.created_at,
-        updated_at: item.updated_at
+        updated_at: item.updated_at,
+        combo_selections: item.order_combo_selections || []
       }))
 
       // 載入桌台資料以獲取桌台號碼

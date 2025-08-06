@@ -136,9 +136,31 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
       return
     }
 
-    // TODO: 將選擇的選項資訊包含在購物車項目中
-    console.log('套餐選項:', selectedOptions)
-    addToCart(combo)
+    // 準備套餐選擇資料
+    const comboSelections: Array<{
+      rule_id: string
+      selected_product_id: string
+      quantity?: number
+      additional_price?: number
+    }> = []
+
+    Object.entries(selectedOptions).forEach(([ruleId, selectedOptionIds]) => {
+      selectedOptionIds.forEach(optionId => {
+        const rule = comboRules.find(r => r.id === ruleId)
+        const option = rule?.options.find(o => o.id === optionId)
+        if (option && option.product_id) {
+          comboSelections.push({
+            rule_id: ruleId,
+            selected_product_id: option.product_id,
+            quantity: 1,
+            additional_price: option.additional_price || 0
+          })
+        }
+      })
+    })
+
+    console.log('套餐選項:', comboSelections)
+    addToCart(combo, comboSelections)
     onClose()
   }
 
@@ -201,7 +223,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
                         <div key={rule.id}>
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="text-sm font-medium text-gray-700">
-                              {rule.rule_name}
+                              {rule.selection_name}
                               {rule.is_required && <span className="text-red-500 ml-1">*</span>}
                             </h4>
                             <span className="text-xs text-gray-500">
@@ -233,7 +255,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
                                   <div className="flex-1">
                                     <div className="flex items-center justify-between">
                                       <span className="text-sm font-medium">
-                                        {option.option_name}
+                                        {option.product_name}
                                         {option.is_default && (
                                           <span className="ml-2 text-xs text-green-600">[預設]</span>
                                         )}

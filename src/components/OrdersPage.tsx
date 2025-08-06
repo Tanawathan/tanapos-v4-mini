@@ -386,8 +386,30 @@ const OrdersPage = memo(({ onBack }: OrdersPageProps) => {
                             <p className="text-xs text-gray-600">
                               NT$ {item.unit_price.toLocaleString()} × {item.quantity}
                             </p>
+                            
+                            {/* 套餐選擇 */}
+                            {item.combo_selections && item.combo_selections.length > 0 && (
+                              <div className="mt-2 pl-3 border-l-2 border-blue-200 bg-blue-50">
+                                <div className="text-xs font-medium text-blue-800 mb-1">套餐選擇:</div>
+                                {item.combo_selections.map((selection, index) => (
+                                  <div key={selection.id} className="text-xs text-blue-700 mb-1">
+                                    <span className="font-medium">
+                                      {selection.combo_selection_rules?.selection_name || `選擇 ${index + 1}`}:
+                                    </span>
+                                    <span className="ml-1">
+                                      {selection.products?.name || '未知商品'}
+                                      {selection.quantity && selection.quantity > 1 && ` × ${selection.quantity}`}
+                                      {selection.additional_price && selection.additional_price > 0 && 
+                                        ` (+NT$ ${selection.additional_price})`
+                                      }
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
                             {item.special_instructions && (
-                              <div className="text-xs text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded mt-1">
+                              <div className="text-xs text-orange-700 bg-orange-50 border border-orange-200 px-2 py-1 rounded mt-1">
                                 <span className="font-medium">備註:</span> {item.special_instructions}
                               </div>
                             )}

@@ -4,6 +4,7 @@ import { ComboCard } from './ComboCard'
 import { ComboModal } from './ComboModal'
 import { ComboRuleEditor } from './ComboRuleEditor'
 import { useMenuStore } from '../../stores/menuStore'
+import { MenuService } from '../../services/menuService'
 import type { ComboProduct } from '../../lib/menu-types'
 
 export const ComboManagement: React.FC = () => {
@@ -18,6 +19,8 @@ export const ComboManagement: React.FC = () => {
     updateCombo,
     deleteCombo
   } = useMenuStore()
+
+  const menuService = MenuService.getInstance()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCombo, setEditingCombo] = useState<ComboProduct | null>(null)
@@ -84,13 +87,29 @@ export const ComboManagement: React.FC = () => {
     if (!editingRulesCombo) return false
 
     try {
-      // TODO: 使用 MenuService 保存規則
       console.log('保存套餐規則:', editingRulesCombo.id, rules)
+      
+      const response = await menuService.saveComboRules(editingRulesCombo.id, rules)
+      
+      if (response.error) {
+        console.error('保存規則失敗:', response.error)
+        alert('保存規則失敗：' + response.error)
+        return false
+      }
+      
+      console.log('規則保存成功:', response.data)
+      alert('套餐規則已成功保存！')
+      
       setIsRuleEditorOpen(false)
       setEditingRulesCombo(null)
+      
+      // 重新載入套餐列表以更新資料
+      loadCombos()
+      
       return true
     } catch (error) {
       console.error('保存規則失敗:', error)
+      alert('保存規則時發生錯誤，請稍後再試')
       return false
     }
   }

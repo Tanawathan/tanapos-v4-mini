@@ -585,15 +585,20 @@ export class MenuService {
       const savedRules = []
       
       for (const rule of rules) {
+        console.log('處理規則:', rule)
+        
         // 保存或更新規則
         const ruleData = {
           combo_id: comboId,
-          rule_name: rule.name,
+          selection_name: rule.name || rule.selection_name,
+          description: rule.description || '',
           min_selections: rule.min_selections,
           max_selections: rule.max_selections,
           is_required: rule.is_required,
-          sort_order: rule.sort_order
+          display_order: rule.sort_order || rule.display_order || 0
         }
+        
+        console.log('規則資料:', ruleData)
 
         let savedRule
         if (rule.id && !rule.id.startsWith('temp_')) {
@@ -628,12 +633,12 @@ export class MenuService {
             .eq('rule_id', savedRule.id)
 
           // 新增選項
-          const optionsData = rule.options.map((option: any) => ({
+          const optionsData = rule.options.map((option: any, index: number) => ({
             rule_id: savedRule.id,
             product_id: option.product_id,
-            additional_price: option.additional_price,
-            is_default: option.is_default,
-            is_available: option.is_available
+            additional_price: option.additional_price || 0,
+            is_default: option.is_default || false,
+            sort_order: option.sort_order || index
           }))
 
           const { error: optionsError } = await supabase

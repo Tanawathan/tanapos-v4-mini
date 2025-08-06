@@ -27,18 +27,31 @@ export const OrderColumn: React.FC<OrderColumnProps> = ({
   const calculateItemSummary = () => {
     if (columnType !== 'preparing' && columnType !== 'pending') return {};
     
-    const itemSummary: { [key: string]: number } = {};
+    const itemSummary: { [key: string]: { total: number; combo: number; single: number } } = {};
     
     orders.forEach(order => {
       if (order.menuItems) {
         order.menuItems.forEach((item: KDSMenuItem) => {
-          const itemName = item.product_name;
-          const quantity = item.quantity || 1;
+          // 使用更精確的項目名稱統計
+          let itemName = item.product_name;
           
-          if (itemSummary[itemName]) {
-            itemSummary[itemName] += quantity;
+          // 如果是套餐組件，使用組件名稱進行統計
+          if (item.isComboComponent && item.combo_selections?.[0]?.products?.name) {
+            itemName = item.combo_selections[0].products.name;
+          }
+          
+          const quantity = item.quantity || 1;
+          const isCombo = item.isComboComponent || (item.combo_id && !item.isComboComponent);
+          
+          if (!itemSummary[itemName]) {
+            itemSummary[itemName] = { total: 0, combo: 0, single: 0 };
+          }
+          
+          itemSummary[itemName].total += quantity;
+          if (isCombo) {
+            itemSummary[itemName].combo += quantity;
           } else {
-            itemSummary[itemName] = quantity;
+            itemSummary[itemName].single += quantity;
           }
         });
       }
@@ -118,17 +131,53 @@ export const OrderColumn: React.FC<OrderColumnProps> = ({
             }`}>
               📊 {columnType === 'preparing' ? '製作中餐點統計' : '待處理餐點統計（備料參考）'}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-2 text-xs md:text-sm">
-              {Object.entries(itemSummary).map(([itemName, quantity]) => (
-                <div key={itemName} className="flex justify-between items-center py-1">
-                  <span className="text-gray-700 truncate mr-2">{itemName}</span>
-                  <span className={`font-semibold flex-shrink-0 ${
-                    columnType === 'preparing' 
-                      ? 'text-blue-600' 
-                      : 'text-orange-600'
-                  }`}>
-                    x{quantity}
-                  </span>
+            <div className="grid grid-cols-1 gap-1 md:gap-2 text-xs md:text-sm">
+              {Object.entries(itemSummary).map(([itemName, counts]) => (
+                <div key={itemName} className="py-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 truncate mr-2">{itemName}</span>
+                    <span className={`font-semibold flex-shrink-0 ${
+                      columnType === 'preparing' 
+                        ? 'text-blue-600' 
+                        : 'text-orange-600'
+                    }`}>
+                      x{counts.total}
+                    </span>
+                  </div>
+                  {/* 套餐/單點明細 */}
+                  {(counts.combo > 0 && counts.single > 0) && (
+                    <div className="ml-2 mt-1 text-xs text-gray-500 flex space-x-3">
+                      {counts.combo > 0 && (
+                        <span className="flex items-center">
+                          <span className="w-2 h-2 bg-purple-400 rounded-full mr-1"></span>
+                          套餐 x{counts.combo}
+                        </span>
+                      )}
+                      {counts.single > 0 && (
+                        <span className="flex items-center">
+                          <span className="w-2 h-2 bg-gray-400 rounded-full mr-1"></span>
+                          單點 x{counts.single}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {/* 只有套餐或只有單點時的簡化顯示 */}
+                  {(counts.combo > 0 && counts.single === 0) && (
+                    <div className="ml-2 mt-1 text-xs text-purple-600">
+                      <span className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-400 rounded-full mr-1"></span>
+                        全部為套餐
+                      </span>
+                    </div>
+                  )}
+                  {(counts.single > 0 && counts.combo === 0) && (
+                    <div className="ml-2 mt-1 text-xs text-gray-600">
+                      <span className="flex items-center">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full mr-1"></span>
+                        全部為單點
+                      </span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

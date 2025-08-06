@@ -154,20 +154,24 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
           <div className="flex-1">
             <div className="flex items-center space-x-2">
               <span className="font-medium text-gray-900">
-                {item.product_name}
+                {/* 如果是套餐組件，顯示簡化的名稱 */}
+                {item.isComboComponent 
+                  ? (item.combo_selections?.[0]?.products?.name || item.product_name?.split(' - ').pop() || item.product_name)
+                  : item.product_name
+                }
               </span>
               <span className="text-gray-500">x{item.quantity}</span>
               
-              {/* 套餐標識 */}
-              {item.combo_id && (
-                <span className="px-2 py-0.5 bg-purple-100 text-purple-600 text-xs rounded-full">
+              {/* 簡化的套餐標識 */}
+              {(item.isComboComponent || (item.combo_id && !item.isComboComponent)) && (
+                <span className="px-1.5 py-0.5 bg-purple-100 text-purple-600 text-xs rounded">
                   套餐
                 </span>
               )}
             </div>
 
-            {/* 特殊說明 */}
-            {item.special_instructions && (
+            {/* 特殊說明 - 對套餐組件進行簡化 */}
+            {item.special_instructions && !item.isComboComponent && (
               <p className="text-sm text-yellow-700 mt-1">
                 📝 {item.special_instructions}
               </p>

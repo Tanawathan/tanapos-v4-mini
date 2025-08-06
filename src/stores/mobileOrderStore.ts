@@ -14,9 +14,8 @@ export interface MenuItem extends Omit<Product, 'id'> {
 export interface ComboSelectionOption {
   id: string
   rule_id: string
-  option_name: string
-  option_type: 'product' | 'custom'
   product_id?: string
+  product_name: string  // 商品名稱
   additional_price: number
   is_default: boolean
   sort_order: number
@@ -26,12 +25,14 @@ export interface ComboSelectionOption {
 export interface ComboSelectionRule {
   id: string
   combo_id: string
-  rule_name: string
+  selection_name: string  // 對應資料庫 combo_selection_rules.selection_name 欄位
+  description?: string    // 對應資料庫 combo_selection_rules.description 欄位
   selection_type: 'single' | 'multiple'
   min_selections: number
   max_selections: number
   is_required: boolean
   sort_order: number
+  display_order?: number  // 對應資料庫 combo_selection_rules.display_order 欄位
   options: ComboSelectionOption[]
 }
 
@@ -67,6 +68,13 @@ export interface MobileCartItem {
   quantity: number
   special_instructions?: string
   product_id: string
+  type?: 'product' | 'combo'
+  combo_selections?: Array<{
+    rule_id: string
+    selected_product_id: string
+    quantity?: number
+    additional_price?: number
+  }>
 }
 
 // 桌台狀態類型
@@ -142,7 +150,7 @@ interface MobileOrderStore {
   closeComboSelector: () => void
   
   // === 購物車操作 ===
-  addToCart: (product: MenuItem) => void
+  addToCart: (product: MenuItem, comboSelections?: Array<{ rule_id: string; selected_product_id: string; quantity?: number; additional_price?: number }>) => void
   updateCartQuantity: (instanceId: string, quantity: number) => void
   updateCartNote: (instanceId: string, note: string) => void
   removeFromCart: (instanceId: string) => void
@@ -308,7 +316,7 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
       },
 
       // === 購物車操作 ===
-      addToCart: (product) => {
+      addToCart: (product, comboSelections) => {
         const instanceId = `${product.id}_${Date.now()}`
         const newItem: MobileCartItem = {
           id: product.id,
@@ -316,7 +324,9 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
           name: product.name,
           price: product.price,
           quantity: 1,
-          product_id: product.id
+          product_id: product.id,
+          type: product.type,
+          combo_selections: comboSelections
         }
 
         set((state) => ({
@@ -491,7 +501,7 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
             .from('combo_selection_rules')
             .select('*')
             .eq('combo_id', comboId)
-            .order('sort_order', { ascending: true })
+            .order('display_order', { ascending: true })
 
           if (rulesError) {
             console.error('載入套餐規則失敗:', rulesError)
@@ -504,7 +514,22 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
           for (const rule of rulesData || []) {
             const { data: optionsData, error: optionsError } = await supabase
               .from('combo_selection_options')
-              .select('*')
+              .select(`
+                id,
+                rule_id,
+                product_id,
+                additional_price,
+                is_default,
+                sort_order,
+                products (
+                  id,
+                  name,
+                  price,
+                  description,
+                  image_url,
+                  is_available
+                )
+              `)
               .eq('rule_id', rule.id)
               .order('sort_order', { ascending: true })
 
@@ -513,10 +538,30 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
               throw optionsError
             }
 
-            rules.push({
-              ...rule,
-              options: optionsData || []
-            })
+            // 轉換為 ComboSelectionRule 格式
+            const convertedRule: ComboSelectionRule = {
+              id: rule.id,
+              combo_id: rule.combo_id,
+              selection_name: rule.selection_name,
+              description: rule.description,
+              selection_type: rule.max_selections === 1 ? 'single' : 'multiple',
+              min_selections: rule.min_selections || 0,
+              max_selections: rule.max_selections || 1,
+              is_required: rule.is_required || false,
+              sort_order: rule.display_order || 0,
+              display_order: rule.display_order || 0,
+              options: (optionsData || []).map((option: any) => ({
+                id: option.id,
+                rule_id: option.rule_id,
+                product_id: option.product_id,
+                product_name: option.products?.name || `商品 ${option.product_id}`,
+                additional_price: option.additional_price || 0,
+                is_default: option.is_default || false,
+                sort_order: option.sort_order || 0
+              }))
+            }
+
+            rules.push(convertedRule)
           }
 
           console.log('✅ 套餐規則載入完成:', {
@@ -753,25 +798,65 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
           if (orderError) throw orderError
 
           // 插入訂單項目
-          const orderItems = cartItems.map(item => ({
-            id: generateUUID(),
-            order_id: orderId,
-            product_id: item.product_id,
-            product_name: item.name,
-            quantity: item.quantity,
-            unit_price: item.price,
-            total_price: item.price * item.quantity,
-            special_instructions: item.special_instructions || '',
-            status: 'pending',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }))
+          const orderItems = cartItems.map(item => {
+            const orderItem: any = {
+              id: generateUUID(),
+              order_id: orderId,
+              quantity: item.quantity,
+              unit_price: item.price,
+              total_price: item.price * item.quantity,
+              status: 'pending',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+
+            // 根據商品類型設置不同的欄位
+            if (item.type === 'combo') {
+              orderItem.product_id = null // 套餐不引用 products 表
+              orderItem.product_name = `[套餐] ${item.name}`
+              orderItem.special_instructions = `combo_id:${item.product_id}${item.special_instructions ? ` | ${item.special_instructions}` : ''}`
+            } else {
+              orderItem.product_id = item.product_id
+              orderItem.product_name = item.name
+              orderItem.special_instructions = item.special_instructions || ''
+            }
+
+            return orderItem
+          })
 
           const { error: itemsError } = await supabase
             .from('order_items')
             .insert(orderItems)
 
           if (itemsError) throw itemsError
+
+          // 處理套餐選擇
+          const comboSelections: any[] = []
+          cartItems.forEach((item, index) => {
+            if (item.combo_selections && item.combo_selections.length > 0) {
+              const orderItemId = orderItems[index].id
+              item.combo_selections.forEach(selection => {
+                comboSelections.push({
+                  id: generateUUID(),
+                  order_item_id: orderItemId,
+                  rule_id: selection.rule_id,
+                  selected_product_id: selection.selected_product_id,
+                  quantity: selection.quantity || 1,
+                  additional_price: selection.additional_price || 0,
+                  created_at: new Date().toISOString()
+                })
+              })
+            }
+          })
+
+          // 插入套餐選擇資料
+          if (comboSelections.length > 0) {
+            const { error: comboSelectionsError } = await supabase
+              .from('order_combo_selections')
+              .insert(comboSelections)
+
+            if (comboSelectionsError) throw comboSelectionsError
+          }
 
           // 如果是內用訂單，更新桌台狀態
           if (orderContext.diningMode === 'dine_in' && orderContext.tableNumber) {

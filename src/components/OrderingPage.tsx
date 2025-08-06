@@ -33,8 +33,11 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
 
   // 過濾產品
   const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(p => p.category_id === selectedCategory)
+    ? products.filter(p => p.is_available !== false)
+    : products.filter(p => p.category_id === selectedCategory && p.is_available !== false)
+
+  // 過濾套餐（排除暫停供應的套餐）
+  const availableComboProducts = comboProducts.filter(combo => combo.is_available !== false)
 
   // 開啟備註模態框
   const openNoteModal = (instanceId: string) => {
@@ -322,13 +325,13 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
             {viewMode === 'combos' && (
               <div className="bg-white rounded-lg shadow-sm border p-4">
                 <h3 className="text-lg font-semibold mb-4">套餐商品</h3>
-                {comboProducts.length === 0 ? (
+                {availableComboProducts.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-gray-600">暫無套餐商品</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {comboProducts.map(combo => {
+                    {availableComboProducts.map(combo => {
                       // 計算此套餐在購物車中的總數量
                       const comboQuantityInCart = cartItems
                         .filter(item => item.id === combo.id)

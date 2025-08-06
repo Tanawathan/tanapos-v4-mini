@@ -59,6 +59,7 @@ export interface ComboSelectionRule {
   id: string
   combo_id: string
   name: string  // 更改為 name 以符合實現
+  description?: string  // 新增描述字段
   min_selections: number
   max_selections: number
   is_required: boolean
@@ -76,6 +77,7 @@ export interface ComboSelectionOption {
   additional_price: number
   is_default: boolean
   is_available: boolean  // 新增 is_available 欄位
+  sort_order: number  // 新增排序字段
   created_at: string
   // 關聯資料
   product?: Product

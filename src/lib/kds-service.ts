@@ -31,6 +31,21 @@ export class KDSService {
               categories (
                 name
               )
+            ),
+            order_combo_selections (
+              id,
+              rule_id,
+              selected_product_id,
+              quantity,
+              additional_price,
+              combo_selection_rules (
+                selection_name,
+                description
+              ),
+              products:selected_product_id (
+                name,
+                price
+              )
             )
           )
         `)
@@ -63,44 +78,58 @@ export class KDSService {
    * 轉換數據庫訂單為 KDS 格式
    */
   private static transformToKDSOrder(dbOrder: any): KDSOrder {
-    // 轉換訂單項目
-    const menuItems: KDSMenuItem[] = (dbOrder.order_items || []).map((item: any) => ({
-      id: item.id,
-      order_id: item.order_id,
-      product_id: item.product_id,
-      combo_id: item.combo_id,
-      item_type: item.item_type || 'product',
-      product_name: item.product_name,
-      product_sku: item.product_sku,
-      variant_name: item.variant_name,
-      quantity: item.quantity,
-      unit_price: item.unit_price,
-      total_price: item.total_price,
-      cost_price: item.cost_price || 0,
-      status: this.mapItemStatus(item.status),
-      
-      // 時間欄位
-      ordered_at: item.ordered_at || item.created_at,
-      preparation_started_at: item.preparation_started_at,
-      ready_at: item.ready_at,
-      served_at: item.served_at,
-      estimated_prep_time: item.estimated_prep_time,
-      actual_prep_time: item.actual_prep_time,
-      
-      // 廚房管理欄位
-      special_instructions: item.special_instructions,
-      modifiers: item.modifiers,
-      kitchen_station: item.kitchen_station,
-      priority_level: item.priority_level || 1,
-      quality_checked: item.quality_checked || false,
-      
-      created_at: item.created_at,
-      updated_at: item.updated_at,
-      
-      // KDS 計算欄位
-      category: this.mapCategory(item.products?.categories?.name),
-      urgencyLevel: this.calculateUrgencyLevel(item.ordered_at || item.created_at)
-    }));
+    // 轉換訂單項目 - 支援套餐展開
+    const menuItems: KDSMenuItem[] = [];
+    
+    (dbOrder.order_items || []).forEach((item: any) => {
+      if (item.product_name?.startsWith('[套餐]') && item.order_combo_selections?.length > 0) {
+        // 套餐項目 - 展開為多個獨立組件
+        const comboItems = this.expandComboToComponents(item);
+        menuItems.push(...comboItems);
+      } else {
+        // 一般商品項目
+        menuItems.push({
+          id: item.id,
+          order_id: item.order_id,
+          product_id: item.product_id,
+          combo_id: item.combo_id,
+          item_type: item.item_type || 'product',
+          product_name: item.product_name,
+          product_sku: item.product_sku,
+          variant_name: item.variant_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          total_price: item.total_price,
+          cost_price: item.cost_price || 0,
+          status: this.mapItemStatus(item.status),
+          
+          // 時間欄位
+          ordered_at: item.ordered_at || item.created_at,
+          preparation_started_at: item.preparation_started_at,
+          ready_at: item.ready_at,
+          served_at: item.served_at,
+          estimated_prep_time: item.estimated_prep_time,
+          actual_prep_time: item.actual_prep_time,
+          
+          // 廚房管理欄位
+          special_instructions: item.special_instructions,
+          modifiers: item.modifiers,
+          kitchen_station: item.kitchen_station,
+          priority_level: item.priority_level || 1,
+          quality_checked: item.quality_checked || false,
+          
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          
+          // KDS 計算欄位
+          category: this.mapCategory(item.products?.categories?.name),
+          urgencyLevel: this.calculateUrgencyLevel(item.ordered_at || item.created_at),
+          
+          // 套餐選擇
+          combo_selections: item.order_combo_selections || []
+        });
+      }
+    });
 
     // 計算總項目數和已完成項目數
     const totalItems = menuItems.length;
@@ -168,6 +197,135 @@ export class KDSService {
       totalItems,
       completedItems
     };
+  }
+
+  /**
+   * 展開套餐為獨立的餐點組件
+   */
+  private static expandComboToComponents(comboItem: any): KDSMenuItem[] {
+    const components: KDSMenuItem[] = [];
+    const comboBaseId = comboItem.id;
+    
+    // 為每個套餐選擇創建獨立的餐點項目
+    (comboItem.order_combo_selections || []).forEach((selection: any, index: number) => {
+      const componentId = `${comboBaseId}_component_${index}`;
+      const productName = selection.products?.name || '未知商品';
+      const selectionName = selection.combo_selection_rules?.selection_name || '組件';
+      
+      // 根據商品名稱或選擇類型決定分類
+      const category = this.inferCategoryFromProduct(productName, selectionName);
+      
+      components.push({
+        id: componentId,
+        order_id: comboItem.order_id,
+        product_id: selection.selected_product_id,
+        combo_id: comboItem.combo_id,
+        item_type: 'combo_component',
+        product_name: productName, // 使用簡潔的產品名稱
+        product_sku: comboItem.product_sku,
+        variant_name: comboItem.variant_name,
+        quantity: selection.quantity || 1,
+        unit_price: selection.additional_price || 0,
+        total_price: (selection.additional_price || 0) * (selection.quantity || 1),
+        cost_price: 0,
+        status: this.mapItemStatus(comboItem.status),
+        
+        // 時間欄位
+        ordered_at: comboItem.ordered_at || comboItem.created_at,
+        preparation_started_at: comboItem.preparation_started_at,
+        ready_at: comboItem.ready_at,
+        served_at: comboItem.served_at,
+        estimated_prep_time: this.getEstimatedPrepTimeByCategory(category),
+        actual_prep_time: comboItem.actual_prep_time,
+        
+        // 廚房管理欄位
+        special_instructions: `套餐: ${selectionName}`, // 簡化的特殊說明
+        modifiers: comboItem.modifiers,
+        kitchen_station: this.getKitchenStationByCategory(category),
+        priority_level: comboItem.priority_level || 1,
+        quality_checked: false,
+        
+        created_at: comboItem.created_at,
+        updated_at: comboItem.updated_at,
+        
+        // KDS 計算欄位
+        category: category,
+        urgencyLevel: this.calculateUrgencyLevel(comboItem.ordered_at || comboItem.created_at),
+        
+        // 套餐選擇 - 包含原始套餐信息
+        combo_selections: [{
+          id: selection.id,
+          order_item_id: comboItem.id,
+          rule_id: selection.rule_id,
+          selected_product_id: selection.selected_product_id,
+          quantity: selection.quantity,
+          additional_price: selection.additional_price,
+          combo_selection_rules: selection.combo_selection_rules,
+          products: selection.products
+        }],
+        
+        // 標記為套餐組件
+        isComboComponent: true,
+        parentComboId: comboBaseId,
+        componentIndex: index
+      });
+    });
+    
+    return components;
+  }
+
+  /**
+   * 根據商品名稱和選擇類型推斷分類
+   */
+  private static inferCategoryFromProduct(productName: string, selectionName: string): MenuCategory {
+    const name = productName.toLowerCase();
+    const selection = selectionName.toLowerCase();
+    
+    // 根據選擇類型推斷
+    if (selection.includes('主餐') || selection.includes('main')) return MenuCategory.MAIN_COURSE;
+    if (selection.includes('沙拉') || selection.includes('salad') || selection.includes('前菜')) return MenuCategory.APPETIZERS;
+    if (selection.includes('飲品') || selection.includes('drink') || selection.includes('beverage')) return MenuCategory.BEVERAGES;
+    if (selection.includes('甜點') || selection.includes('dessert')) return MenuCategory.DESSERTS;
+    if (selection.includes('湯品') || selection.includes('soup')) return MenuCategory.APPETIZERS;
+    
+    // 根據商品名稱推斷
+    if (name.includes('雞') || name.includes('牛') || name.includes('豬') || name.includes('魚')) return MenuCategory.MAIN_COURSE;
+    if (name.includes('沙拉') || name.includes('湯')) return MenuCategory.APPETIZERS;
+    if (name.includes('咖啡') || name.includes('茶') || name.includes('可樂') || name.includes('果汁')) return MenuCategory.BEVERAGES;
+    if (name.includes('蛋糕') || name.includes('布丁') || name.includes('冰淇淋')) return MenuCategory.DESSERTS;
+    
+    // 預設為單點
+    return MenuCategory.A_LA_CARTE;
+  }
+
+  /**
+   * 根據分類獲取預估製作時間
+   */
+  private static getEstimatedPrepTimeByCategory(category: MenuCategory): number {
+    switch (category) {
+      case MenuCategory.APPETIZERS: return 10;
+      case MenuCategory.MAIN_COURSE: return 20;
+      case MenuCategory.BEVERAGES: return 5;
+      case MenuCategory.DESSERTS: return 8;
+      case MenuCategory.A_LA_CARTE: return 15;
+      case MenuCategory.ADDITIONAL: return 5;
+      default: return 10;
+    }
+  }
+
+  /**
+   * 根據分類獲取廚房工作站
+   */
+  private static getKitchenStationByCategory(category: MenuCategory): string {
+    switch (category) {
+      case MenuCategory.APPETIZERS: return '冷盤區';
+      case MenuCategory.MAIN_COURSE: return '熱炒區';
+      case MenuCategory.BEVERAGES: return '飲品區';
+      case MenuCategory.DESSERTS: return '甜點區';
+      case MenuCategory.A_LA_CARTE: return '綜合區';
+      case MenuCategory.ADDITIONAL: return '備餐區';
+      default: return '綜合區';
+    }
   }
 
   /**

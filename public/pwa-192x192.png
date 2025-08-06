@@ -1,0 +1,14 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="32" fill="#3b82f6"/>
+  <path d="M48 48h96v16H48V48z" fill="white"/>
+  <path d="M48 72h96v8H48v-8z" fill="white" opacity="0.8"/>
+  <path d="M48 88h64v8H48v-8z" fill="white" opacity="0.6"/>
+  
+  <rect x="48" y="112" width="96" height="64" rx="8" fill="white" opacity="0.1"/>
+  <rect x="56" y="120" width="80" height="8" rx="4" fill="white" opacity="0.6"/>
+  <rect x="56" y="136" width="60" height="8" rx="4" fill="white" opacity="0.4"/>
+  <rect x="56" y="152" width="40" height="8" rx="4" fill="white" opacity="0.3"/>
+  
+  <circle cx="144" cy="144" r="16" fill="#fbbf24"/>
+  <text x="144" y="148" text-anchor="middle" fill="white" font-size="12" font-weight="bold">T</text>
+</svg>

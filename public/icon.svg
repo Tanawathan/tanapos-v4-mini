@@ -1,0 +1,17 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="32" fill="#3b82f6"/>
+  <!-- POS 系統圖標 -->
+  <rect x="48" y="48" width="96" height="16" rx="8" fill="white"/>
+  <rect x="48" y="72" width="96" height="8" rx="4" fill="white" opacity="0.8"/>
+  <rect x="48" y="88" width="64" height="8" rx="4" fill="white" opacity="0.6"/>
+  
+  <!-- 訂單卡片 -->
+  <rect x="48" y="112" width="96" height="64" rx="8" fill="white" opacity="0.1" stroke="white" stroke-width="1"/>
+  <rect x="56" y="120" width="80" height="8" rx="4" fill="white" opacity="0.6"/>
+  <rect x="56" y="136" width="60" height="8" rx="4" fill="white" opacity="0.4"/>
+  <rect x="56" y="152" width="40" height="8" rx="4" fill="white" opacity="0.3"/>
+  
+  <!-- TanaPOS 標誌 -->
+  <circle cx="144" cy="144" r="16" fill="#fbbf24"/>
+  <text x="144" y="150" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial">T</text>
+</svg>
