@@ -375,11 +375,11 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
         const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0)
 
         if (orderContext.diningMode === 'dine_in') {
-          const serviceCharge = subtotal * 0.1 // 10% 服務費
+          // 移除自動服務費計算
           return {
             subtotal,
-            serviceCharge,
-            total: subtotal + serviceCharge
+            serviceCharge: 0,
+            total: subtotal
           }
         } else {
           const takeawayBagFee = 5 // 外帶袋費 $5

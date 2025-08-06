@@ -18,6 +18,8 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const loadTables = usePOSStore(state => state.loadTables)
   const loadOrders = usePOSStore(state => state.loadOrders)
   const updateTableStatus = usePOSStore(state => state.updateTableStatus)
+  const updateOrderStatus = usePOSStore(state => state.updateOrderStatus)
+  const processCheckout = usePOSStore(state => state.processCheckout)
 
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [selectedTable, setSelectedTable] = useState<Table | null>(null)
@@ -171,6 +173,87 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const closeOrderModal = () => {
     setSelectedOrder(null)
     setShowOrderModal(false)
+  }
+
+  // 快速結帳處理
+  const handleQuickCheckout = async (order: any, paymentMethod: string) => {
+    try {
+      const paymentData = {
+        payment_method: paymentMethod,
+        received_amount: order.total_amount || 0,
+        change_amount: 0
+      }
+
+      // 調用結帳處理
+      await processCheckout(order.table_id || '', order.id, paymentData)
+      
+      // 顯示成功訊息
+      alert(`✅ 結帳成功！\n訂單：${order.order_number}\n支付方式：${getPaymentMethodName(paymentMethod)}\n金額：NT$ ${(order.total_amount || 0).toLocaleString()}`)
+      
+      // 關閉模態框並重新載入資料
+      closeOrderModal()
+      
+      // 重新載入資料
+      usePOSStore.setState({ tablesLoaded: false, ordersLoaded: false })
+      loadTables()
+      loadOrders()
+      
+    } catch (error) {
+      console.error('快速結帳失敗:', error)
+      alert('❌ 結帳失敗，請稍後再試')
+    }
+  }
+
+  // 取得支付方式名稱
+  const getPaymentMethodName = (method: string) => {
+    const methods: { [key: string]: string } = {
+      cash: '現金',
+      mobile: '行動支付',
+      card: '信用卡'
+    }
+    return methods[method] || method
+  }
+
+  // 更新訂單狀態
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      // 確保狀態值是有效的訂單狀態
+      const validStatuses = ['pending', 'confirmed', 'preparing', 'ready', 'served', 'completed', 'cancelled']
+      if (!validStatuses.includes(newStatus)) {
+        throw new Error(`無效的狀態: ${newStatus}`)
+      }
+      
+      await updateOrderStatus(orderId, newStatus as 'pending' | 'confirmed' | 'preparing' | 'ready' | 'served' | 'completed' | 'cancelled')
+      
+      // 顯示成功訊息
+      alert(`✅ 訂單狀態已更新為：${getStatusName(newStatus)}`)
+      
+      // 重新載入資料以更新顯示
+      usePOSStore.setState({ ordersLoaded: false })
+      loadOrders()
+      
+      // 更新當前選中的訂單資料
+      if (selectedOrder) {
+        setSelectedOrder({ ...selectedOrder, status: newStatus })
+      }
+      
+    } catch (error) {
+      console.error('更新訂單狀態失敗:', error)
+      alert('❌ 更新狀態失敗，請稍後再試')
+    }
+  }
+
+  // 取得狀態名稱
+  const getStatusName = (status: string) => {
+    const statusNames: { [key: string]: string } = {
+      pending: '待確認',
+      confirmed: '已確認',
+      preparing: '製作中',
+      ready: '已完成',
+      served: '已送出',
+      completed: '已完成'
+    }
+    return statusNames[status] || status
   }
 
   // 統計資訊
@@ -627,6 +710,71 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
               <div className="bg-yellow-50 rounded-lg p-4 mb-6">
                 <h4 className="font-semibold text-gray-900 mb-2">訂單備註</h4>
                 <p className="text-gray-700">{selectedOrder.notes}</p>
+              </div>
+            )}
+
+            {/* 狀態更新區域 */}
+            <div className="bg-blue-50 rounded-lg p-4 mb-6">
+              <h4 className="font-semibold text-gray-900 mb-3">狀態更新</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {['pending', 'confirmed', 'preparing', 'ready', 'served'].map((status) => {
+                  const statusConfig = {
+                    pending: { label: '待確認', color: 'bg-gray-100 text-gray-700 hover:bg-gray-200' },
+                    confirmed: { label: '已確認', color: 'bg-blue-100 text-blue-700 hover:bg-blue-200' },
+                    preparing: { label: '製作中', color: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' },
+                    ready: { label: '已完成', color: 'bg-green-100 text-green-700 hover:bg-green-200' },
+                    served: { label: '已送出', color: 'bg-purple-100 text-purple-700 hover:bg-purple-200' }
+                  }
+                  
+                  const config = statusConfig[status as keyof typeof statusConfig]
+                  const isCurrentStatus = selectedOrder.status === status
+                  
+                  return (
+                    <button
+                      key={status}
+                      onClick={() => handleUpdateOrderStatus(selectedOrder.id, status)}
+                      disabled={isCurrentStatus}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        isCurrentStatus 
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                          : config.color
+                      }`}
+                    >
+                      {config.label}
+                      {isCurrentStatus && ' (目前)'}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* 快速結帳區域 */}
+            {['ready', 'served'].includes(selectedOrder.status) && (
+              <div className="bg-green-50 rounded-lg p-4 mb-6 border border-green-200">
+                <h4 className="font-semibold text-gray-900 mb-3">💰 快速結帳</h4>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'cash', name: '現金', icon: '💵', color: 'bg-green-600 hover:bg-green-700' },
+                      { id: 'mobile', name: '行動支付', icon: '📱', color: 'bg-blue-600 hover:bg-blue-700' },
+                      { id: 'card', name: '信用卡', icon: '💳', color: 'bg-purple-600 hover:bg-purple-700' }
+                    ].map((method) => (
+                      <button
+                        key={method.id}
+                        onClick={() => handleQuickCheckout(selectedOrder, method.id)}
+                        className={`px-3 py-2 ${method.color} text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-1`}
+                      >
+                        <span>{method.icon}</span>
+                        <span>{method.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="text-center text-sm text-gray-600">
+                    總金額: <span className="font-semibold text-lg text-green-600">
+                      NT$ {(selectedOrder.total_amount || 0).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
               </div>
             )}
 
