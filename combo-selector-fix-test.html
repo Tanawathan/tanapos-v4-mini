@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>套餐選擇器測試</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function ComboSelectorTest() {
+            return (
+                <div className="min-h-screen bg-gray-50 p-8">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                            <h1 className="text-3xl font-bold text-gray-900 mb-6">🎯 套餐選擇器功能修復完成</h1>
+                            
+                            <div className="mb-8">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-4">✅ 修復內容</h2>
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                                        <h3 className="font-semibold text-green-800 mb-2">1. 新增 ProductSelector 組件</h3>
+                                        <ul className="text-sm text-green-700 space-y-1">
+                                            <li>• 產品搜尋功能</li>
+                                            <li>• 分類篩選功能</li>
+                                            <li>• 產品詳細資訊展示</li>
+                                            <li>• 響應式彈窗設計</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <h3 className="font-semibold text-blue-800 mb-2">2. 新增 OptionEditor 組件</h3>
+                                        <ul className="text-sm text-blue-700 space-y-1">
+                                            <li>• 產品選擇界面</li>
+                                            <li>• 價格調整功能</li>
+                                            <li>• 預設選項設定</li>
+                                            <li>• 可用性控制</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                                        <h3 className="font-semibold text-orange-800 mb-2">3. 更新 RuleSection 組件</h3>
+                                        <ul className="text-sm text-orange-700 space-y-1">
+                                            <li>• 整合 OptionEditor 組件</li>
+                                            <li>• 改善選項管理流程</li>
+                                            <li>• 修正選項更新邏輯</li>
+                                            <li>• 優化用戶體驗</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mb-8">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-4">🔧 功能特色</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="p-4 border border-gray-200 rounded-lg">
+                                        <h4 className="font-medium text-gray-900 mb-2">智能產品搜尋</h4>
+                                        <p className="text-sm text-gray-600">支援產品名稱和描述搜尋，快速找到需要的商品</p>
+                                    </div>
+                                    
+                                    <div className="p-4 border border-gray-200 rounded-lg">
+                                        <h4 className="font-medium text-gray-900 mb-2">分類篩選</h4>
+                                        <p className="text-sm text-gray-600">按分類篩選產品，提升選擇效率</p>
+                                    </div>
+                                    
+                                    <div className="p-4 border border-gray-200 rounded-lg">
+                                        <h4 className="font-medium text-gray-900 mb-2">價格調整</h4>
+                                        <p className="text-sm text-gray-600">靈活設定各選項的加價或折扣</p>
+                                    </div>
+                                    
+                                    <div className="p-4 border border-gray-200 rounded-lg">
+                                        <h4 className="font-medium text-gray-900 mb-2">預設選項</h4>
+                                        <p className="text-sm text-gray-600">設定預設選項，提升用戶體驗</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mb-8">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-4">📋 使用流程</h2>
+                                <div className="space-y-3">
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-6 h-6 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                                        <div>
+                                            <h4 className="font-medium">進入套餐規則編輯</h4>
+                                            <p className="text-sm text-gray-600">在套餐管理頁面點擊「編輯規則」</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-6 h-6 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                                        <div>
+                                            <h4 className="font-medium">新增選擇規則</h4>
+                                            <p className="text-sm text-gray-600">設定規則名稱、選擇數量等基本資訊</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-6 h-6 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                                        <div>
+                                            <h4 className="font-medium">新增商品選項</h4>
+                                            <p className="text-sm text-gray-600 font-semibold text-green-600">✅ 現在會彈出產品選擇器！</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-6 h-6 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</div>
+                                        <div>
+                                            <h4 className="font-medium">選擇產品並設定價格</h4>
+                                            <p className="text-sm text-gray-600">從產品列表中選擇商品，設定加價或折扣</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-6 h-6 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">5</div>
+                                        <div>
+                                            <h4 className="font-medium">保存設定</h4>
+                                            <p className="text-sm text-gray-600">完成所有設定後保存套餐規則</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="text-center mb-8">
+                                <a
+                                    href="http://localhost:5195/"
+                                    target="_blank"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors"
+                                >
+                                    🚀 立即測試套餐管理功能
+                                </a>
+                            </div>
+
+                            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                                <h3 className="font-semibold text-green-800 mb-2">🎉 問題解決</h3>
+                                <p className="text-green-700">
+                                    <strong>原問題</strong>：「套餐選擇器在設定時新增選項沒有跳出可選的產品，導致無法正確設定」
+                                </p>
+                                <p className="text-green-700 mt-2">
+                                    <strong>解決方案</strong>：創建了完整的產品選擇器系統，包含搜尋、篩選和詳細設定功能，
+                                    現在新增選項時會自動彈出產品選擇界面，用戶可以輕鬆選擇商品並完成設定。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+
+        ReactDOM.render(<ComboSelectorTest />, document.getElementById('root'))
+    </script>
+</body>
+</html>

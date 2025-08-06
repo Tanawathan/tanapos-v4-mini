@@ -1,14 +1,44 @@
 import React from 'react'
-import { useMobileOrderStore } from '../../stores/mobileOrderStore'
+import { useMobileOrderStore, type MenuItem } from '../../stores/mobileOrderStore'
 import ProductCard from './ProductCard'
 
 const ProductGrid: React.FC = () => {
-  const { products, selectedCategory, loading } = useMobileOrderStore()
+  const { products, selectedCategory, productFilter, loading } = useMobileOrderStore()
 
-  // 根據選擇的分類過濾商品
-  const filteredProducts = selectedCategory
-    ? products.filter(product => product.category_id === selectedCategory)
-    : products
+  // 根據選擇的商品類型和分類過濾商品
+  const filteredProducts: MenuItem[] = React.useMemo(() => {
+    let filtered = products
+
+    // 首先根據商品類型過濾
+    if (productFilter === 'products') {
+      filtered = filtered.filter(item => item.type === 'product')
+    } else if (productFilter === 'combos') {
+      filtered = filtered.filter(item => item.type === 'combo')
+    }
+
+    // 然後根據分類過濾
+    if (selectedCategory) {
+      filtered = filtered.filter(item => item.category_id === selectedCategory)
+    }
+
+    return filtered
+  }, [products, selectedCategory, productFilter])
+
+  // 調試用：顯示載入的資料統計
+  React.useEffect(() => {
+    if (products.length > 0) {
+      const productCount = products.filter(item => item.type === 'product').length
+      const comboCount = products.filter(item => item.type === 'combo').length
+      console.log('📋 ProductGrid 資料統計:', {
+        總數: products.length,
+        產品數: productCount,
+        套餐數: comboCount,
+        當前商品類型過濾: productFilter,
+        當前分類: selectedCategory,
+        過濾後數量: filteredProducts.length
+      })
+    }
+  }, [products, selectedCategory, productFilter, filteredProducts.length])
 
   if (loading) {
     return (
@@ -37,14 +67,22 @@ const ProductGrid: React.FC = () => {
         <p className="text-gray-500 text-sm mt-2">
           {selectedCategory ? '該分類下暫無商品' : '請先載入商品資料'}
         </p>
+        {/* 調試資訊 */}
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg text-left text-xs">
+          <p>調試資訊:</p>
+          <p>總商品數: {products.length}</p>
+          <p>商品類型過濾: {productFilter}</p>
+          <p>選擇分類: {selectedCategory || '無'}</p>
+          <p>商品類型分布: {products.map(p => p.type).join(', ')}</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="grid grid-cols-1 gap-4">
-      {filteredProducts.map((product) => (
-        <ProductCard key={product.id} product={product} />
+      {filteredProducts.map((item) => (
+        <ProductCard key={item.id} product={item} />
       ))}
     </div>
   )

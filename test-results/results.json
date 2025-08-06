@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "C:\\TanaPOS\\tanapos-v4-ai\\playwright.config.ts",
-    "rootDir": "C:/TanaPOS/tanapos-v4-ai/tests",
+    "configFile": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\playwright.config.ts",
+    "rootDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/tests",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": null,
@@ -37,7 +37,7 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "C:/TanaPOS/tanapos-v4-ai/test-results",
+        "outputDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/test-results",
         "repeatEach": 1,
         "retries": 1,
         "metadata": {
@@ -45,7 +45,7 @@
         },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "C:/TanaPOS/tanapos-v4-ai/tests",
+        "testDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -53,7 +53,7 @@
         "timeout": 30000
       },
       {
-        "outputDir": "C:/TanaPOS/tanapos-v4-ai/test-results",
+        "outputDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/test-results",
         "repeatEach": 1,
         "retries": 1,
         "metadata": {
@@ -61,7 +61,7 @@
         },
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
-        "testDir": "C:/TanaPOS/tanapos-v4-ai/tests",
+        "testDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -83,21 +83,21 @@
   },
   "suites": [
     {
-      "title": "final-verification.test.ts",
-      "file": "final-verification.test.ts",
+      "title": "table-management.test.ts",
+      "file": "table-management.test.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "TanaPOS V4-AI 最終功能驗證",
-          "file": "final-verification.test.ts",
+          "title": "TanaPOS V4-AI 桌台管理系統",
+          "file": "table-management.test.ts",
           "line": 3,
           "column": 6,
           "specs": [
             {
-              "title": "V4-AI 系統基本功能完整驗證",
-              "ok": true,
+              "title": "桌台狀態循環測試 - Available → Seated → Dining → Payment-Pending → Cleaning → Available",
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -110,76 +110,529 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 11330,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🎯 開始V4-AI系統完整驗證...\n"
+                      "status": "failed",
+                      "duration": 14908,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
+                        "location": {
+                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                          "column": 33,
+                          "line": 11
                         },
+                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
                         {
-                          "text": "✅ 頁面標題驗證通過\n"
-                        },
-                        {
-                          "text": "✅ \"開始點餐\" 按鈕存在且可見\n"
-                        },
-                        {
-                          "text": "✅ \"訂單管理\" 按鈕存在且可見\n"
-                        },
-                        {
-                          "text": "✅ \"桌台管理\" 按鈕存在且可見\n"
-                        },
-                        {
-                          "text": "✅ \"結帳管理\" 按鈕存在且可見\n"
-                        },
-                        {
-                          "text": "🪑 測試桌台管理功能...\n"
-                        },
-                        {
-                          "text": "✅ 桌台管理頁面導航成功\n"
-                        },
-                        {
-                          "text": "✅ 返回首頁功能正常\n"
-                        },
-                        {
-                          "text": "🍽️ 測試點餐功能...\n"
-                        },
-                        {
-                          "text": "✅ 點餐功能導航成功\n"
-                        },
-                        {
-                          "text": "📋 測試訂單管理功能...\n"
-                        },
-                        {
-                          "text": "✅ 訂單管理功能導航成功\n"
-                        },
-                        {
-                          "text": "💰 測試結帳管理功能...\n"
-                        },
-                        {
-                          "text": "✅ 結帳管理功能導航成功\n"
-                        },
-                        {
-                          "text": "🎉 V4-AI系統功能驗證完成！\n"
+                          "location": {
+                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                            "column": 33,
+                            "line": 11
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
                         }
                       ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-04T13:32:32.932Z",
+                      "startTime": "2025-08-06T04:17:31.452Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                        "column": 33,
+                        "line": 11
+                      }
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12203,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
+                        "location": {
+                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                          "column": 33,
+                          "line": 11
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                            "column": 33,
+                            "line": 11
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-08-06T04:17:47.608Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                        "column": 33,
+                        "line": 11
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
-              "id": "e0250d0dee710422cbc1-b6b1288e5fbde9238861",
-              "file": "final-verification.test.ts",
-              "line": 9,
+              "id": "e03735c7ff441e4e5f70-f82ad8e2a3061bfaa741",
+              "file": "table-management.test.ts",
+              "line": 17,
               "column": 3
             },
             {
-              "title": "V4-AI 響應式設計測試",
+              "title": "桌台篩選功能測試",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11958,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
+                        "location": {
+                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                          "column": 33,
+                          "line": 11
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                            "column": 33,
+                            "line": 11
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-06T04:18:00.874Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                        "column": 33,
+                        "line": 11
+                      }
+                    },
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12239,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
+                        "location": {
+                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                          "column": 33,
+                          "line": 11
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                            "column": 33,
+                            "line": 11
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-08-06T04:18:13.706Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                        "column": 33,
+                        "line": 11
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e03735c7ff441e4e5f70-741ff0597cc211f25abf",
+              "file": "table-management.test.ts",
+              "line": 111,
+              "column": 3
+            },
+            {
+              "title": "桌台容量與分配測試",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12008,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
+                        "location": {
+                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                          "column": 33,
+                          "line": 11
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                            "column": 33,
+                            "line": 11
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-06T04:18:27.073Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                        "column": 33,
+                        "line": 11
+                      }
+                    },
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12283,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
+                        "location": {
+                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                          "column": 33,
+                          "line": 11
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                            "column": 33,
+                            "line": 11
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-08-06T04:18:39.956Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                        "column": 33,
+                        "line": 11
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e03735c7ff441e4e5f70-f9899029c967db1e2801",
+              "file": "table-management.test.ts",
+              "line": 145,
+              "column": 3
+            },
+            {
+              "title": "桌台資訊顯示測試",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12092,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
+                        "location": {
+                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                          "column": 33,
+                          "line": 11
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                            "column": 33,
+                            "line": 11
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-06T04:18:53.344Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                        "column": 33,
+                        "line": 11
+                      }
+                    },
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12494,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
+                        "location": {
+                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                          "column": 33,
+                          "line": 11
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                            "column": 33,
+                            "line": 11
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-08-06T04:19:06.327Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium-retry1\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium-retry1\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium-retry1\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
+                        "column": 33,
+                        "line": 11
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e03735c7ff441e4e5f70-8555be11fd77907113b1",
+              "file": "table-management.test.ts",
+              "line": 173,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "TanaPOS V4-AI 響應式設計測試",
+          "file": "table-management.test.ts",
+          "line": 208,
+          "column": 6,
+          "specs": [
+            {
+              "title": "移動設備桌台管理測試",
               "ok": true,
               "tags": [],
               "tests": [
@@ -191,31 +644,25 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 8,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4121,
+                      "duration": 2074,
                       "errors": [],
                       "stdout": [
                         {
-                          "text": "📱 開始響應式設計測試...\n"
+                          "text": "開始測試移動設備桌台管理...\n"
                         },
                         {
-                          "text": "✅ 桌面版 (1280x720): 發現 2 個主要按鈕\n"
+                          "text": "移動設備上顯示 0 個桌台\n"
                         },
                         {
-                          "text": "✅ 平板版 (768x1024): 發現 2 個主要按鈕\n"
-                        },
-                        {
-                          "text": "✅ 手機版 (375x667): 發現 2 個主要按鈕\n"
-                        },
-                        {
-                          "text": "✅ 響應式設計測試通過\n"
+                          "text": "🎉 移動設備測試完成！\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-04T13:32:44.676Z",
+                      "startTime": "2025-08-06T04:19:19.911Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -223,284 +670,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "e0250d0dee710422cbc1-d22f6c309521a8944736",
-              "file": "final-verification.test.ts",
-              "line": 90,
-              "column": 3
-            },
-            {
-              "title": "V4-AI 系統穩定性測試",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 13221,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🛡️ 開始系統穩定性測試...\n"
-                        },
-                        {
-                          "text": "🔄 測試 桌台管理 功能...\n"
-                        },
-                        {
-                          "text": "✅ 桌台管理 導航完成\n"
-                        },
-                        {
-                          "text": "🔄 測試 開始點餐 功能...\n"
-                        },
-                        {
-                          "text": "✅ 開始點餐 導航完成\n"
-                        },
-                        {
-                          "text": "🔄 測試 訂單管理 功能...\n"
-                        },
-                        {
-                          "text": "✅ 訂單管理 導航完成\n"
-                        },
-                        {
-                          "text": "🔄 測試 結帳管理 功能...\n"
-                        },
-                        {
-                          "text": "✅ 結帳管理 導航完成\n"
-                        },
-                        {
-                          "text": "📊 控制台錯誤統計: 總計 0 個，嚴重錯誤 0 個\n"
-                        },
-                        {
-                          "text": "✅ 未發現嚴重系統錯誤\n"
-                        },
-                        {
-                          "text": "✅ 系統穩定性測試通過\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-04T13:32:48.809Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e0250d0dee710422cbc1-c5f0e62dac9c1fcd5dd9",
-              "file": "final-verification.test.ts",
-              "line": 123,
-              "column": 3
-            },
-            {
-              "title": "V4-AI 系統基本功能完整驗證",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 10985,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🎯 開始V4-AI系統完整驗證...\n"
-                        },
-                        {
-                          "text": "✅ 頁面標題驗證通過\n"
-                        },
-                        {
-                          "text": "✅ \"開始點餐\" 按鈕存在且可見\n"
-                        },
-                        {
-                          "text": "✅ \"訂單管理\" 按鈕存在且可見\n"
-                        },
-                        {
-                          "text": "✅ \"桌台管理\" 按鈕存在且可見\n"
-                        },
-                        {
-                          "text": "✅ \"結帳管理\" 按鈕存在且可見\n"
-                        },
-                        {
-                          "text": "🪑 測試桌台管理功能...\n"
-                        },
-                        {
-                          "text": "✅ 桌台管理頁面導航成功\n"
-                        },
-                        {
-                          "text": "✅ 返回首頁功能正常\n"
-                        },
-                        {
-                          "text": "🍽️ 測試點餐功能...\n"
-                        },
-                        {
-                          "text": "✅ 點餐功能導航成功\n"
-                        },
-                        {
-                          "text": "📋 測試訂單管理功能...\n"
-                        },
-                        {
-                          "text": "✅ 訂單管理功能導航成功\n"
-                        },
-                        {
-                          "text": "💰 測試結帳管理功能...\n"
-                        },
-                        {
-                          "text": "✅ 結帳管理功能導航成功\n"
-                        },
-                        {
-                          "text": "🎉 V4-AI系統功能驗證完成！\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-04T13:33:04.541Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e0250d0dee710422cbc1-6b27d07dbbfb9830da2b",
-              "file": "final-verification.test.ts",
-              "line": 9,
-              "column": 3
-            },
-            {
-              "title": "V4-AI 響應式設計測試",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4335,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "📱 開始響應式設計測試...\n"
-                        },
-                        {
-                          "text": "✅ 桌面版 (1280x720): 發現 2 個主要按鈕\n"
-                        },
-                        {
-                          "text": "✅ 平板版 (768x1024): 發現 2 個主要按鈕\n"
-                        },
-                        {
-                          "text": "✅ 手機版 (375x667): 發現 2 個主要按鈕\n"
-                        },
-                        {
-                          "text": "✅ 響應式設計測試通過\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-04T13:33:15.934Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e0250d0dee710422cbc1-394f843314543585f274",
-              "file": "final-verification.test.ts",
-              "line": 90,
-              "column": 3
-            },
-            {
-              "title": "V4-AI 系統穩定性測試",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 13315,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🛡️ 開始系統穩定性測試...\n"
-                        },
-                        {
-                          "text": "🔄 測試 桌台管理 功能...\n"
-                        },
-                        {
-                          "text": "✅ 桌台管理 導航完成\n"
-                        },
-                        {
-                          "text": "🔄 測試 開始點餐 功能...\n"
-                        },
-                        {
-                          "text": "✅ 開始點餐 導航完成\n"
-                        },
-                        {
-                          "text": "🔄 測試 訂單管理 功能...\n"
-                        },
-                        {
-                          "text": "✅ 訂單管理 導航完成\n"
-                        },
-                        {
-                          "text": "🔄 測試 結帳管理 功能...\n"
-                        },
-                        {
-                          "text": "✅ 結帳管理 導航完成\n"
-                        },
-                        {
-                          "text": "📊 控制台錯誤統計: 總計 0 個，嚴重錯誤 0 個\n"
-                        },
-                        {
-                          "text": "✅ 未發現嚴重系統錯誤\n"
-                        },
-                        {
-                          "text": "✅ 系統穩定性測試通過\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-04T13:33:20.278Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e0250d0dee710422cbc1-81fcb844860ee543feea",
-              "file": "final-verification.test.ts",
-              "line": 123,
+              "id": "e03735c7ff441e4e5f70-32b93d722b6d689986f5",
+              "file": "table-management.test.ts",
+              "line": 209,
               "column": 3
             }
           ]
@@ -510,11 +682,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-08-04T13:32:30.127Z",
-    "duration": 63856.100000000006,
-    "expected": 6,
+    "startTime": "2025-08-06T04:17:30.567Z",
+    "duration": 111604.454,
+    "expected": 1,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 4,
     "flaky": 0
   }
 }

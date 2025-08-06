@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Plus, Search, Filter, ChefHat, Package, Clock, Utensils } from 'lucide-react'
 import { ComboCard } from './ComboCard'
 import { ComboModal } from './ComboModal'
+import { ComboRuleEditor } from './ComboRuleEditor'
 import { useMenuStore } from '../../stores/menuStore'
 import type { ComboProduct } from '../../lib/menu-types'
 
@@ -20,6 +21,8 @@ export const ComboManagement: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCombo, setEditingCombo] = useState<ComboProduct | null>(null)
+  const [isRuleEditorOpen, setIsRuleEditorOpen] = useState(false)
+  const [editingRulesCombo, setEditingRulesCombo] = useState<ComboProduct | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategory, setFilterCategory] = useState<string>('')
   const [filterType, setFilterType] = useState<string>('')
@@ -64,6 +67,38 @@ export const ComboManagement: React.FC = () => {
   const handleEditCombo = (combo: ComboProduct) => {
     setEditingCombo(combo)
     setIsModalOpen(true)
+  }
+
+  // 處理編輯套餐規則
+  const handleEditRules = (combo: ComboProduct) => {
+    if (combo.combo_type !== 'selectable') {
+      alert('只有自選套餐需要設定選擇規則')
+      return
+    }
+    setEditingRulesCombo(combo)
+    setIsRuleEditorOpen(true)
+  }
+
+  // 處理規則保存
+  const handleSaveRules = async (rules: any[]) => {
+    if (!editingRulesCombo) return false
+
+    try {
+      // TODO: 使用 MenuService 保存規則
+      console.log('保存套餐規則:', editingRulesCombo.id, rules)
+      setIsRuleEditorOpen(false)
+      setEditingRulesCombo(null)
+      return true
+    } catch (error) {
+      console.error('保存規則失敗:', error)
+      return false
+    }
+  }
+
+  // 取消規則編輯
+  const handleCancelRuleEdit = () => {
+    setIsRuleEditorOpen(false)
+    setEditingRulesCombo(null)
   }
 
   // 處理刪除套餐
@@ -137,8 +172,17 @@ export const ComboManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 頁面標題與操作 */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* 如果在規則編輯模式，顯示規則編輯器 */}
+      {isRuleEditorOpen && editingRulesCombo ? (
+        <ComboRuleEditor
+          combo={editingRulesCombo}
+          onSave={handleSaveRules}
+          onCancel={handleCancelRuleEdit}
+        />
+      ) : (
+        <>
+          {/* 頁面標題與操作 */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-orange-100 rounded-lg">
             <ChefHat className="w-6 h-6 text-orange-600" />
@@ -291,6 +335,7 @@ export const ComboManagement: React.FC = () => {
                 combo={combo}
                 categories={categories}
                 onEdit={handleEditCombo}
+                onEditRules={handleEditRules}
                 onDelete={handleDeleteCombo}
                 onToggleAvailability={handleToggleAvailability}
               />
@@ -329,6 +374,8 @@ export const ComboManagement: React.FC = () => {
         combo={editingCombo}
         categories={categories}
       />
+      </>
+      )}
     </div>
   )
 }

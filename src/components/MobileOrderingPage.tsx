@@ -5,6 +5,7 @@ import ProductCategoryTabs from './mobile/ProductCategoryTabs'
 import ProductGrid from './mobile/ProductGrid'
 import FloatingCart from './mobile/FloatingCart'
 import CartModal from './mobile/CartModal'
+import ComboSelectorModal from './mobile/ComboSelectorModal'
 
 interface MobileOrderingPageProps {
   onBack?: () => void
@@ -17,7 +18,10 @@ const MobileOrderingPage: React.FC<MobileOrderingPageProps> = ({ onBack }) => {
     loadCategories,
     loadProducts,
     loadTables,
-    clearError
+    clearError,
+    isComboSelectorOpen,
+    selectedComboForSelection,
+    closeComboSelector
   } = useMobileOrderStore()
 
   // 初始化資料載入
@@ -112,6 +116,13 @@ const MobileOrderingPage: React.FC<MobileOrderingPageProps> = ({ onBack }) => {
 
       {/* 購物車彈窗 */}
       <CartModal />
+
+      {/* 套餐選擇器彈窗 */}
+      <ComboSelectorModal
+        combo={selectedComboForSelection}
+        isOpen={isComboSelectorOpen}
+        onClose={closeComboSelector}
+      />
     </div>
   )
 }

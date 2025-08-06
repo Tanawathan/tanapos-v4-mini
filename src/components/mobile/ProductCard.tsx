@@ -1,16 +1,22 @@
 import React from 'react'
-import { useMobileOrderStore } from '../../stores/mobileOrderStore'
-import type { Product } from '../../lib/types'
+import { useMobileOrderStore, type MenuItem } from '../../stores/mobileOrderStore'
 
 interface ProductCardProps {
-  product: Product
+  product: MenuItem
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart } = useMobileOrderStore()
+  const { addToCart, openComboSelector } = useMobileOrderStore()
 
   const handleAddToCart = () => {
-    addToCart(product)
+    // 檢查是否為可選擇的套餐
+    if (product.type === 'combo' && product.combo_type === 'selectable') {
+      // 打開套餐選擇器
+      openComboSelector(product)
+    } else {
+      // 直接加入購物車（普通產品或固定套餐）
+      addToCart(product)
+    }
   }
 
   return (
@@ -37,11 +43,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* 商品資訊 */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
-            {product.name}
-          </h3>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-lg font-semibold text-gray-800 truncate">
+              {product.name}
+            </h3>
+            {/* 套餐標識 */}
+            {product.type === 'combo' && (
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                🍱 套餐
+              </span>
+            )}
+          </div>
           <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-            {product.description || '經典美味料理'}
+            {product.description || (product.type === 'combo' ? '精選套餐組合' : '經典美味料理')}
           </p>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -53,7 +67,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               onClick={handleAddToCart}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors min-w-[80px] active:scale-95"
             >
-              + 加入
+              {product.type === 'combo' && product.combo_type === 'selectable' 
+                ? '選擇' 
+                : '+ 加入'
+              }
             </button>
           </div>
         </div>

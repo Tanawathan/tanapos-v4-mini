@@ -140,7 +140,7 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
       {/* 收縮狀態 */}
       {!isExpanded && (
         <div 
-          className="p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+          className="p-2 md:p-3 cursor-pointer hover:bg-gray-50 transition-colors"
           onClick={() => onToggleExpand(order.id)}
           onContextMenu={(e) => {
             e.preventDefault();
@@ -160,39 +160,39 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
 
       {/* 展開狀態 */}
       {isExpanded && (
-        <div className="p-4">
+        <div className="p-2 md:p-4">
           {/* 訂單標題 */}
           <div 
-            className="flex items-center justify-between cursor-pointer mb-4"
+            className="flex items-center justify-between cursor-pointer mb-3 md:mb-4"
             onClick={() => onToggleExpand(order.id)}
           >
-            <div className="flex items-center space-x-3">
-              <span className="text-lg">🏷️</span>
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <span className="text-base md:text-lg">🏷️</span>
               <div>
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-gray-900 text-sm md:text-base">
                   訂單 #{order.order_number}
                 </h3>
-                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <div className="flex items-center space-x-1 md:space-x-2 text-xs md:text-sm text-gray-500">
                   <span>桌號: T{order.table_number?.toString().padStart(2, '0')}</span>
                   <span>⏰ {formatDuration(calculateOrderDuration(order.created_at))}</span>
                   <span>👥 {order.party_size || 0}人</span>
                 </div>
               </div>
             </div>
-            <button className="text-gray-400 hover:text-gray-600">
+            <button className="text-gray-400 hover:text-gray-600 text-sm md:text-base">
               ▲
             </button>
           </div>
 
           {/* 進度條 */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+          <div className="mb-3 md:mb-4">
+            <div className="flex items-center justify-between text-xs md:text-sm text-gray-600 mb-2">
               <span>製作進度 {completedItems}/{totalItems}</span>
               <span>預估剩餘 {estimatedTimeRemaining}分鐘</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-200 rounded-full h-1.5 md:h-2">
               <div 
-                className={`h-2 rounded-full transition-all duration-300 ${
+                className={`h-1.5 md:h-2 rounded-full transition-all duration-300 ${
                   progressPercentage === 100 ? 'bg-green-500' :
                   progressPercentage > 50 ? 'bg-blue-500' : 'bg-orange-500'
                 }`}
@@ -209,24 +209,24 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
 
           {/* 備註 */}
           {order.notes && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+            <div className="mt-3 md:mt-4 p-2 md:p-3 bg-yellow-50 border border-yellow-200 rounded-md">
               <div className="flex items-start space-x-2">
-                <span className="text-yellow-600">📝</span>
+                <span className="text-yellow-600 text-sm md:text-base">📝</span>
                 <div>
-                  <p className="text-sm font-medium text-yellow-800">備註</p>
-                  <p className="text-sm text-yellow-700">{order.notes}</p>
+                  <p className="text-xs md:text-sm font-medium text-yellow-800">備註</p>
+                  <p className="text-xs md:text-sm text-yellow-700">{order.notes}</p>
                 </div>
               </div>
             </div>
           )}
 
           {/* 操作按鈕 */}
-          <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+          <div className="mt-3 md:mt-4 flex flex-col md:flex-row items-start md:items-center justify-between space-y-2 md:space-y-0">
+            <div className="flex items-center space-x-1 md:space-x-2 flex-wrap gap-1">
               {columnType === 'pending' && (
                 <button
                   onClick={() => handleStatusChange(OrderStatus.PREPARING)}
-                  className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                  className="px-2 md:px-3 py-1 bg-blue-600 text-white text-xs md:text-sm rounded-md hover:bg-blue-700 transition-colors"
                 >
                   開始製作
                 </button>
@@ -236,13 +236,13 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
                 <>
                   <button
                     onClick={() => handleStatusChange(OrderStatus.READY)}
-                    className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
+                    className="px-2 md:px-3 py-1 bg-green-600 text-white text-xs md:text-sm rounded-md hover:bg-green-700 transition-colors"
                   >
                     標記完成
                   </button>
                   <button
                     onClick={() => handleStatusChange(OrderStatus.PENDING)}
-                    className="px-3 py-1 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition-colors"
+                    className="px-2 md:px-3 py-1 bg-gray-600 text-white text-xs md:text-sm rounded-md hover:bg-gray-700 transition-colors"
                   >
                     暫停
                   </button>
@@ -252,23 +252,23 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
               {columnType === 'completed' && (
                 <button
                   onClick={() => handleStatusChange(OrderStatus.SERVED)}
-                  className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 transition-colors"
+                  className="px-2 md:px-3 py-1 bg-purple-600 text-white text-xs md:text-sm rounded-md hover:bg-purple-700 transition-colors"
                 >
                   已送出
                 </button>
               )}
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 md:space-x-2 flex-wrap gap-1">
               <button
                 onClick={() => handleQuickAction('add_note')}
-                className="px-3 py-1 text-gray-600 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-2 md:px-3 py-1 text-gray-600 text-xs md:text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               >
                 📝 備註
               </button>
               <button
                 onClick={() => handleQuickAction('report_issue')}
-                className="px-3 py-1 text-gray-600 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-2 md:px-3 py-1 text-gray-600 text-xs md:text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               >
                 ⚠️ 問題
               </button>

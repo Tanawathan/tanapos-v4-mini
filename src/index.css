@@ -1,5 +1,7 @@
 /* 匯入 UI 樣式變數系統 */
 @import './styles/ui-variables.css';
+/* 匯入 KDS 響應式設計 */
+@import './styles/kds-responsive.css';
 
 @tailwind base;
 @tailwind components;

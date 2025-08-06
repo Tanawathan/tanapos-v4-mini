@@ -1,11 +1,12 @@
 import React from 'react'
-import { Clock, Users, Edit2, Trash2, ToggleLeft, ToggleRight, ChefHat } from 'lucide-react'
+import { Clock, Users, Edit2, Trash2, ToggleLeft, ToggleRight, ChefHat, Settings } from 'lucide-react'
 import type { ComboProduct, Category } from '../../lib/menu-types'
 
 interface ComboCardProps {
   combo: ComboProduct
   categories: Category[]
   onEdit: (combo: ComboProduct) => void
+  onEditRules?: (combo: ComboProduct) => void
   onDelete: (id: string) => void
   onToggleAvailability: (id: string, isAvailable: boolean) => void
 }
@@ -14,6 +15,7 @@ export const ComboCard: React.FC<ComboCardProps> = ({
   combo,
   categories,
   onEdit,
+  onEditRules,
   onDelete,
   onToggleAvailability
 }) => {
@@ -161,6 +163,17 @@ export const ComboCard: React.FC<ComboCardProps> = ({
             <Edit2 className="w-4 h-4" />
             編輯
           </button>
+          
+          {/* 自選套餐規則編輯按鈕 */}
+          {combo.combo_type === 'selectable' && onEditRules && (
+            <button
+              onClick={() => onEditRules(combo)}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-md transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              規則
+            </button>
+          )}
           
           <button
             onClick={() => onDelete(combo.id)}

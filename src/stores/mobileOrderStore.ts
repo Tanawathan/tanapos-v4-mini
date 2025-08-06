@@ -3,6 +3,38 @@ import { devtools } from 'zustand/middleware'
 import { supabase } from '../lib/supabase'
 import type { Product, Category } from '../lib/types'
 
+// 統一的商品項目類型（可以是產品或套餐）
+export interface MenuItem extends Omit<Product, 'id'> {
+  id: string
+  type: 'product' | 'combo'
+  combo_type?: 'fixed' | 'selectable' // 只有套餐才有這個欄位
+}
+
+// 套餐選項類型
+export interface ComboSelectionOption {
+  id: string
+  rule_id: string
+  option_name: string
+  option_type: 'product' | 'custom'
+  product_id?: string
+  additional_price: number
+  is_default: boolean
+  sort_order: number
+}
+
+// 套餐規則類型
+export interface ComboSelectionRule {
+  id: string
+  combo_id: string
+  rule_name: string
+  selection_type: 'single' | 'multiple'
+  min_selections: number
+  max_selections: number
+  is_required: boolean
+  sort_order: number
+  options: ComboSelectionOption[]
+}
+
 // UUID 生成函數（兼容性處理）
 const generateUUID = (): string => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -22,6 +54,9 @@ export type DiningMode = 'dine_in' | 'takeaway'
 
 // 訂單模式類型（僅限內用）
 export type OrderMode = 'new' | 'additional'
+
+// 商品過濾類型
+export type ProductFilter = 'all' | 'products' | 'combos'
 
 // 購物車項目類型
 export interface MobileCartItem {
@@ -74,7 +109,7 @@ export interface PriceCalculation {
 interface MobileOrderStore {
   // === 基本資料 ===
   categories: Category[]
-  products: Product[]
+  products: MenuItem[]  // 改用 MenuItem 來包含產品和套餐
   tables: Array<{ id: string, table_number: string, status: string }>
   
   // === 訂單上下文 ===
@@ -85,8 +120,11 @@ interface MobileOrderStore {
   
   // === UI 狀態 ===
   selectedCategory: string | null
+  productFilter: ProductFilter // 新增：商品類型過濾器
   isCartOpen: boolean
   isOrderInfoCollapsed: boolean
+  isComboSelectorOpen: boolean
+  selectedComboForSelection: MenuItem | null
   loading: boolean
   error: string | null
   
@@ -96,12 +134,15 @@ interface MobileOrderStore {
   setTableNumber: (tableNumber: string) => void
   setPartySize: (size: number) => void
   setSelectedCategory: (categoryId: string | null) => void
+  setProductFilter: (filter: ProductFilter) => void // 新增：設置商品過濾器
   toggleCart: () => void
   toggleOrderInfoCollapse: () => void
   checkAndAutoCollapse: () => void
+  openComboSelector: (combo: MenuItem) => void
+  closeComboSelector: () => void
   
   // === 購物車操作 ===
-  addToCart: (product: Product) => void
+  addToCart: (product: MenuItem) => void
   updateCartQuantity: (instanceId: string, quantity: number) => void
   updateCartNote: (instanceId: string, note: string) => void
   removeFromCart: (instanceId: string) => void
@@ -115,6 +156,7 @@ interface MobileOrderStore {
   loadCategories: () => Promise<void>
   loadProducts: () => Promise<void>
   loadTables: () => Promise<void>
+  loadComboRules: (comboId: string) => Promise<ComboSelectionRule[]>
   updateTableStatus: (tableId: string, status: string) => Promise<void>
   
   // === 外帶功能 ===
@@ -133,7 +175,7 @@ interface MobileOrderStore {
 }
 
 // 獲取環境變數中的餐廳ID
-const RESTAURANT_ID = import.meta.env.VITE_RESTAURANT_ID || 'default-restaurant-id'
+const RESTAURANT_ID = import.meta.env.VITE_RESTAURANT_ID || '550e8400-e29b-41d4-a716-446655440000'
 
 export const useMobileOrderStore = create<MobileOrderStore>()(
   devtools(
@@ -148,8 +190,11 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
       },
       cartItems: [],
       selectedCategory: null,
+      productFilter: 'all', // 新增：預設顯示所有商品
       isCartOpen: false,
       isOrderInfoCollapsed: false,
+      isComboSelectorOpen: false,
+      selectedComboForSelection: null,
       loading: false,
       error: null,
 
@@ -212,6 +257,10 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
         set({ selectedCategory: categoryId })
       },
 
+      setProductFilter: (filter) => {
+        set({ productFilter: filter })
+      },
+
       toggleCart: () => {
         set((state) => ({
           isCartOpen: !state.isCartOpen
@@ -242,6 +291,20 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
         if (isComplete) {
           set({ isOrderInfoCollapsed: true })
         }
+      },
+
+      openComboSelector: (combo) => {
+        set({
+          selectedComboForSelection: combo,
+          isComboSelectorOpen: true
+        })
+      },
+
+      closeComboSelector: () => {
+        set({
+          selectedComboForSelection: null,
+          isComboSelectorOpen: false
+        })
       },
 
       // === 購物車操作 ===
@@ -344,16 +407,50 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
       loadProducts: async () => {
         set({ loading: true, error: null })
         try {
-          const { data, error } = await supabase
+          // 載入普通產品
+          const { data: productsData, error: productsError } = await supabase
             .from('products')
             .select('*')
             .eq('restaurant_id', RESTAURANT_ID)
             .eq('is_active', true)
             .order('sort_order', { ascending: true })
 
-          if (error) throw error
+          if (productsError) throw productsError
 
-          set({ products: data || [], loading: false })
+          // 載入套餐產品
+          const { data: combosData, error: combosError } = await supabase
+            .from('combo_products')
+            .select('*')
+            .eq('restaurant_id', RESTAURANT_ID)
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true })
+
+          if (combosError) throw combosError
+
+          // 轉換產品資料格式
+          const menuProducts: MenuItem[] = (productsData || []).map((product: any) => ({
+            ...product,
+            type: 'product' as const
+          }))
+
+          // 轉換套餐資料格式
+          const menuCombos: MenuItem[] = (combosData || []).map((combo: any) => ({
+            ...combo,
+            type: 'combo' as const
+          }))
+
+          // 合併並排序所有項目
+          const allMenuItems = [...menuProducts, ...menuCombos]
+            .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+
+          console.log('🍽️ 載入完成:', {
+            products: menuProducts.length,
+            combos: menuCombos.length,
+            total: allMenuItems.length,
+            restaurant_id: RESTAURANT_ID
+          })
+
+          set({ products: allMenuItems, loading: false })
         } catch (error) {
           console.error('載入商品失敗:', error)
           set({ 
@@ -382,6 +479,56 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
             error: error instanceof Error ? error.message : '載入桌台失敗',
             loading: false 
           })
+        }
+      },
+
+      loadComboRules: async (comboId: string): Promise<ComboSelectionRule[]> => {
+        try {
+          console.log('🔄 載入套餐規則，套餐ID:', comboId)
+          
+          // 載入套餐規則
+          const { data: rulesData, error: rulesError } = await supabase
+            .from('combo_selection_rules')
+            .select('*')
+            .eq('combo_id', comboId)
+            .order('sort_order', { ascending: true })
+
+          if (rulesError) {
+            console.error('載入套餐規則失敗:', rulesError)
+            throw rulesError
+          }
+
+          const rules: ComboSelectionRule[] = []
+
+          // 為每個規則載入選項
+          for (const rule of rulesData || []) {
+            const { data: optionsData, error: optionsError } = await supabase
+              .from('combo_selection_options')
+              .select('*')
+              .eq('rule_id', rule.id)
+              .order('sort_order', { ascending: true })
+
+            if (optionsError) {
+              console.error('載入套餐選項失敗:', optionsError)
+              throw optionsError
+            }
+
+            rules.push({
+              ...rule,
+              options: optionsData || []
+            })
+          }
+
+          console.log('✅ 套餐規則載入完成:', {
+            comboId,
+            rulesCount: rules.length,
+            totalOptions: rules.reduce((sum, rule) => sum + rule.options.length, 0)
+          })
+
+          return rules
+        } catch (error) {
+          console.error('載入套餐規則失敗:', error)
+          throw error
         }
       },
 

@@ -21,7 +21,7 @@ import type {
 
 export class MenuService {
   private static instance: MenuService
-  private restaurantId: string = import.meta.env.VITE_RESTAURANT_ID || '11111111-1111-1111-1111-111111111111' // 從環境變數取得餐廳ID
+  private restaurantId: string = import.meta.env.VITE_RESTAURANT_ID || '550e8400-e29b-41d4-a716-446655440000' // 從環境變數取得餐廳ID
 
   static getInstance(): MenuService {
     if (!MenuService.instance) {
@@ -304,16 +304,20 @@ export class MenuService {
   // === 套餐管理 ===
   async getCombos(): Promise<ApiResponse<ComboProduct[]>> {
     try {
+      console.log('🔍 MenuService 載入套餐，restaurant_id:', this.restaurantId)
+      
       const { data, error } = await supabase
         .from('combo_products')
         .select(`
           *,
           category:categories(*)
         `)
+        .eq('restaurant_id', this.restaurantId)
         .order('created_at', { ascending: false })
 
       if (error) throw error
 
+      console.log('📋 MenuService 套餐載入結果:', data?.length || 0, '筆')
       return { data: data || [], error: null }
     } catch (error) {
       console.error('獲取套餐失敗:', error)
@@ -570,6 +574,143 @@ export class MenuService {
       return { data: null, error: null }
     } catch (error) {
       console.error('刪除套餐選項失敗:', error)
+      return { data: null, error: (error as Error).message }
+    }
+  }
+
+  // === 套餐規則與選項批量操作 ===
+  async saveComboRules(comboId: string, rules: any[]): Promise<ApiResponse<any[]>> {
+    try {
+      // 使用事務處理批量保存規則和選項
+      const savedRules = []
+      
+      for (const rule of rules) {
+        // 保存或更新規則
+        const ruleData = {
+          combo_id: comboId,
+          rule_name: rule.name,
+          min_selections: rule.min_selections,
+          max_selections: rule.max_selections,
+          is_required: rule.is_required,
+          sort_order: rule.sort_order
+        }
+
+        let savedRule
+        if (rule.id && !rule.id.startsWith('temp_')) {
+          // 更新現有規則
+          const { data, error } = await supabase
+            .from('combo_selection_rules')
+            .update(ruleData)
+            .eq('id', rule.id)
+            .select()
+            .single()
+          
+          if (error) throw error
+          savedRule = data
+        } else {
+          // 新增規則
+          const { data, error } = await supabase
+            .from('combo_selection_rules')
+            .insert(ruleData)
+            .select()
+            .single()
+          
+          if (error) throw error
+          savedRule = data
+        }
+
+        // 保存規則選項
+        if (rule.options && rule.options.length > 0) {
+          // 先刪除舊的選項
+          await supabase
+            .from('combo_selection_options')
+            .delete()
+            .eq('rule_id', savedRule.id)
+
+          // 新增選項
+          const optionsData = rule.options.map((option: any) => ({
+            rule_id: savedRule.id,
+            product_id: option.product_id,
+            additional_price: option.additional_price,
+            is_default: option.is_default,
+            is_available: option.is_available
+          }))
+
+          const { error: optionsError } = await supabase
+            .from('combo_selection_options')
+            .insert(optionsData)
+
+          if (optionsError) throw optionsError
+        }
+
+        savedRules.push(savedRule)
+      }
+
+      return { data: savedRules, error: null }
+    } catch (error) {
+      console.error('保存套餐規則失敗:', error)
+      return { data: null, error: (error as Error).message }
+    }
+  }
+
+  async getComboWithRules(comboId: string): Promise<ApiResponse<any>> {
+    try {
+      // 獲取套餐基本資訊
+      const { data: combo, error: comboError } = await supabase
+        .from('combo_products')
+        .select(`
+          *,
+          category:categories(*)
+        `)
+        .eq('id', comboId)
+        .single()
+
+      if (comboError) throw comboError
+
+      // 獲取套餐規則和選項
+      const { data: rules, error: rulesError } = await supabase
+        .from('combo_selection_rules')
+        .select(`
+          id,
+          combo_id,
+          selection_name,
+          description,
+          min_selections,
+          max_selections,
+          is_required,
+          display_order,
+          created_at,
+          updated_at,
+          options:combo_selection_options(
+            id,
+            rule_id,
+            product_id,
+            additional_price,
+            is_default,
+            sort_order,
+            created_at,
+            product:products(id, name, price)
+          )
+        `)
+        .eq('combo_id', comboId)
+        .order('display_order', { ascending: true })
+
+      if (rulesError) throw rulesError
+
+      // 轉換資料庫欄位名稱為前端期待的名稱
+      const transformedRules: ComboSelectionRule[] = rules?.map((rule: any) => ({
+        ...rule,
+        name: rule.selection_name,
+        sort_order: rule.display_order,
+        options: rule.options?.map((option: any) => ({
+          ...option,
+          is_available: option.is_available ?? true // 如果資料庫沒有這個欄位，預設為 true
+        }))
+      })) || []
+
+      return { data: { ...combo, rules: transformedRules }, error: null }
+    } catch (error) {
+      console.error('獲取套餐規則失敗:', error)
       return { data: null, error: (error as Error).message }
     }
   }

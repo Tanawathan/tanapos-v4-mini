@@ -174,7 +174,7 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
   }
 
   return (
-    <div className="min-h-screen bg-ui-secondary">
+    <div className="min-h-screen bg-ui-secondary flex flex-col kds-container">
       {/* 靜默更新指示器 */}
       {isLoading && !isInitialLoad && (
         <div className="fixed top-4 right-4 z-50 bg-blue-500 text-white px-3 py-1 rounded-full text-sm shadow-lg">
@@ -184,29 +184,32 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
       )}
       
       {/* 標題欄 */}
-      <header className="bg-ui-primary shadow-sm border-b border-ui">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+      <header className="bg-ui-primary shadow-sm border-b border-ui flex-shrink-0 kds-header">
+        <div className="px-3 md:px-6 py-3 md:py-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center space-x-2 md:space-x-4 min-w-0">
               <button
                 onClick={handleBackToHome}
-                className="flex items-center px-3 py-2 text-sm font-medium text-ui-secondary hover:text-ui-primary hover:bg-ui-secondary rounded-md transition-colors"
+                className="flex items-center px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm font-medium text-ui-secondary hover:text-ui-primary hover:bg-ui-secondary rounded-md transition-colors whitespace-nowrap"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                返回首頁
+                <span className="hidden sm:inline">返回首頁</span>
+                <span className="sm:hidden">返回</span>
               </button>
-              <h1 className="text-2xl font-bold text-ui-primary">
+              <h1 className="text-lg md:text-2xl font-bold text-ui-primary truncate">
                 🍳 KDS 廚房顯示系統
               </h1>
-              <div className="text-sm text-ui-muted">
+              <div className="text-xs md:text-sm text-ui-muted hidden sm:block">
                 {new Date().toLocaleString('zh-TW')}
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <StatsPanel stats={stats} />
+            <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
+              <div className="hidden md:block">
+                <StatsPanel stats={stats} />
+              </div>
               
               <SortControl
                 sortBy={sortBy}
@@ -220,19 +223,25 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
               
               <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-1 md:p-2 text-gray-400 hover:text-gray-600 transition-colors text-lg md:text-xl"
                 title="設定"
               >
                 ⚙️
               </button>
             </div>
           </div>
+          
+          {/* 在小螢幕上顯示統計資訊 */}
+          <div className="md:hidden mt-2 pt-2 border-t border-ui">
+            <StatsPanel stats={stats} />
+          </div>
         </div>
       </header>
 
       {/* 主要內容區域 */}
-      <main className="p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="p-3 md:p-4 lg:p-6 flex-1 min-h-0 overflow-hidden kds-main">
+        {/* 針對平板橫向優化的響應式網格佈局 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-6 h-full kds-grid">
           {/* 待處理訂單 */}
           <OrderColumn
             title="待處理"
@@ -269,9 +278,9 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
       </main>
 
       {/* 底部統計欄 */}
-      <footer className="bg-white border-t border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-center space-x-8 text-sm text-gray-600">
-          <span>📈 即時統計:</span>
+      <footer className="bg-white border-t border-gray-200 px-3 md:px-6 py-2 md:py-4 flex-shrink-0 kds-footer">
+        <div className="flex items-center justify-center flex-wrap gap-3 md:gap-8 text-xs md:text-sm text-gray-600 kds-footer-stats">
+          <span className="hidden md:inline">📈 即時統計:</span>
           <span>待處理 <strong className="text-orange-600">{stats.pendingOrders}</strong></span>
           <span>製作中 <strong className="text-blue-600">{stats.inProgressOrders}</strong></span>
           <span>完成 <strong className="text-green-600">{stats.completedOrders}</strong></span>
