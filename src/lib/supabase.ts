@@ -1,19 +1,20 @@
 import { createClient } from '@supabase/supabase-js'
 
-// 直接使用正確的配置值
-const supabaseUrl = 'https://arksfwmcmwnyxvlcpskm.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFya3Nmd21jbXdueXh2bGNwc2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMzM3MTAsImV4cCI6MjA2OTkwOTcxMH0.7ifP1Un1mZvtazPjeLAQEPnpO_G75VmxrI3NdkaaYCU'
+// 從環境變數載入配置
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 // 驗證配置
 console.log('🔍 Supabase 配置載入:')
-console.log('URL:', supabaseUrl)
-console.log('Key 前30字:', supabaseKey.substring(0, 30))
-console.log('Key 長度:', supabaseKey.length)
+console.log('- URL:', supabaseUrl ? '✅ 已載入' : '❌ 未載入')
+console.log('- Key:', supabaseKey ? '✅ 已載入' : '❌ 未載入')
 
-// 檢查環境變數（用於除錯）
-console.log('環境變數檢查:')
-console.log('- VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL || '❌ 未載入')
-console.log('- VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅ 已載入' : '❌ 未載入')
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Supabase 配置不完整!')
+  console.log('請確保環境變數已設定:')
+  console.log('- VITE_SUPABASE_URL')
+  console.log('- VITE_SUPABASE_ANON_KEY')
+}
 
 // JWT 解析檢查
 try {

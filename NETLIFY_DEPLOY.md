@@ -6,7 +6,7 @@
 
 ### 必需變數
 ```
-VITE_SUPABASE_URL=https://arksfwmcmwnyxvlcpskm.supabase.co
+VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_anon_key_here
 VITE_SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 VITE_RESTAURANT_ID=11111111-1111-1111-1111-111111111111
