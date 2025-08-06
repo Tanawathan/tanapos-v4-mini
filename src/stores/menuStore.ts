@@ -113,7 +113,7 @@ export const useMenuStore = create<MenuStore>()(
       selectedCategory: null,
 
       currentPage: 0,
-      pageSize: 20,
+      pageSize: 100, // 增加分頁大小以顯示更多商品
       totalCount: 0,
       hasNextPage: false,
 

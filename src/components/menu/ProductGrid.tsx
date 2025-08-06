@@ -7,11 +7,14 @@ interface ProductGridProps {
   loading: boolean;
   viewMode: MenuViewMode['mode'];
   sorting: ProductSorting;
+  totalCount?: number;
+  hasNextPage?: boolean;
   onSortingChange: (sorting: ProductSorting) => void;
   onViewModeChange: (mode: MenuViewMode['mode']) => void;
   onEditProduct: (product: Product) => void;
   onDeleteProduct: (productId: string) => void;
   onToggleAvailable: (productId: string, available: boolean) => void;
+  onLoadMore?: () => void;
 }
 
 export default function ProductGrid({
@@ -19,11 +22,14 @@ export default function ProductGrid({
   loading,
   viewMode,
   sorting,
+  totalCount,
+  hasNextPage,
   onSortingChange,
   onViewModeChange,
   onEditProduct,
   onDeleteProduct,
-  onToggleAvailable
+  onToggleAvailable,
+  onLoadMore
 }: ProductGridProps) {
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
@@ -80,7 +86,12 @@ export default function ProductGrid({
           {/* 左側：統計與批量操作 */}
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">
-              共 {products.length} 項商品
+              共 {totalCount || products.length} 項商品
+              {totalCount && totalCount > products.length && (
+                <span className="text-blue-600 ml-1">
+                  (顯示 {products.length} 項)
+                </span>
+              )}
             </span>
             
             {selectedProducts.size > 0 && (
@@ -271,6 +282,19 @@ export default function ProductGrid({
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* 載入更多按鈕 */}
+      {hasNextPage && onLoadMore && (
+        <div className="text-center py-8">
+          <button
+            onClick={onLoadMore}
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? '載入中...' : '載入更多商品'}
+          </button>
         </div>
       )}
     </div>

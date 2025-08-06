@@ -148,7 +148,7 @@ export class MenuService {
     filters: ProductFilters = {},
     sorting: ProductSorting = { field: 'sort_order', order: 'asc' },
     page: number = 0,
-    pageSize: number = 50
+    pageSize: number = 100 // 增加預設分頁大小以顯示更多商品
   ): Promise<PaginatedResponse<Product>> {
     try {
       let query = supabase

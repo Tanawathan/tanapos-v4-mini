@@ -9,15 +9,18 @@ export default function ProductManagement() {
     products, 
     loading, 
     error,
+    totalCount,
+    hasNextPage,
     loadProducts, 
     loadCategories,
     deleteProduct,
-    updateProduct 
+    updateProduct,
+    nextPage
   } = useMenuStore();
 
   const [filters, setFilters] = useState<ProductFilters>({});
   const [sorting, setSorting] = useState<ProductSorting>({
-    field: 'name',
+    field: 'sort_order',
     order: 'asc'
   });
   const [viewMode, setViewMode] = useState<MenuViewMode['mode']>('grid');
@@ -170,11 +173,14 @@ export default function ProductManagement() {
         loading={loading}
         viewMode={viewMode}
         sorting={sorting}
+        totalCount={totalCount}
+        hasNextPage={hasNextPage}
         onSortingChange={setSorting}
         onViewModeChange={setViewMode}
         onEditProduct={handleEditProduct}
         onDeleteProduct={handleDeleteProduct}
         onToggleAvailable={handleToggleAvailable}
+        onLoadMore={() => nextPage()}
       />
 
       {/* 編輯商品模態框 - 暫時佔位 */}
