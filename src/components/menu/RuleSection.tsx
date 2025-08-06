@@ -63,6 +63,7 @@ export const RuleSection: React.FC<RuleSectionProps> = ({
       additional_price: 0,
       is_default: false,
       is_available: true,
+      sort_order: (rule.options || []).length,
       created_at: new Date().toISOString()
     }
     onUpdate({ options: [...(rule.options || []), newOption] })

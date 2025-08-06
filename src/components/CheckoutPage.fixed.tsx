@@ -10,9 +10,6 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   // 使用 selector 模式避免無限渲染
   const tables = usePOSStore(state => state.tables)
   const orders = usePOSStore(state => state.orders)
-  const orderItems = usePOSStore(state => state.orderItems)
-  const loading = usePOSStore(state => state.loading)
-  const error = usePOSStore(state => state.error)
   const tablesLoaded = usePOSStore(state => state.tablesLoaded)
   const ordersLoaded = usePOSStore(state => state.ordersLoaded)
   const loadTables = usePOSStore(state => state.loadTables)
@@ -20,8 +17,6 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const processCheckout = usePOSStore(state => state.processCheckout)
 
   // 狀態管理
-  const [selectedTable, setSelectedTable] = useState<Table | null>(null)
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [selectedTableData, setSelectedTableData] = useState<(Table & { is_takeout?: boolean }) | null>(null)
   const [tableOrders, setTableOrders] = useState<Order[]>([])
   const [paymentMethod, setPaymentMethod] = useState<string>('cash')
@@ -94,19 +89,6 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
     return orderNumber?.toUpperCase().startsWith('TOGO-') || orderNumber?.toUpperCase().startsWith('#TOGO-');
   }
 
-  // 取得桌台的活躍訂單（保持向後兼容）
-  const getTableOrder = (tableId: string) => {
-    return orders.find(order => 
-      order.table_id === tableId && 
-      ['pending', 'confirmed', 'preparing', 'ready', 'served'].includes(order.status || '')
-    )
-  }
-
-  // 取得桌台的訂單項目總和（保持向後兼容）
-  const getOrderItems = (orderId: string) => {
-    return orderItems.filter(item => item.order_id === orderId)
-  }
-
   // 選擇桌台進行結帳
   const selectTableForCheckout = (table: Table & { is_takeout?: boolean }) => {
     let relatedOrders: Order[] = []
@@ -114,7 +96,6 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
     if (table.is_takeout) {
       // 外帶：取得該特定外帶訂單
       const takeoutOrders = getTakeoutOrders()
-      const orderIndex = parseInt(table.id.replace('takeout-', ''))
       relatedOrders = takeoutOrders.filter(order => order.id === table.id.replace('takeout-', ''))
       if (relatedOrders.length === 0) {
         // 如果找不到，使用其他方式定位
