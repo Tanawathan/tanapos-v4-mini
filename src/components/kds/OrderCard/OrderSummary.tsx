@@ -29,6 +29,19 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
     return () => clearInterval(interval);
   }, []);
 
+  // 檢測是否為外帶訂單
+  const isTakeoutOrder = (orderNumber: string): boolean => {
+    return orderNumber?.toUpperCase().startsWith('TOGO-') || orderNumber?.toUpperCase().startsWith('#TOGO-');
+  };
+
+  // 格式化訂單號顯示（移除 TOGO 前綴用於顯示）
+  const formatOrderNumber = (orderNumber: string): string => {
+    if (isTakeoutOrder(orderNumber)) {
+      return orderNumber.replace(/^#?TOGO-/i, '');
+    }
+    return orderNumber;
+  };
+
   // 計算訂單持續時間（分鐘）
   const calculateOrderDuration = (createdAt: string): number => {
     const orderTime = new Date(createdAt).getTime();
@@ -77,10 +90,25 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
         <div className="flex items-center space-x-3">
           <span className="text-lg">{getStatusIcon()}</span>
           <div className="flex items-center space-x-2 text-sm">
-            <span className="font-semibold text-gray-900">#{order.order_number}</span>
+            {/* 外帶訂單特別標示 */}
+            {isTakeoutOrder(order.order_number) ? (
+              <div className="flex items-center space-x-1">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                  🥡 外帶
+                </span>
+                <span className="font-semibold text-gray-900">#{formatOrderNumber(order.order_number)}</span>
+              </div>
+            ) : (
+              <span className="font-semibold text-gray-900">#{order.order_number}</span>
+            )}
             <span className="text-gray-500">|</span>
-            <span className="text-gray-700">T{order.table_number?.toString().padStart(2, '0')}</span>
-            <span className="text-gray-500">|</span>
+            {/* 桌號顯示 - 外帶訂單不顯示桌號 */}
+            {!isTakeoutOrder(order.order_number) && (
+              <>
+                <span className="text-gray-700">T{order.table_number?.toString().padStart(2, '0')}</span>
+                <span className="text-gray-500">|</span>
+              </>
+            )}
             <span className="text-gray-600">
               ⏰ {formatDuration(calculateOrderDuration(order.created_at))}
             </span>

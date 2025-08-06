@@ -73,6 +73,23 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
   // 使用預計算的緊急程度
   const urgencyLevel = order.urgencyLevel || 'low';
 
+  // 檢測是否為外帶訂單
+  const isTakeoutOrder = (orderNumber: string): boolean => {
+    return orderNumber?.toUpperCase().startsWith('TOGO-') || orderNumber?.toUpperCase().startsWith('#TOGO-');
+  };
+
+  // 為外帶訂單生成特別的卡片樣式
+  const getCardStyle = () => {
+    const baseStyle = `border rounded-lg bg-white shadow-sm border-l-4 ${URGENCY_COLORS[urgencyLevel]}`;
+    
+    if (isTakeoutOrder(order.order_number)) {
+      // 外帶訂單添加橙色邊框和背景
+      return `${baseStyle} border-orange-300 bg-orange-50`;
+    }
+    
+    return baseStyle;
+  };
+
   // 處理狀態變更
   const handleStatusChange = (newStatus: OrderStatus) => {
     onStatusChange(order.id, newStatus);
@@ -108,7 +125,18 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
   };
 
   return (
-    <div className={`border rounded-lg bg-white shadow-sm border-l-4 ${URGENCY_COLORS[urgencyLevel]}`}>
+    <div className={getCardStyle()}>
+      {/* 外帶訂單特別標示 */}
+      {isTakeoutOrder(order.order_number) && (
+        <div className="bg-orange-100 border-b border-orange-200 px-3 py-2">
+          <div className="flex items-center justify-center space-x-2 text-orange-800">
+            <span className="text-lg">🥡</span>
+            <span className="font-semibold text-sm">外帶訂單</span>
+            <span className="text-lg">🥡</span>
+          </div>
+        </div>
+      )}
+      
       {/* 收縮狀態 */}
       {!isExpanded && (
         <div 
