@@ -10,59 +10,68 @@ const ProductCategoryTabs: React.FC = () => {
     setProductFilter
   } = useMobileOrderStore()
 
-  // 創建統一的分類系統
-  const unifiedCategories = [
-    { id: 'all', name: '🍽️ 全部', type: 'all' },
-    { id: 'combos', name: '🍱 套餐', type: 'combos' },
-    { id: 'products', name: '🍕 單品', type: 'products' },
-    ...categories.map(cat => ({ id: cat.id, name: cat.name, type: 'category' }))
-  ]
-
-  const handleCategorySelect = (item: any) => {
-    if (item.type === 'all') {
-      setProductFilter('all')
+  const handleTypeSelect = (type: 'all' | 'combos' | 'products') => {
+    setProductFilter(type)
+    if (type !== 'all') {
       setSelectedCategory(null)
-    } else if (item.type === 'combos') {
-      setProductFilter('combos')
-      setSelectedCategory(null)
-    } else if (item.type === 'products') {
-      setProductFilter('products')
-      setSelectedCategory(null)
-    } else {
-      setProductFilter('all')
-      setSelectedCategory(item.id)
     }
   }
 
-  const getActiveState = (item: any) => {
-    if (item.type === 'all') {
-      return productFilter === 'all' && selectedCategory === null
-    } else if (item.type === 'combos') {
-      return productFilter === 'combos'
-    } else if (item.type === 'products') {
-      return productFilter === 'products'
-    } else {
-      return selectedCategory === item.id
-    }
+  const handleCategorySelect = (categoryId: string | null) => {
+    setSelectedCategory(categoryId)
+    // 選分類時，類型回到 all，避免重複概念
+    setProductFilter('all')
   }
 
   return (
-    <div className="p-4">
-      {/* 統一分類標籤 */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-3">選擇分類</h3>
+    <div className="p-2 md:p-4">
+      {/* 類型（不與分類重疊） */}
+      <div className="mb-2">
+        <h3 className="text-xs font-medium text-gray-600 mb-2">類型</h3>
         <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-1">
-          {unifiedCategories.map((item) => (
+          {[
+            { id: 'all', label: '🍽️ 全部' },
+            { id: 'combos', label: '🍱 套餐' },
+            { id: 'products', label: '🍕 單品' }
+          ].map((t) => (
             <button
-              key={item.id}
-              onClick={() => handleCategorySelect(item)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full border-2 transition-all ${
-                getActiveState(item)
+              key={t.id}
+              onClick={() => handleTypeSelect(t.id as any)}
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full border-2 transition-all text-sm ${
+                productFilter === t.id
                   ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm'
                   : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
               }`}
             >
-              <span className="text-sm font-medium">{item.name}</span>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 分類（純分類，不含「套餐/單品」） */}
+      <div>
+        <h3 className="text-xs font-medium text-gray-600 mb-2">分類</h3>
+        <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-1">
+          <button
+            onClick={() => handleCategorySelect(null)}
+            className={`flex-shrink-0 px-3 py-1.5 rounded-full border-2 transition-all text-sm ${
+              selectedCategory === null ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+            }`}
+          >
+            全分類
+          </button>
+          {categories.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => handleCategorySelect(cat.id)}
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full border-2 transition-all text-sm ${
+                selectedCategory === cat.id
+                  ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm'
+                  : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+              }`}
+            >
+              {cat.name}
             </button>
           ))}
         </div>

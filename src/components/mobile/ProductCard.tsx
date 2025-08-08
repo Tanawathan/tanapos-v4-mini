@@ -24,28 +24,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="flex p-3">
-        {/* 商品圖片 */}
-        <div className="w-20 h-20 flex-shrink-0 mr-4">
-          {product.image_url ? (
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-full object-cover rounded-lg"
-              loading="lazy"
-              onError={(e) => {
-                // 圖片載入失敗時顯示預設圖示
-                e.currentTarget.style.display = 'none'
-                e.currentTarget.nextElementSibling?.classList.remove('hidden')
-              }}
-            />
-          ) : null}
-          <div className={`w-full h-full bg-gray-100 rounded-lg flex items-center justify-center ${product.image_url ? 'hidden' : ''}`}>
-            <span className="text-gray-400 text-2xl">🍽️</span>
-          </div>
-        </div>
-
-        {/* 商品資訊 */}
-        <div className="flex-1 min-w-0">
+        {/* 商品資訊：移除圖片，專注文字與價格 */}
+        <div className="flex-1 min-w-0 pr-1">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-base font-semibold text-gray-800 truncate">
               {product.name}
@@ -57,12 +37,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+      <p className="text-xs text-gray-600 mb-2 line-clamp-2">
             {product.description || (product.type === 'combo' ? '精選套餐組合' : '經典美味料理')}
           </p>
-          <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <span className="text-lg font-bold text-gray-800">
+        <span className="text-lg font-bold text-gray-800">
                 💰 NT${product.price}
               </span>
             </div>
@@ -84,7 +64,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               </button>
             )}
           </div>
-        </div>
+  </div>
       </div>
 
       {/* 商品可用性指示 */}
