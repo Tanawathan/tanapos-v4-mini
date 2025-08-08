@@ -151,7 +151,7 @@ interface MobileOrderStore {
   closeComboSelector: () => void
   
   // === 購物車操作 ===
-  addToCart: (product: MenuItem, comboSelections?: Array<{ rule_id: string; selected_product_id: string; quantity?: number; additional_price?: number }>) => void
+  addToCart: (product: MenuItem, comboSelections?: Array<{ rule_id: string; selected_product_id: string; quantity?: number; additional_price?: number }>, initialQuantity?: number) => void
   updateCartQuantity: (instanceId: string, quantity: number) => void
   updateCartNote: (instanceId: string, note: string) => void
   removeFromCart: (instanceId: string) => void
@@ -317,14 +317,14 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
       },
 
       // === 購物車操作 ===
-      addToCart: (product, comboSelections) => {
+    addToCart: (product, comboSelections, initialQuantity) => {
         const instanceId = `${product.id}_${Date.now()}`
         const newItem: MobileCartItem = {
           id: product.id,
           instanceId,
           name: product.name,
           price: product.price,
-          quantity: 1,
+      quantity: Math.max(1, Number(initialQuantity) || 1),
           product_id: product.id,
           type: product.type,
           combo_selections: comboSelections

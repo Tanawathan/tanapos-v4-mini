@@ -13,6 +13,8 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
   const [comboRules, setComboRules] = useState<ComboSelectionRule[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [quantity, setQuantity] = useState<number>(1)
+  const [activeRuleIndex, setActiveRuleIndex] = useState<number>(0)
 
   // 載入套餐規則
   useEffect(() => {
@@ -27,6 +29,8 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
       setSelectedOptions({})
       setComboRules([])
       setError(null)
+  setQuantity(1)
+  setActiveRuleIndex(0)
     }
   }, [isOpen])
 
@@ -53,7 +57,9 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
           defaultSelections[rule.id] = []
         }
       })
-      setSelectedOptions(defaultSelections)
+  setSelectedOptions(defaultSelections)
+  setActiveRuleIndex(0)
+  setQuantity(1)
     } catch (error) {
       console.error('載入套餐規則失敗:', error)
       setError('載入套餐選項失敗')
@@ -119,13 +125,13 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
       }
     }
     
-    return totalPrice
+  return totalPrice * quantity
   }
 
   const handleAddToCart = () => {
     // 對於 fixed 類型套餐，直接加入購物車
     if (combo.combo_type === 'fixed') {
-      addToCart(combo)
+      addToCart(combo, undefined, quantity)
       onClose()
       return
     }
@@ -160,7 +166,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
     })
 
     console.log('套餐選項:', comboSelections)
-    addToCart(combo, comboSelections)
+  addToCart(combo, comboSelections, quantity)
     onClose()
   }
 
@@ -195,6 +201,17 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
                 {combo.combo_type === 'fixed' ? '固定套餐' : '可選套餐'}
               </span>
             </div>
+            {combo.combo_type === 'selectable' && (
+              <div className="mt-3 flex items-center gap-3">
+                <span className="text-sm text-gray-600">份數</span>
+                <div className="flex items-center border rounded-lg overflow-hidden">
+                  <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-8 h-8 grid place-items-center bg-gray-50">-</button>
+                  <div className="px-3 text-sm min-w-[2rem] text-center">{quantity}</div>
+                  <button onClick={() => setQuantity(q => q + 1)} className="w-8 h-8 grid place-items-center bg-gray-50">+</button>
+                </div>
+                <span className="text-xs text-gray-500">此選擇將套用到每一份</span>
+              </div>
+            )}
           </div>
 
           {/* 錯誤提示 */}
@@ -215,68 +232,67 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
               ) : (
                 <div>
                   <h3 className="text-lg font-medium text-gray-800 mb-3">請選擇套餐內容</h3>
-                  
-                  <div className="space-y-6">
-                    {comboRules.map((rule) => {
-                      const currentSelections = selectedOptions[rule.id] || []
+
+                  {/* 規則 Tabs（縮短整體長度） */}
+                  <div className="mb-3 flex gap-2 overflow-x-auto">
+                    {comboRules.map((rule, idx) => {
+                      const hasMin = Math.max(1, rule.min_selections || 0)
+                      const done = (selectedOptions[rule.id] || []).length >= hasMin
                       return (
-                        <div key={rule.id}>
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-medium text-gray-700">
-                              {rule.selection_name}
-                              {rule.is_required && <span className="text-red-500 ml-1">*</span>}
-                            </h4>
-                            <span className="text-xs text-gray-500">
-                              {rule.selection_type === 'single' ? '單選' : `${rule.min_selections}-${rule.max_selections} 選`}
-                            </span>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            {rule.options.map((option) => {
-                              const isSelected = currentSelections.includes(option.id)
-                              const inputType = rule.selection_type === 'single' ? 'radio' : 'checkbox'
-                              
-                              return (
-                                <label 
-                                  key={option.id} 
-                                  className={`flex items-center p-2 rounded-lg border-2 transition-colors cursor-pointer ${
-                                    isSelected 
-                                      ? 'border-blue-500 bg-blue-50' 
-                                      : 'border-gray-200 hover:border-gray-300'
-                                  }`}
-                                >
-                                  <input
-                                    type={inputType}
-                                    name={`rule_${rule.id}`}
-                                    checked={isSelected}
-                                    onChange={() => handleOptionChange(rule.id, option.id, rule)}
-                                    className="mr-3"
-                                  />
-                                  <div className="flex-1">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-sm font-medium">
-                                        {option.product_name}
-                                        {option.is_default && (
-                                          <span className="ml-2 text-xs text-green-600">[預設]</span>
-                                        )}
-                                      </span>
-                                      {option.additional_price !== 0 && (
-                                        <span className={`text-sm font-medium ${
-                                          option.additional_price > 0 ? 'text-red-600' : 'text-green-600'
-                                        }`}>
-                                          {option.additional_price > 0 ? '+' : ''}${option.additional_price}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                </label>
-                              )
-                            })}
-                          </div>
-                        </div>
+                        <button
+                          key={rule.id}
+                          onClick={() => setActiveRuleIndex(idx)}
+                          className={`px-3 py-1.5 rounded-full border text-sm whitespace-nowrap ${idx===activeRuleIndex ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 bg-white text-gray-600'}`}
+                        >
+                          {done ? '✅' : `${idx+1}.`} {rule.selection_name}
+                        </button>
                       )
                     })}
                   </div>
+
+                  {/* 當前規則內容（可滾動） */}
+                  {comboRules[activeRuleIndex] && (() => {
+                    const rule = comboRules[activeRuleIndex]
+                    const currentSelections = selectedOptions[rule.id] || []
+                    const inputType = rule.selection_type === 'single' ? 'radio' : 'checkbox'
+                    return (
+                      <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="text-sm text-gray-700">
+                            {rule.selection_name} {rule.is_required && <span className="text-red-500">*</span>}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {rule.selection_type === 'single' ? '單選' : `${rule.min_selections}-${rule.max_selections} 選`}
+                          </div>
+                        </div>
+                        {rule.options.map(option => {
+                          const isSelected = currentSelections.includes(option.id)
+                          return (
+                            <label key={option.id} className={`flex items-center p-2 rounded-lg border cursor-pointer text-sm ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                              <input
+                                type={inputType}
+                                name={`rule_${rule.id}`}
+                                checked={isSelected}
+                                onChange={() => handleOptionChange(rule.id, option.id, rule)}
+                                className="mr-2"
+                              />
+                              <div className="flex-1 flex items-center justify-between gap-2">
+                                <span className="truncate">
+                                  {option.product_name}
+                                  {option.is_default && <span className="ml-1 text-xs text-green-600">[預設]</span>}
+                                </span>
+                                {option.additional_price !== 0 && (
+                                  <span className={`${option.additional_price > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                    {option.additional_price > 0 ? '+' : ''}${option.additional_price}
+                                  </span>
+                                )}
+                              </div>
+                            </label>
+                          )
+                        })}
+                      </div>
+                    )
+                  })()}
                 </div>
               )}
             </div>
@@ -293,7 +309,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
         </div>
 
         {/* 底部按鈕 */}
-        <div className="p-4 border-t border-gray-200">
+    <div className="p-4 border-t border-gray-200">
           <div className="flex gap-3">
             <button
               onClick={onClose}
@@ -304,7 +320,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
             <button
               onClick={handleAddToCart}
               disabled={loading}
-              className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium"
+      className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium"
             >
               加入購物車
             </button>
