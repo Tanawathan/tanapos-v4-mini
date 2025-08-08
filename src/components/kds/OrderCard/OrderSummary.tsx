@@ -19,6 +19,16 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
   progressPercentage
 }) => {
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const isCompact = (() => {
+    try {
+      const raw = localStorage.getItem('kds-settings');
+      if (!raw) return true; // 預設 UI 偏緊湊
+      const parsed = JSON.parse(raw);
+      return parsed?.displayMode === 'compact';
+    } catch {
+      return true;
+    }
+  })();
 
   // 每分鐘更新一次時間，確保持續時間顯示準確
   useEffect(() => {
@@ -84,44 +94,44 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
   };
 
   return (
-    <div className="space-y-2">
+    <div className={isCompact ? 'space-y-1' : 'space-y-2'}>
       {/* 第一行：基本信息 */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <span className="text-lg">{getStatusIcon()}</span>
-          <div className="flex items-center space-x-2 text-sm">
+        <div className={`flex items-center ${isCompact ? 'space-x-2' : 'space-x-3'}`}>
+          <span className={isCompact ? 'text-base' : 'text-lg'}>{getStatusIcon()}</span>
+          <div className={`flex items-center ${isCompact ? 'space-x-1 text-xs' : 'space-x-2 text-sm'}`}>
             {/* 外帶訂單特別標示 */}
             {isTakeoutOrder(order.order_number) ? (
               <div className="flex items-center space-x-1">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                <span className={`inline-flex items-center ${isCompact ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-xs'} rounded-full font-medium bg-orange-100 text-orange-800 border border-orange-200`}>
                   🥡 外帶
                 </span>
-                <span className="font-semibold text-gray-900">#{formatOrderNumber(order.order_number)}</span>
+                <span className={`${isCompact ? 'text-xs' : ''} font-semibold text-gray-900`}>#{formatOrderNumber(order.order_number)}</span>
               </div>
             ) : (
-              <span className="font-semibold text-gray-900">#{order.order_number}</span>
+              <span className={`${isCompact ? 'text-xs' : ''} font-semibold text-gray-900`}>#{order.order_number}</span>
             )}
-            <span className="text-gray-500">|</span>
+            {!isCompact && <span className="text-gray-500">|</span>}
             {/* 桌號顯示 - 外帶訂單不顯示桌號 */}
             {!isTakeoutOrder(order.order_number) && (
               <>
-                <span className="text-gray-700">T{order.table_number?.toString().padStart(2, '0')}</span>
-                <span className="text-gray-500">|</span>
+                <span className={`${isCompact ? 'text-xs' : ''} text-gray-700`}>T{order.table_number?.toString().padStart(2, '0')}</span>
+                {!isCompact && <span className="text-gray-500">|</span>}
               </>
             )}
-            <span className="text-gray-600">
+            <span className={`${isCompact ? 'text-xs' : ''} text-gray-600`}>
               ⏰ {formatDuration(calculateOrderDuration(order.created_at))}
             </span>
-            <span className="text-gray-500">|</span>
-            <span className="text-gray-600">👥 {order.party_size || 0}人</span>
-            <span className="text-gray-500">|</span>
-            <span className="text-gray-600">📦 {totalItems}項</span>
+            {!isCompact && <span className="text-gray-500">|</span>}
+            {!isCompact && <span className="text-gray-600">👥 {order.party_size || 0}人</span>}
+            {!isCompact && <span className="text-gray-500">|</span>}
+            <span className={`${isCompact ? 'text-xs' : ''} text-gray-600`}>📦 {totalItems}項</span>
           </div>
         </div>
         
         <div className="flex items-center space-x-2">
           <button 
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className={`${isCompact ? 'text-gray-400' : 'text-gray-400 hover:text-gray-600'} transition-colors`}
             title="展開訂單詳情"
           >
             ▼
@@ -131,24 +141,24 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
 
       {/* 第二行：進度和時間 */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className={`flex items-center ${isCompact ? 'space-x-2' : 'space-x-4'}`}>
           {/* 進度指示 */}
-          <div className="flex items-center space-x-2">
-            <span className={`text-sm font-medium ${getUrgencyColor()}`}>
+          <div className={`flex items-center ${isCompact ? 'space-x-1' : 'space-x-2'}`}>
+            <span className={`${isCompact ? 'text-xs' : 'text-sm'} font-medium ${getUrgencyColor()}`}>
               {order.status === 'preparing' ? '🔄 製作中' : 
                order.status === 'ready' ? '✅ 已完成' : 
                '📦 待處理'}
             </span>
-            <span className="text-sm text-gray-600">
+            <span className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-600`}>
               {completedItems}/{totalItems}
             </span>
           </div>
 
           {/* 進度條 */}
           <div className="flex-1 min-w-[80px]">
-            <div className="w-full bg-gray-200 rounded-full h-1.5">
+            <div className={`w-full bg-gray-200 rounded-full ${isCompact ? 'h-1' : 'h-1.5'}`}>
               <div 
-                className={`h-1.5 rounded-full transition-all duration-300 ${
+                className={`${isCompact ? 'h-1' : 'h-1.5'} rounded-full transition-all duration-300 ${
                   progressPercentage === 100 ? 'bg-green-500' :
                   progressPercentage > 50 ? 'bg-blue-500' : 'bg-orange-500'
                 }`}
@@ -159,7 +169,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
 
           {/* 預估時間 */}
           {estimatedTimeRemaining > 0 && (
-            <span className={`text-sm ${getUrgencyColor()}`}>
+            <span className={`${isCompact ? 'text-xs' : 'text-sm'} ${getUrgencyColor()}`}>
               ⏱️ 剩餘 {estimatedTimeRemaining}分鐘
             </span>
           )}
@@ -168,7 +178,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
         {/* 快速操作按鈕 */}
         <div className="flex items-center space-x-1">
           <button
-            className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+            className={`px-2 py-1 ${isCompact ? 'text-[10px]' : 'text-xs'} bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors`}
             title="快速操作"
             onClick={(e) => {
               e.stopPropagation();

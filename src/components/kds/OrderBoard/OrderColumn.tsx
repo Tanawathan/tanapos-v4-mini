@@ -22,6 +22,17 @@ export const OrderColumn: React.FC<OrderColumnProps> = ({
   columnType
 }) => {
   const [showItemSummary, setShowItemSummary] = useState(false);
+  // 讀取顯示模式
+  const isCompact = (() => {
+    try {
+      const raw = localStorage.getItem('kds-settings');
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      return parsed?.displayMode === 'compact';
+    } catch {
+      return false;
+    }
+  })();
 
   // 計算餐點的統計摘要（待處理和製作中都需要）
   const calculateItemSummary = () => {
@@ -83,21 +94,23 @@ export const OrderColumn: React.FC<OrderColumnProps> = ({
   return (
     <div className={`border rounded-lg ${getColumnColor()} min-h-0 flex flex-col h-full kds-column`}>
       {/* 欄位標題 */}
-      <div className="p-3 md:p-4 border-b border-gray-200 bg-white rounded-t-lg flex-shrink-0 kds-column-header">
+      <div className={`${isCompact ? 'p-2 md:p-3' : 'p-3 md:p-4'} border-b border-gray-200 bg-white rounded-t-lg flex-shrink-0 kds-column-header`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-base md:text-lg">{getColumnIcon()}</span>
+            <span className={`${isCompact ? 'text-sm md:text-base' : 'text-base md:text-lg'}`}>{getColumnIcon()}</span>
             <div>
-              <h2 className="font-semibold text-gray-900 text-sm md:text-base">{title}</h2>
-              <p className="text-xs md:text-sm text-gray-500">{subtitle}</p>
+              <h2 className={`font-semibold text-gray-900 ${isCompact ? 'text-xs md:text-sm' : 'text-sm md:text-base'}`}>{title}</h2>
+              {!isCompact && (
+                <p className="text-xs md:text-sm text-gray-500">{subtitle}</p>
+              )}
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className={`flex items-center ${isCompact ? 'space-x-1' : 'space-x-2'}`}>
             {/* 餐點統計按鈕 - 待處理和製作中都顯示 */}
             {(columnType === 'preparing' || columnType === 'pending') && hasItems && (
               <button
                 onClick={() => setShowItemSummary(!showItemSummary)}
-                className={`p-1 md:p-2 hover:bg-opacity-80 rounded-md transition-colors text-sm md:text-base ${
+                className={`p-1 md:p-2 hover:bg-opacity-80 rounded-md transition-colors ${isCompact ? 'text-xs md:text-sm' : 'text-sm md:text-base'} ${
                   columnType === 'preparing' 
                     ? 'text-blue-600 hover:bg-blue-100' 
                     : 'text-orange-600 hover:bg-orange-100'
@@ -107,7 +120,7 @@ export const OrderColumn: React.FC<OrderColumnProps> = ({
                 📊
               </button>
             )}
-            <div className={`px-2 py-1 rounded-full text-xs md:text-sm font-medium ${
+            <div className={`px-2 py-1 rounded-full ${isCompact ? 'text-[10px] md:text-xs' : 'text-xs md:text-sm'} font-medium ${
               columnType === 'pending' ? 'bg-orange-100 text-orange-600' :
               columnType === 'preparing' ? 'bg-blue-100 text-blue-600' :
               'bg-green-100 text-green-600'
@@ -119,19 +132,19 @@ export const OrderColumn: React.FC<OrderColumnProps> = ({
         
         {/* 餐點統計摘要 - 待處理和製作中都顯示 */}
         {(columnType === 'preparing' || columnType === 'pending') && showItemSummary && hasItems && (
-          <div className={`mt-3 p-2 md:p-3 rounded-md border ${
+          <div className={`mt-2 ${isCompact ? 'p-2' : 'p-2 md:p-3'} rounded-md border ${
             columnType === 'preparing' 
               ? 'bg-blue-50 border-blue-200' 
               : 'bg-orange-50 border-orange-200'
           }`}>
-            <h3 className={`text-xs md:text-sm font-semibold mb-2 ${
+            <h3 className={`${isCompact ? 'text-[11px] md:text-xs' : 'text-xs md:text-sm'} font-semibold mb-2 ${
               columnType === 'preparing' 
                 ? 'text-blue-800' 
                 : 'text-orange-800'
             }`}>
               📊 {columnType === 'preparing' ? '製作中餐點統計' : '待處理餐點統計（備料參考）'}
             </h3>
-            <div className="grid grid-cols-1 gap-1 md:gap-2 text-xs md:text-sm">
+            <div className={`grid grid-cols-1 ${isCompact ? 'gap-1 text-[11px] md:text-xs' : 'gap-1 md:gap-2 text-xs md:text-sm'}`}>
               {Object.entries(itemSummary).map(([itemName, counts]) => (
                 <div key={itemName} className="py-1">
                   <div className="flex justify-between items-center">

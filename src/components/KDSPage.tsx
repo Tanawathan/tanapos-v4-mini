@@ -52,6 +52,15 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
     return completedItems / order.menuItems.length;
   };
 
+  // 顯示模式變更時自動展開/收合
+  useEffect(() => {
+    if (settings.displayMode === 'detailed') {
+      setExpandedOrders(new Set(orders.map(o => o.id)));
+    } else {
+      setExpandedOrders(new Set());
+    }
+  }, [settings.displayMode, orders]);
+
   // 排序訂單 - 距離完成越近越優先，相同進度時訂單時間較早的優先
   const sortOrders = (orders: KDSOrder[]): KDSOrder[] => {
     return [...orders].sort((a, b) => {
@@ -241,7 +250,7 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
       {/* 主要內容區域 */}
   <main className={`p-3 md:p-4 lg:p-6 flex-1 min-h-0 overflow-hidden kds-main ${settings.mobileLandscapeMode ? 'pb-20' : ''}`}>
         {/* 針對平板橫向優化的響應式網格佈局 */}
-        <div className={`grid gap-3 md:gap-4 lg:gap-6 h-full kds-grid ${settings.mobileLandscapeMode ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3'}`}>
+  <div className={`grid ${settings.displayMode === 'compact' ? 'gap-2 md:gap-3 lg:gap-4' : 'gap-3 md:gap-4 lg:gap-6'} h-full kds-grid ${settings.mobileLandscapeMode ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3'}`}>
           {/* 待處理訂單 */}
           <OrderColumn
             title="待處理"
