@@ -2,7 +2,11 @@ import React from 'react'
 import { useMobileOrderStore, type MenuItem } from '../../stores/mobileOrderStore'
 import ProductCard from './ProductCard'
 
-const ProductGrid: React.FC = () => {
+interface ProductGridProps {
+  searchQuery?: string
+}
+
+const ProductGrid: React.FC<ProductGridProps> = ({ searchQuery = '' }) => {
   const { products, selectedCategory, productFilter, loading } = useMobileOrderStore()
 
   // 根據選擇的商品類型和分類過濾商品
@@ -24,8 +28,18 @@ const ProductGrid: React.FC = () => {
       filtered = filtered.filter(item => item.category_id === selectedCategory)
     }
 
+    // 搜尋關鍵字過濾（名稱與描述）
+    const q = searchQuery.trim().toLowerCase()
+    if (q) {
+      filtered = filtered.filter(item => {
+        const name = (item.name || '').toLowerCase()
+        const desc = (item.description || '').toLowerCase()
+        return name.includes(q) || desc.includes(q)
+      })
+    }
+
     return filtered
-  }, [products, selectedCategory, productFilter])
+  }, [products, selectedCategory, productFilter, searchQuery])
 
   // 調試用：顯示載入的資料統計
   React.useEffect(() => {
@@ -45,7 +59,7 @@ const ProductGrid: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         {Array.from({ length: 6 }).map((_, index) => (
           <div key={index} className="bg-white rounded-lg border animate-pulse">
             <div className="flex p-4">
@@ -83,7 +97,7 @@ const ProductGrid: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-2 gap-3">
       {filteredProducts.map((item) => (
         <ProductCard key={item.id} product={item} />
       ))}

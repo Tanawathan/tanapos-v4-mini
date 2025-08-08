@@ -6,7 +6,9 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart, openComboSelector } = useMobileOrderStore()
+  const { addToCart, openComboSelector, cartItems, updateCartQuantity, removeFromCart } = useMobileOrderStore()
+
+  const current = React.useMemo(() => cartItems.find(ci => ci.id === product.id), [cartItems, product.id])
 
   const handleAddToCart = () => {
     // 檢查是否為可選擇的套餐
@@ -21,7 +23,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex p-4">
+      <div className="flex p-3">
         {/* 商品圖片 */}
         <div className="w-20 h-20 flex-shrink-0 mr-4">
           {product.image_url ? (
@@ -29,6 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               src={product.image_url}
               alt={product.name}
               className="w-full h-full object-cover rounded-lg"
+              loading="lazy"
               onError={(e) => {
                 // 圖片載入失敗時顯示預設圖示
                 e.currentTarget.style.display = 'none'
@@ -44,7 +47,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* 商品資訊 */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-lg font-semibold text-gray-800 truncate">
+            <h3 className="text-base font-semibold text-gray-800 truncate">
               {product.name}
             </h3>
             {/* 套餐標識 */}
@@ -54,30 +57,38 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+          <p className="text-xs text-gray-600 mb-2 line-clamp-2">
             {product.description || (product.type === 'combo' ? '精選套餐組合' : '經典美味料理')}
           </p>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <span className="text-xl font-bold text-gray-800">
+              <span className="text-lg font-bold text-gray-800">
                 💰 NT${product.price}
               </span>
             </div>
-            <button
-              onClick={handleAddToCart}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors min-w-[80px] active:scale-95"
-            >
-              {product.type === 'combo' && product.combo_type === 'selectable' 
-                ? '選擇' 
-                : '+ 加入'
-              }
-            </button>
+            {current ? (
+              <div className="flex items-center gap-2">
+                <button onClick={() => updateCartQuantity(current.instanceId, current.quantity - 1)} className="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 grid place-items-center">-</button>
+                <span className="min-w-[1.5rem] text-center text-sm">{current.quantity}</span>
+                <button onClick={() => updateCartQuantity(current.instanceId, current.quantity + 1)} className="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 grid place-items-center">+</button>
+              </div>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors min-w-[72px] active:scale-95 text-sm"
+              >
+                {product.type === 'combo' && product.combo_type === 'selectable' 
+                  ? '選擇' 
+                  : '+ 加入'
+                }
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       {/* 商品可用性指示 */}
-      {!product.is_available && (
+  {!product.is_available && (
         <div className="px-4 pb-3">
           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
             ⏸️ 暫停供應

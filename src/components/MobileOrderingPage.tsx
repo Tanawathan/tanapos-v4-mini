@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useMobileOrderStore } from '../stores/mobileOrderStore'
 import CollapsibleOrderInfo from './mobile/CollapsibleOrderInfo'
 import ProductCategoryTabs from './mobile/ProductCategoryTabs'
@@ -23,6 +23,7 @@ const MobileOrderingPage: React.FC<MobileOrderingPageProps> = ({ onBack }) => {
     selectedComboForSelection,
     closeComboSelector
   } = useMobileOrderStore()
+  const [search, setSearch] = useState('')
 
   // 初始化資料載入
   useEffect(() => {
@@ -105,13 +106,29 @@ const MobileOrderingPage: React.FC<MobileOrderingPageProps> = ({ onBack }) => {
           </div>
         )}
 
-        {/* 商品分類標籤 */}
-        <div className="bg-white rounded-lg shadow-sm border mb-4">
+        {/* 搜尋 + 商品分類標籤 */}
+        <div className="bg-white rounded-lg shadow-sm border mb-4 p-3">
+          <div className="mb-3">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 relative">
+                <span className="absolute left-3 top-2.5 text-gray-400">🔎</span>
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="搜尋餐點或描述"
+                  className="w-full pl-9 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+              </div>
+              {search && (
+                <button onClick={() => setSearch('')} className="text-sm text-gray-500 underline">清除</button>
+              )}
+            </div>
+          </div>
           <ProductCategoryTabs />
         </div>
 
         {/* 商品網格 */}
-        <ProductGrid />
+  <ProductGrid searchQuery={search} />
       </div>
 
       {/* 購物車彈窗 */}
