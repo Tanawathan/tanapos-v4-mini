@@ -252,7 +252,7 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
       </header>
 
       {/* 主要內容區域 */}
-  <main className={`p-3 md:p-4 lg:p-6 flex-1 min-h-0 overflow-hidden kds-main ${settings.mobileLandscapeMode ? 'pb-20' : ''}`}>
+  <main className={`p-3 md:p-4 lg:p-6 flex-1 min-h-0 overflow-hidden kds-main ${settings.mobileLandscapeMode && !settings.hideStats ? 'pb-20' : ''}`}>
         {/* 針對平板橫向優化的響應式網格佈局 */}
   <div className={`grid ${settings.displayMode === 'compact' ? 'gap-2 md:gap-3 lg:gap-4' : 'gap-3 md:gap-4 lg:gap-6'} h-full kds-grid ${settings.mobileLandscapeMode ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3'}`}>
           {/* 待處理訂單 */}
@@ -291,8 +291,8 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
       </main>
 
       {/* 底部統計欄 */}
-      <footer className={`bg-white border-t border-gray-200 px-3 md:px-6 py-2 md:py-4 flex-shrink-0 kds-footer ${settings.mobileLandscapeMode ? 'fixed bottom-0 left-0 right-0 z-40' : ''}`}>
-        {!settings.hideStats && (
+      {!settings.hideStats && (
+        <footer className={`bg-white border-t border-gray-200 px-3 md:px-6 py-2 md:py-4 flex-shrink-0 kds-footer ${settings.mobileLandscapeMode ? 'fixed bottom-0 left-0 right-0 z-40' : ''}`}>
           <div className="flex items-center justify-center flex-wrap gap-3 md:gap-8 text-xs md:text-sm text-gray-600 kds-footer-stats">
             <span className="hidden md:inline">📈 即時統計:</span>
             <span>待處理 <strong className="text-orange-600">{stats.pendingOrders}</strong></span>
@@ -305,31 +305,31 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
               </span>
             )}
           </div>
-        )}
-        {settings.displayMode === 'compact' && (
-          <div className="mt-2 flex items-center justify-center gap-2 text-xs">
-            <button
-              onClick={handleExpandAll}
-              className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50"
-            >
-              展開全部
-            </button>
-            <button
-              onClick={handleCollapseAll}
-              className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50"
-            >
-              收合全部
-            </button>
-            <button
-              onClick={() => handleSort(sortBy === 'priority' ? 'time' : 'priority')}
-              className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50"
-              title="切換排序（時間/優先級）"
-            >
-              排序：{sortBy === 'priority' ? '優先級' : '時間'}
-            </button>
-          </div>
-        )}
-      </footer>
+          {settings.displayMode === 'compact' && (
+            <div className="mt-2 flex items-center justify-center gap-2 text-xs">
+              <button
+                onClick={handleExpandAll}
+                className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50"
+              >
+                展開全部
+              </button>
+              <button
+                onClick={handleCollapseAll}
+                className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50"
+              >
+                收合全部
+              </button>
+              <button
+                onClick={() => handleSort(sortBy === 'priority' ? 'time' : 'priority')}
+                className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50"
+                title="切換排序（時間/優先級）"
+              >
+                排序：{sortBy === 'priority' ? '優先級' : '時間'}
+              </button>
+            </div>
+          )}
+        </footer>
+      )}
 
       {/* 設定視窗 */}
       {isSettingsOpen && (
