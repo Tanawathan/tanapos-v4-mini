@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from './supabase'
+import { generateDineInOrderNumber, generateTakeawayOrderNumber } from '../utils/orderNumberGenerator'
 import type { 
   Restaurant, 
   Category, 
@@ -435,7 +436,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       const table = get().tables.find(t => t.id === selectedTable)
       if (!table) throw new Error('找不到選擇的桌台')
 
-      const orderNumber = `ORD-${Date.now()}`
+      const orderNumber = generateDineInOrderNumber(table.table_number.toString())
       const total = get().getCartTotal()
 
       const orderData: Omit<Order, 'id' | 'created_at' | 'updated_at'> = {
@@ -745,7 +746,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       // 1. 準備完整的訂單資料（匹配實際資料庫結構）
       const newOrder: Order = {
         id: crypto.randomUUID(),
-        order_number: `ORD-${Date.now()}`,
+        order_number: generateDineInOrderNumber((orderData.table_number || 1).toString()),
         restaurant_id: orderData.restaurant_id,
         table_id: orderData.table_id,
         session_id: null,

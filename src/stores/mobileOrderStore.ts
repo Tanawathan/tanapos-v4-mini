@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { supabase } from '../lib/supabase'
 import type { Product, Category } from '../lib/types'
+import { generateTakeawayOrderNumber, generatePickupNumber, generateDineInOrderNumber } from '../utils/orderNumberGenerator'
 
 // 統一的商品項目類型（可以是產品或套餐）
 export interface MenuItem extends Omit<Product, 'id'> {
@@ -633,8 +634,9 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
               last_sequence: nextSequence
             })
 
-          const takeawayNumber = `TOGO-${nextSequence.toString().padStart(3, '0')}`
-          const pickupNumber = `TO-${nextSequence.toString().padStart(3, '0')}`
+          // 使用隨機生成器生成外帶訂單編號和取餐號
+          const takeawayNumber = generateTakeawayOrderNumber()
+          const pickupNumber = generatePickupNumber()
 
           const takeawayInfo: TakeawayInfo = {
             takeawayNumber,
@@ -651,11 +653,10 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
           return takeawayInfo
         } catch (error) {
           console.error('生成取餐號失敗:', error)
-          // 使用時間戳作為後備方案
-          const timestamp = Date.now().toString().slice(-3)
+          // 使用隨機生成器作為後備方案
           const takeawayInfo: TakeawayInfo = {
-            takeawayNumber: `TOGO-${timestamp}`,
-            pickupNumber: `TO-${timestamp}`
+            takeawayNumber: generateTakeawayOrderNumber(),
+            pickupNumber: generatePickupNumber()
           }
 
           set((state) => ({
@@ -749,9 +750,8 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
           // 生成訂單編號
           let orderNumber: string
           if (orderContext.diningMode === 'takeaway') {
-            orderNumber = orderContext.takeawayInfo?.takeawayNumber || `TOGO-${Date.now()}`
+            orderNumber = orderContext.takeawayInfo?.takeawayNumber || generateTakeawayOrderNumber()
           } else {
-            const timestamp = Date.now()
             if (orderContext.orderMode === 'additional') {
               // 加點訂單：查詢同桌已有訂單數量
               const tableNumberInt = parseInt(orderContext.tableNumber!, 10)
@@ -763,9 +763,9 @@ export const useMobileOrderStore = create<MobileOrderStore>()(
                 .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
 
               const sequence = (existingOrders?.length || 0) + 1
-              orderNumber = `${orderContext.tableNumber}-${timestamp.toString().slice(-3)}-A${sequence}`
+              orderNumber = generateDineInOrderNumber(orderContext.tableNumber!, true, sequence)
             } else {
-              orderNumber = `${orderContext.tableNumber}-${timestamp.toString().slice(-3)}`
+              orderNumber = generateDineInOrderNumber(orderContext.tableNumber!)
             }
           }
 

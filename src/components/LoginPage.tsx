@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 interface LoginPageProps {
-  onLoginSuccess: () => void
+  onLoginSuccess?: () => void // 現在是可選的，因為我們會使用路由導航
 }
 
 export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('admin@tanapos.com')
   const [password, setPassword] = useState('TanaPos2025!')
   const [loading, setLoading] = useState(false)
@@ -17,11 +19,15 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
         console.log('✅ 用戶已登入:', session.user.email)
-        onLoginSuccess()
+        if (onLoginSuccess) {
+          onLoginSuccess()
+        } else {
+          navigate('/', { replace: true })
+        }
       }
     }
     checkUser()
-  }, [onLoginSuccess])
+  }, [navigate, onLoginSuccess])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,7 +80,13 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
         console.log('✅ 登入成功:', data.user?.email)
         console.log('用戶 ID:', data.user?.id)
         console.log('Session 狀態:', data.session ? '已建立' : '未建立')
-        onLoginSuccess()
+        
+        // 使用路由導航或回調函數
+        if (onLoginSuccess) {
+          onLoginSuccess()
+        } else {
+          navigate('/', { replace: true })
+        }
       }
     } catch (err: any) {
       console.error('❌ 登入過程發生錯誤:', err)
