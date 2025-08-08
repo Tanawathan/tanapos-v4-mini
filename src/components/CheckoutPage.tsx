@@ -23,6 +23,16 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const [receivedAmount, setReceivedAmount] = useState<string>('')
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set())
+  const [successInfo, setSuccessInfo] = useState<null | {
+    tableDisplay: string,
+    orderNumbers: string,
+    subtotal: number,
+    taxAmount: number,
+    serviceFee: number,
+    finalAmount: number,
+    change?: number
+  }>(null)
 
   // 只在未載入時觸發資料載入，避免無限渲染
   useEffect(() => {
@@ -115,18 +125,25 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
     setSelectedTableData(table)
     setTableOrders(relatedOrders)
+  setSelectedOrderIds(new Set(relatedOrders.map(o => o.id)))
     setShowConfirmModal(true)
   }
 
   // 計算所有訂單的總計
+  const getSelectedOrders = () => {
+    if (tableOrders.length === 0) return [] as Order[]
+    return tableOrders.filter(o => selectedOrderIds.has(o.id))
+  }
+
   const calculateTotalAmount = () => {
-    if (tableOrders.length === 0) return 0
-    return tableOrders.reduce((total, order) => total + (order.total_amount || 0), 0)
+    const selected = getSelectedOrders()
+    if (selected.length === 0) return 0
+    return selected.reduce((total, order) => total + (order.total_amount || 0), 0)
   }
 
   // 計算稅額（根據付款方式）
   const getTaxAmount = () => {
-    if (tableOrders.length === 0) return 0
+  if (getSelectedOrders().length === 0) return 0
     const subtotal = calculateTotalAmount()
     
     // 現金付款：不收稅金
@@ -144,7 +161,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
   // 計算服務費（基於含稅金額）
   const getServiceFee = () => {
-    if (tableOrders.length === 0) return 0
+  if (getSelectedOrders().length === 0) return 0
     
     // 現金付款：不收服務費
     if (paymentMethod === 'cash') {
@@ -163,7 +180,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
   // 計算最終金額（包含稅額和服務費）
   const getFinalAmount = () => {
-    if (tableOrders.length === 0) return 0
+  if (getSelectedOrders().length === 0) return 0
     
     const subtotal = calculateTotalAmount()
     const taxAmount = getTaxAmount()
@@ -175,7 +192,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
   // 計算找零
   const calculateChange = () => {
-    if (tableOrders.length === 0 || !receivedAmount) return 0
+  if (getSelectedOrders().length === 0 || !receivedAmount) return 0
     const received = parseFloat(receivedAmount)
     const total = getFinalAmount()
     return Math.max(0, received - total)
@@ -210,12 +227,13 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
   // 處理結帳
   const handleCheckout = async () => {
-    if (tableOrders.length === 0) return
+  const selected = getSelectedOrders()
+  if (selected.length === 0) return
 
     setIsProcessing(true)
     try {
       // 處理所有訂單的結帳
-      for (const order of tableOrders) {
+  for (const order of selected) {
         await processCheckout(selectedTableData?.id || '', order.id, {
           payment_method: paymentMethod,
           received_amount: paymentMethod === 'cash' ? parseFloat(receivedAmount) : undefined,
@@ -239,17 +257,20 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
         amountDetails += `\n服務費：NT$ 0 (現金免服務費)`
       }
       
-      const orderNumbers = tableOrders.map(order => order.order_number).join(', ')
+      const orderNumbers = selected.map(order => order.order_number).join(', ')
       const tableDisplay = selectedTableData?.is_takeout ? 
         `外帶 (${orderNumbers})` : 
         `桌號：${selectedTableData?.table_number}`
       
-      alert(`✅ 結帳成功！\n${tableDisplay}\n訂單：${orderNumbers}${amountDetails}\n總計：NT$ ${finalAmount.toLocaleString()}\n${paymentMethod === 'cash' ? `找零：NT$ ${calculateChange().toLocaleString()}` : ''}`)
-
-      setSelectedTableData(null)
-      setTableOrders([])
-      setReceivedAmount('')
-      setShowConfirmModal(false)
+      setSuccessInfo({
+        tableDisplay,
+        orderNumbers,
+        subtotal,
+        taxAmount,
+        serviceFee,
+        finalAmount,
+        change: paymentMethod === 'cash' ? calculateChange() : undefined
+      })
 
     } catch (error) {
       console.error('結帳失敗:', error)
@@ -308,7 +329,10 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       {/* 桌台選擇區域 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-ui-primary rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-ui-primary mb-6">選擇要結帳的桌台</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-ui-primary">選擇要結帳的桌台</h2>
+            <div className="text-sm text-ui-muted">已載入桌台 {tables.length} • 訂單 {orders.length}</div>
+          </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {getOccupiedTablesAndTakeout().map((table) => {
@@ -324,19 +348,17 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                 <button
                   key={table.id}
                   onClick={() => selectTableForCheckout(table)}
-                  className="p-4 bg-yellow-100 border-2 border-yellow-300 rounded-lg hover:bg-yellow-200 transition-colors text-left"
+                  className="p-4 bg-white border rounded-lg hover:border-blue-300 hover:shadow transition text-left"
                 >
-                  <div className="font-semibold text-gray-900 mb-1">
-                    {table.is_takeout ? '🥡' : '🍽️'} {table.is_takeout ? table.name : table.table_number}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="font-semibold text-gray-900">
+                      {table.is_takeout ? '🥡 外帶' : '🍽️ 桌號'} {table.is_takeout ? table.name?.replace('外帶-', '') : table.table_number}
+                    </div>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">{orders.length} 張</span>
                   </div>
-                  <div className="text-sm text-gray-600 mb-2">
-                    {orders.length}個訂單
-                  </div>
-                  <div className="text-sm font-medium text-gray-900">
-                    NT$ {totalAmount.toLocaleString()}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {orders.map(order => order.order_number).join(', ')}
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium text-gray-900">NT$ {totalAmount.toLocaleString()}</div>
+                    <div className="text-xs text-gray-500 truncate max-w-[60%]">{orders.map(order => order.order_number).join(', ')}</div>
                   </div>
                 </button>
               )
@@ -355,30 +377,88 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       {/* 結帳確認彈窗 */}
       {showConfirmModal && selectedTableData && tableOrders.length > 0 && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-ui-primary rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-ui-primary rounded-lg shadow-xl w-full max-w-2xl max-h-[92vh] overflow-y-auto">
             <div className="p-6">
-              <h3 className="text-xl font-semibold text-ui-primary mb-4">
-                {selectedTableData.is_takeout ? '🥡 外帶訂單結帳' : `🍽️ 桌號 ${selectedTableData.table_number} 結帳`}
-              </h3>
-              
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-ui-primary">
+                  {selectedTableData.is_takeout ? '🥡 外帶訂單結帳' : `🍽️ 桌號 ${selectedTableData.table_number} 結帳`}
+                </h3>
+                <button onClick={() => setShowConfirmModal(false)} className="text-ui-muted hover:text-ui-primary">✕</button>
+              </div>
+              {successInfo ? (
+                <div className="space-y-4">
+                  <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
+                    <div className="flex items-center space-x-2 text-green-700 font-semibold mb-2">
+                      <span>✅</span><span>結帳成功</span>
+                    </div>
+                    <div className="text-sm text-gray-700 space-y-1">
+                      <div>{successInfo.tableDisplay}</div>
+                      <div>訂單：{successInfo.orderNumbers}</div>
+                      <div className="pt-2 border-t">
+                        <div>小計：NT$ {successInfo.subtotal.toLocaleString()}</div>
+                        <div>稅額：NT$ {successInfo.taxAmount.toLocaleString()}</div>
+                        <div>服務費：NT$ {successInfo.serviceFee.toLocaleString()}</div>
+                        <div className="font-semibold">總計：NT$ {successInfo.finalAmount.toLocaleString()}</div>
+                        {typeof successInfo.change === 'number' && (
+                          <div>找零：NT$ {successInfo.change.toLocaleString()}</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setSuccessInfo(null)
+                        setSelectedTableData(null)
+                        setTableOrders([])
+                        setReceivedAmount('')
+                        setShowConfirmModal(false)
+                      }}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      完成
+                    </button>
+                  </div>
+                </div>
+              ) : (
+              <>
               {/* 訂單詳情 */}
               <div className="space-y-4 mb-6">
                 <div className="bg-ui-secondary p-4 rounded-lg">
-                  <h4 className="font-medium text-ui-primary mb-3">訂單資訊</h4>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-ui-primary">訂單資訊</h4>
+                    <div className="flex gap-2 text-xs">
+                      <button
+                        onClick={() => setSelectedOrderIds(new Set(tableOrders.map(o => o.id)))}
+                        className="px-2 py-1 border rounded hover:bg-gray-50"
+                      >全選</button>
+                      <button
+                        onClick={() => setSelectedOrderIds(new Set())}
+                        className="px-2 py-1 border rounded hover:bg-gray-50"
+                      >全不選</button>
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     {tableOrders.map((order, index) => (
-                      <div key={order.id} className="flex justify-between items-center py-1">
-                        <span className="text-sm text-ui-muted">
-                          {index + 1}. {order.order_number}
-                        </span>
-                        <span className="font-medium text-ui-primary">
-                          NT$ {(order.total_amount || 0).toLocaleString()}
-                        </span>
-                      </div>
+                      <label key={order.id} className="flex justify-between items-center py-2 px-2 rounded hover:bg-white cursor-pointer border border-transparent">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedOrderIds.has(order.id)}
+                            onChange={(e) => {
+                              const next = new Set(selectedOrderIds)
+                              if (e.target.checked) next.add(order.id); else next.delete(order.id)
+                              setSelectedOrderIds(next)
+                            }}
+                          />
+                          <span className="text-sm text-ui-muted">{index + 1}. {order.order_number}</span>
+                        </div>
+                        <span className="font-medium text-ui-primary">NT$ {(order.total_amount || 0).toLocaleString()}</span>
+                      </label>
                     ))}
                     <div className="border-t pt-2 mt-2">
                       <div className="flex justify-between items-center font-semibold">
-                        <span>小計</span>
+                        <span>小計（{getSelectedOrders().length} 張）</span>
                         <span>NT$ {calculateTotalAmount().toLocaleString()}</span>
                       </div>
                     </div>
@@ -419,8 +499,11 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                       value={receivedAmount}
                       onChange={(e) => setReceivedAmount(e.target.value)}
                       placeholder="輸入收款金額"
-                      className="w-full px-3 py-2 border border-ui rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3"
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2 ${isPaymentValid() ? 'border-ui' : 'border-red-300'}`}
                     />
+                    {!isPaymentValid() && (
+                      <div className="text-xs text-red-600 mb-2">收款不足，請確認金額</div>
+                    )}
                     
                     {/* 快速金額按鈕 */}
                     <div className="mb-3">
@@ -471,6 +554,23 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                           剛好
                         </button>
                       </div>
+                      <div className="grid grid-cols-3 gap-2 mb-2">
+                        <button
+                          type="button"
+                          onClick={() => addQuickAmount(2000)}
+                          className="px-3 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors font-medium text-sm"
+                        >
+                          +2000
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => addQuickAmount(5000)}
+                          className="px-3 py-2 bg-pink-100 text-pink-700 rounded-lg hover:bg-pink-200 transition-colors font-medium text-sm"
+                        >
+                          +5000
+                        </button>
+                        <div></div>
+                      </div>
                       <div className="grid grid-cols-1 gap-2">
                         <button
                           type="button"
@@ -487,6 +587,30 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                         找零：NT$ {calculateChange().toLocaleString()}
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* 行動支付資訊 */}
+                {paymentMethod === 'mobile' && (
+                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                    <div className="text-sm text-blue-800 mb-2">請使用行動支付掃描以下 QR 進行付款（示意）</div>
+                    <div className="flex items-center justify-center">
+                      <div className="w-40 h-40 bg-white border border-blue-200 rounded grid place-items-center text-blue-400">QR</div>
+                    </div>
+                    <div className="text-xs text-blue-700 mt-2 text-center">金額：NT$ {getFinalAmount().toLocaleString()}</div>
+                  </div>
+                )}
+
+                {/* 銀行轉帳資訊 */}
+                {paymentMethod === 'transfer' && (
+                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                    <div className="text-sm text-amber-800">請客戶進行轉帳並確認入帳：</div>
+                    <ul className="text-xs text-amber-700 mt-2 list-disc list-inside space-y-1">
+                      <li>銀行：XXX 銀行（示意）</li>
+                      <li>帳號：000-123-456789</li>
+                      <li>戶名：TanaPOS Demo</li>
+                      <li>應付金額：NT$ {getFinalAmount().toLocaleString()}</li>
+                    </ul>
                   </div>
                 )}
 
@@ -532,24 +656,33 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                   </div>
                 )}
               </div>
+              </>
+              )}
             </div>
             
-            <div className="flex space-x-3 p-6 pt-0">
-              <button
-                onClick={() => setShowConfirmModal(false)}
-                className="flex-1 px-4 py-2 text-ui-muted border border-ui rounded-lg hover:text-ui-primary hover:bg-ui-secondary transition-colors"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleCheckout}
-                disabled={isProcessing || !isPaymentValid()}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-              >
-                {isProcessing ? '處理中...' : '確認結帳'}
-              </button>
-            </div>
+            {!successInfo && (
+              <div className="flex space-x-3 p-6 pt-0">
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  className="flex-1 px-4 py-2 text-ui-muted border border-ui rounded-lg hover:text-ui-primary hover:bg-ui-secondary transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleCheckout}
+                  disabled={isProcessing || !isPaymentValid() || getSelectedOrders().length === 0}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                >
+                  {isProcessing ? '處理中...' : `確認結帳（${getSelectedOrders().length} 張）`}
+                </button>
+              </div>
+            )}
           </div>
+          {isProcessing && (
+            <div className="absolute inset-0 bg-white/50 grid place-items-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600" />
+            </div>
+          )}
         </div>
       )}
     </div>
