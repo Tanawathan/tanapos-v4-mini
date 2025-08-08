@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 
 test.describe('TanaPOS V4-AI 桌台管理系統', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5178');
+    await page.goto('/');
     // 等待頁面載入完成
     await page.waitForLoadState('networkidle');
     
     // 切換到桌台管理頁面 - 點擊桌台管理按鈕
-    const tableManagementButton = page.locator('button:has-text("桌台管理")').last();
+  const tableManagementButton = page.locator('button:has-text("桌台管理"), a:has-text("桌台管理")').last();
     await tableManagementButton.click();
     
     // 等待桌台管理頁面完全載入
@@ -208,8 +208,8 @@ test.describe('TanaPOS V4-AI 桌台管理系統', () => {
 test.describe('TanaPOS V4-AI 響應式設計測試', () => {
   test('移動設備桌台管理測試', async ({ page }) => {
     // 設置移動設備視窗大小
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('http://localhost:5174');
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto('/');
     
     console.log('開始測試移動設備桌台管理...');
 

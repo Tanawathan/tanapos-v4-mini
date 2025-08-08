@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('TanaPOS V4-AI 最終功能驗證', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5178');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
   });
 
@@ -22,13 +22,14 @@ test.describe('TanaPOS V4-AI 最終功能驗證', () => {
     ];
 
     for (const buttonText of mainButtons) {
-      await expect(page.locator(`button:has-text("${buttonText}")`)).toBeVisible();
-      console.log(`✅ "${buttonText}" 按鈕存在且可見`);
+      const el = page.locator(`button:has-text("${buttonText}"), a:has-text("${buttonText}")`).first();
+      await expect(el).toBeVisible();
+      console.log(`✅ "${buttonText}" 元素存在且可見`);
     }
 
     // 3. 測試桌台管理功能流程
     console.log('🪑 測試桌台管理功能...');
-    await page.locator('button:has-text("桌台管理")').click();
+  await page.locator('button:has-text("桌台管理"), a:has-text("桌台管理")').first().click();
     await page.waitForSelector('h1:has-text("桌台管理")', { timeout: 5000 });
     await expect(page.locator('h1')).toContainText('桌台管理');
     console.log('✅ 桌台管理頁面導航成功');
@@ -41,7 +42,7 @@ test.describe('TanaPOS V4-AI 最終功能驗證', () => {
 
     // 4. 測試開始點餐功能
     console.log('🍽️ 測試點餐功能...');
-    await page.locator('button:has-text("開始點餐")').click();
+  await page.locator('button:has-text("開始點餐"), a:has-text("開始點餐")').first().click();
     await page.waitForTimeout(2000);
     
     // 檢查是否導航到點餐頁面（根據實際頁面結構調整）
@@ -61,7 +62,7 @@ test.describe('TanaPOS V4-AI 最終功能驗證', () => {
 
     // 5. 測試訂單管理功能
     console.log('📋 測試訂單管理功能...');
-    await page.locator('button:has-text("訂單管理")').click();
+  await page.locator('button:has-text("訂單管理"), a:has-text("訂單管理")').first().click();
     await page.waitForTimeout(2000);
     
     const hasOrderManagement = await page.locator('h1, h2, h3').count() > 0;
@@ -73,10 +74,10 @@ test.describe('TanaPOS V4-AI 最終功能驗證', () => {
     console.log('💰 測試結帳管理功能...');
     
     // 先回到首頁
-    await page.goto('http://localhost:5178');
+  await page.goto('/');
     await page.waitForLoadState('networkidle');
     
-    await page.locator('button:has-text("結帳管理")').click();
+  await page.locator('button:has-text("結帳管理"), a:has-text("結帳管理")').first().click();
     await page.waitForTimeout(2000);
     
     const hasCheckoutManagement = await page.locator('h1, h2, h3').count() > 0;
@@ -95,7 +96,7 @@ test.describe('TanaPOS V4-AI 最終功能驗證', () => {
     await page.reload();
     await page.waitForLoadState('networkidle');
     
-    let buttonCount = await page.locator('button:has-text("開始點餐"), button:has-text("桌台管理")').count();
+  let buttonCount = await page.locator('button:has-text("開始點餐"), a:has-text("開始點餐"), button:has-text("桌台管理"), a:has-text("桌台管理")').count();
     expect(buttonCount).toBeGreaterThan(0);
     console.log(`✅ 桌面版 (1280x720): 發現 ${buttonCount} 個主要按鈕`);
 
@@ -104,7 +105,7 @@ test.describe('TanaPOS V4-AI 最終功能驗證', () => {
     await page.reload();
     await page.waitForLoadState('networkidle');
     
-    buttonCount = await page.locator('button:has-text("開始點餐"), button:has-text("桌台管理")').count();
+  buttonCount = await page.locator('button:has-text("開始點餐"), a:has-text("開始點餐"), button:has-text("桌台管理"), a:has-text("桌台管理")').count();
     expect(buttonCount).toBeGreaterThan(0);
     console.log(`✅ 平板版 (768x1024): 發現 ${buttonCount} 個主要按鈕`);
 
@@ -113,7 +114,7 @@ test.describe('TanaPOS V4-AI 最終功能驗證', () => {
     await page.reload();
     await page.waitForLoadState('networkidle');
     
-    buttonCount = await page.locator('button:has-text("開始點餐"), button:has-text("桌台管理")').count();
+  buttonCount = await page.locator('button:has-text("開始點餐"), a:has-text("開始點餐"), button:has-text("桌台管理"), a:has-text("桌台管理")').count();
     expect(buttonCount).toBeGreaterThan(0);
     console.log(`✅ 手機版 (375x667): 發現 ${buttonCount} 個主要按鈕`);
 
@@ -143,11 +144,11 @@ test.describe('TanaPOS V4-AI 最終功能驗證', () => {
       console.log(`🔄 測試 ${action} 功能...`);
       
       // 回到首頁
-      await page.goto('http://localhost:5178');
+  await page.goto('/');
       await page.waitForLoadState('networkidle');
       
       // 點擊相應按鈕
-      await page.locator(`button:has-text("${action}")`).click();
+  await page.locator(`button:has-text("${action}"), a:has-text("${action}")`).first().click();
       await page.waitForTimeout(2000);
       
       console.log(`✅ ${action} 導航完成`);

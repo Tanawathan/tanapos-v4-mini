@@ -1,12 +1,31 @@
 import { useState, useEffect } from 'react'
 import usePOSStore from '../lib/store'
 import { Table } from '../lib/types'
+import { supabase } from '../lib/supabase'
+import { ReservationService } from '../services/reservationService'
+import { ORDER_STATUS_COLOR, ORDER_STATUS_LABEL } from '../lib/status'
+import { useAppNavigation } from './withRouterNavigation'
 
 interface TableManagementPageProps {
   onBack: () => void
 }
 
+interface Reservation {
+  id: string
+  customer_name: string
+  customer_phone?: string
+  customer_email?: string
+  party_size: number
+  reservation_time: string
+  duration_minutes: number
+  status: string
+  special_requests?: string
+  customer_notes?: string
+  table_id?: string
+}
+
 export default function TableManagementPage({ onBack }: TableManagementPageProps) {
+  const { goTo } = useAppNavigation()
   // 使用 selector 模式避免無限渲染
   const tables = usePOSStore(state => state.tables)
   const orders = usePOSStore(state => state.orders)
@@ -18,12 +37,16 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const loadTables = usePOSStore(state => state.loadTables)
   const loadOrders = usePOSStore(state => state.loadOrders)
   const updateTableStatus = usePOSStore(state => state.updateTableStatus)
+  const currentRestaurant = usePOSStore(state => state.currentRestaurant)
 
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [selectedTable, setSelectedTable] = useState<Table | null>(null)
   const [showStatusModal, setShowStatusModal] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<any>(null)
   const [showOrderModal, setShowOrderModal] = useState(false)
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
+  const [showReservationModal, setShowReservationModal] = useState(false)
+  const [reservations, setReservations] = useState<Reservation[]>([])
 
   useEffect(() => {
     // 只在還沒載入過時才載入，避免無限循環
@@ -33,7 +56,33 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     if (!ordersLoaded) {
       loadOrders()
     }
-  }, []) // 移除依賴項，避免無限循環
+    if (currentRestaurant?.id) {
+      loadReservations()
+    }
+  }, [currentRestaurant?.id]) // 移除依賴項，避免無限循環
+
+  // 載入預約資訊
+  const loadReservations = async () => {
+    if (!currentRestaurant?.id) return
+    
+    try {
+      const { data, error } = await supabase
+        .from('table_reservations')
+        .select('*')
+        .eq('restaurant_id', currentRestaurant.id)
+        .in('status', ['confirmed', 'seated']) // 包含已入座的預約
+        .gte('reservation_time', new Date().toISOString().split('T')[0])
+        .order('reservation_time', { ascending: true })
+
+      if (error) {
+        console.error('載入預約資訊失敗:', error)
+      } else {
+        setReservations(data || [])
+      }
+    } catch (error) {
+      console.error('載入預約資訊異常:', error)
+    }
+  }
 
   // 過濾桌台
   const filteredTables = tables.filter(table => {
@@ -48,6 +97,14 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
       String(order.table_number) === tableNumberStr && 
       ['pending', 'confirmed', 'preparing', 'ready', 'served'].includes(order.status || '')
     ).sort((a, b) => new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime())
+  }
+
+  // 取得桌台的預約資訊（包含已入座的預約）
+  const getTableReservation = (tableId: string) => {
+    return reservations.find(reservation => 
+      reservation.table_id === tableId && 
+      ['confirmed', 'seated'].includes(reservation.status)
+    )
   }
 
   // 取得訂單的項目
@@ -165,6 +222,81 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const openOrderModal = (order: any) => {
     setSelectedOrder(order)
     setShowOrderModal(true)
+  }
+
+  // 打開預約詳情模態
+  const openReservationModal = (reservation: Reservation) => {
+    setSelectedReservation(reservation)
+    setShowReservationModal(true)
+  }
+
+  // 處理預約操作
+  const handleReservationAction = async (action: 'seated' | 'cancelled' | 'no_show') => {
+    if (!selectedReservation) return
+
+    try {
+      // 1) 統一走 Service 更新狀態
+      await ReservationService.updateReservationStatus(selectedReservation.id, action as any)
+      // 2) 桌台狀態同步
+      if (action === 'seated' && selectedReservation.table_id) {
+        await updateTableStatus(selectedReservation.table_id, 'occupied')
+      }
+      if ((action === 'cancelled' || action === 'no_show')) {
+        await ReservationService.releaseTableForReservation(selectedReservation.id)
+      }
+
+      // 重新載入資料
+      await Promise.all([
+        loadTables(),
+        loadReservations()
+      ])
+
+      // 更新當前選中的預約資訊
+      setSelectedReservation(prev => prev ? { ...prev, status: action } : null)
+
+      const actionText = action === 'seated' ? '入座' : action === 'cancelled' ? '取消' : '標記未出現'
+      console.log(`✅ 預約已${actionText}`)
+      
+    } catch (error) {
+      console.error('預約操作失敗:', error)
+      alert('操作失敗，請稍後再試')
+    }
+  }
+
+  // 開始點餐功能
+  const handleStartOrdering = () => {
+    if (!selectedReservation) return
+
+    // 找到對應的桌台
+    const table = tables.find(t => t.id === selectedReservation.table_id)
+    if (!table) {
+      alert('找不到對應的桌台')
+      return
+    }
+
+    // 設定點餐資訊到全域狀態
+    const orderingInfo = {
+      tableNumber: String(table.table_number),
+      tableName: table.name || `桌台 ${table.table_number}`,
+      partySize: selectedReservation.party_size,
+      customerName: selectedReservation.customer_name,
+      reservationId: selectedReservation.id
+    }
+
+    // 儲存到 store
+    usePOSStore.setState({
+      selectedTable: table.id,
+      orderingInfo
+    })
+
+    // 關閉模態並導航到點餐頁面
+    setShowReservationModal(false)
+    
+    // 這裡可以觸發導航到點餐頁面
+    console.log('🍽️ 開始點餐:', orderingInfo)
+    alert(`開始為${selectedReservation.customer_name}(${selectedReservation.party_size}人)在桌台${table.table_number}點餐`)
+  // 自動導向到點餐頁
+  goTo('/ordering')
   }
 
   // 關閉訂單詳情模態框
@@ -335,6 +467,7 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredTables.map(table => {
                 const tableOrders = getTableOrders(table.table_number || '')
+                const tableReservation = getTableReservation(table.id!)
                 
                 return (
                   <div
@@ -366,6 +499,56 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                       <div className={`inline-block text-xs px-3 py-1 rounded-full font-semibold mb-3 border ${getStatusColor(table.status || 'available')}`}>
                         {getStatusText(table.status || 'available')}
                       </div>
+
+                      {/* 預約資訊（如果桌台有相關預約） */}
+                      {tableReservation && (
+                        <div className="space-y-2 mb-3">
+                          <div className="text-xs font-semibold text-blue-800 mb-2">
+                            📅 預約資訊
+                          </div>
+                          <button
+                            onClick={() => openReservationModal(tableReservation)}
+                            className={`w-full rounded-lg p-2 text-left transition-all duration-200 hover:shadow-md border ${
+                              tableReservation.status === 'seated' 
+                                ? 'bg-green-50 hover:bg-green-100 border-green-200'
+                                : 'bg-blue-50 hover:bg-blue-100 border-blue-200'
+                            }`}
+                          >
+                            <div className={`text-xs font-semibold mb-1 ${
+                              tableReservation.status === 'seated' ? 'text-green-800' : 'text-blue-800'
+                            }`}>
+                              👤 {tableReservation.customer_name}
+                            </div>
+                            <div className={`text-xs mb-1 ${
+                              tableReservation.status === 'seated' ? 'text-green-600' : 'text-blue-600'
+                            }`}>
+                              {tableReservation.party_size} 人 · {tableReservation.status === 'confirmed' ? '已確認' : '已入座'}
+                            </div>
+                            <div className={`text-xs ${
+                              tableReservation.status === 'seated' ? 'text-green-500' : 'text-blue-500'
+                            }`}>
+                              {new Date(tableReservation.reservation_time).toLocaleString('zh-TW', {
+                                month: 'numeric',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </div>
+                            {tableReservation.special_requests && (
+                              <div className={`text-xs mt-1 truncate ${
+                                tableReservation.status === 'seated' ? 'text-green-400' : 'text-blue-400'
+                              }`}>
+                                備註: {tableReservation.special_requests}
+                              </div>
+                            )}
+                          </button>
+                          <div className={`text-xs font-medium text-center pt-1 ${
+                            tableReservation.status === 'seated' ? 'text-green-600' : 'text-blue-600'
+                          }`}>
+                            👆 點擊查看預約詳情
+                          </div>
+                        </div>
+                      )}
                       
                       {/* 訂單資訊（如果有） */}
                       {tableOrders.length > 0 && (
@@ -382,8 +565,11 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                               <div className="text-xs font-semibold text-gray-800 mb-1">
                                 {index === 0 ? '🍽️' : '➕'} {order.order_number}
                               </div>
-                              <div className="text-xs text-gray-600">
-                                NT$ {(order.total_amount || 0).toLocaleString()} · {order.status}
+                              <div className="text-xs text-gray-600 flex items-center gap-2">
+                                <span>NT$ {(order.total_amount || 0).toLocaleString()}</span>
+                                <span className={`px-2 py-0.5 rounded-full border ${ORDER_STATUS_COLOR[(order.status as any) || 'pending']}`}>
+                                  {ORDER_STATUS_LABEL[(order.status as any) || 'pending']}
+                                </span>
                               </div>
                               <div className="text-xs text-gray-500">
                                 {new Date(order.created_at || '').toLocaleTimeString('zh-TW', {
@@ -634,6 +820,141 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
             <button
               onClick={closeOrderModal}
               className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            >
+              關閉
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 預約詳情模態框 */}
+      {showReservationModal && selectedReservation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">📅 預約詳情</h3>
+            
+            {/* 客戶資訊 */}
+            <div className="bg-blue-50 rounded-lg p-4 mb-6">
+              <h4 className="font-semibold text-blue-900 mb-3">客戶資訊</h4>
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <span className="text-sm text-blue-700 w-20">姓名:</span>
+                  <span className="font-medium">{selectedReservation.customer_name}</span>
+                </div>
+                {selectedReservation.customer_phone && (
+                  <div className="flex items-center">
+                    <span className="text-sm text-blue-700 w-20">電話:</span>
+                    <span>{selectedReservation.customer_phone}</span>
+                  </div>
+                )}
+                {selectedReservation.customer_email && (
+                  <div className="flex items-center">
+                    <span className="text-sm text-blue-700 w-20">信箱:</span>
+                    <span>{selectedReservation.customer_email}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 預約資訊 */}
+            <div className="bg-green-50 rounded-lg p-4 mb-6">
+              <h4 className="font-semibold text-green-900 mb-3">預約資訊</h4>
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <span className="text-sm text-green-700 w-24">預約時間:</span>
+                  <span className="font-medium">
+                    {new Date(selectedReservation.reservation_time).toLocaleString('zh-TW', {
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      weekday: 'short'
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-sm text-green-700 w-24">用餐人數:</span>
+                  <span className="font-medium">{selectedReservation.party_size} 人</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-sm text-green-700 w-24">用餐時長:</span>
+                  <span>{selectedReservation.duration_minutes} 分鐘</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-sm text-green-700 w-24">預約狀態:</span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    selectedReservation.status === 'confirmed' 
+                      ? 'bg-green-100 text-green-800' 
+                      : selectedReservation.status === 'seated'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {selectedReservation.status === 'confirmed' ? '已確認' : 
+                     selectedReservation.status === 'seated' ? '已入座' : selectedReservation.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 特殊需求 */}
+            {selectedReservation.special_requests && (
+              <div className="bg-yellow-50 rounded-lg p-4 mb-6">
+                <h4 className="font-semibold text-yellow-900 mb-2">特殊需求</h4>
+                <p className="text-yellow-800">{selectedReservation.special_requests}</p>
+              </div>
+            )}
+
+            {/* 額外備註 */}
+            {selectedReservation.customer_notes && (
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <h4 className="font-semibold text-gray-900 mb-2">備註資訊</h4>
+                <p className="text-gray-700">{selectedReservation.customer_notes}</p>
+              </div>
+            )}
+
+            {/* 操作按鈕 */}
+            <div className="space-y-3">
+              {selectedReservation.status === 'confirmed' && (
+                <>
+                  <button
+                    onClick={() => handleReservationAction('seated')}
+                    className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center justify-center gap-2"
+                  >
+                    ✅ 已入座
+                  </button>
+                  <button
+                    onClick={() => handleReservationAction('no_show')}
+                    className="w-full px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold flex items-center justify-center gap-2"
+                  >
+                    ❌ 未出現
+                  </button>
+                </>
+              )}
+              
+              {['confirmed', 'seated'].includes(selectedReservation.status) && (
+                <button
+                  onClick={() => handleReservationAction('cancelled')}
+                  className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold flex items-center justify-center gap-2"
+                >
+                  🚫 取消預約
+                </button>
+              )}
+              
+              {selectedReservation.status === 'seated' && (
+                <button
+                  onClick={() => handleStartOrdering()}
+                  className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold flex items-center justify-center gap-2"
+                >
+                  🍽️ 開始點餐
+                </button>
+              )}
+            </div>
+
+            {/* 關閉按鈕 */}
+            <button
+              onClick={() => setShowReservationModal(false)}
+              className="w-full px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold mt-4"
             >
               關閉
             </button>

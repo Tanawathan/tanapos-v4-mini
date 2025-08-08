@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('TanaPOS V4-AI 基本功能流程驗證', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5178');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
   });
 
@@ -13,9 +13,9 @@ test.describe('TanaPOS V4-AI 基本功能流程驗證', () => {
     await expect(page.locator('h1')).toContainText('TanaPOS v4 AI');
     
     // 驗證功能按鈕存在（使用實際按鈕文字）
-    const buttons = ['桌台管理', '庫存管理', '結帳系統'];
+    const buttons = ['桌台管理', '預約管理', '結帳管理'];
     for (const buttonText of buttons) {
-      await expect(page.locator(`button:has-text("${buttonText}")`)).toBeVisible();
+      await expect(page.locator(`button:has-text("${buttonText}"), a:has-text("${buttonText}")`).first()).toBeVisible();
     }
     
     console.log('✅ 首頁功能驗證完成');
@@ -25,7 +25,7 @@ test.describe('TanaPOS V4-AI 基本功能流程驗證', () => {
     console.log('🪑 開始測試桌台管理導航...');
 
     // 點擊桌台管理按鈕
-    await page.locator('button:has-text("桌台管理")').last().click();
+  await page.locator('button:has-text("桌台管理"), a:has-text("桌台管理")').first().click();
     
     // 等待頁面切換
     await page.waitForSelector('h1:has-text("桌台管理")', { timeout: 5000 });
@@ -43,7 +43,7 @@ test.describe('TanaPOS V4-AI 基本功能流程驗證', () => {
     console.log('📊 開始測試桌台資料載入...');
 
     // 導航到桌台管理
-    await page.locator('button:has-text("桌台管理")').last().click();
+  await page.locator('button:has-text("桌台管理"), a:has-text("桌台管理")').first().click();
     await page.waitForSelector('h1:has-text("桌台管理")', { timeout: 5000 });
     
     // 等待桌台資料載入
@@ -77,11 +77,11 @@ test.describe('TanaPOS V4-AI 基本功能流程驗證', () => {
     console.log('🍽️ 開始測試POS系統導航...');
 
     // 檢查首頁是否有POS相關功能按鈕
-    const posButtons = await page.locator('button:has-text("POS"), button:has-text("點餐"), button:has-text("收銀")').count();
+  const posButtons = await page.locator('a:has-text("開始點餐"), button:has-text("點餐"), button:has-text("收銀")').count();
     
     if (posButtons > 0) {
       // 如果找到相關按鈕，點擊第一個
-      await page.locator('button:has-text("POS"), button:has-text("點餐"), button:has-text("收銀")').first().click();
+  await page.locator('a:has-text("開始點餐"), button:has-text("點餐"), button:has-text("收銀")').first().click();
       await page.waitForTimeout(2000);
       console.log('✅ POS系統導航成功');
     } else {
@@ -108,7 +108,7 @@ test.describe('TanaPOS V4-AI 基本功能流程驗證', () => {
     await page.waitForLoadState('networkidle');
     
     // 驗證桌面版佈局
-    const desktopButtons = await page.locator('button:has-text("點餐系統"), button:has-text("桌台管理")').count();
+  const desktopButtons = await page.locator('a:has-text("開始點餐"), a:has-text("桌台管理")').count();
     expect(desktopButtons).toBeGreaterThan(0);
     
     // 測試手機版面
@@ -117,7 +117,7 @@ test.describe('TanaPOS V4-AI 基本功能流程驗證', () => {
     await page.waitForLoadState('networkidle');
     
     // 驗證手機版佈局
-    const mobileButtons = await page.locator('button:has-text("點餐系統"), button:has-text("桌台管理")').count();
+  const mobileButtons = await page.locator('a:has-text("開始點餐"), a:has-text("桌台管理")').count();
     expect(mobileButtons).toBeGreaterThan(0);
     
     console.log('✅ 響應式設計驗證完成');
@@ -135,7 +135,7 @@ test.describe('TanaPOS V4-AI 基本功能流程驗證', () => {
     });
 
     // 執行基本操作
-    await page.locator('button:has-text("桌台管理")').last().click();
+  await page.locator('button:has-text("桌台管理"), a:has-text("桌台管理")').first().click();
     await page.waitForTimeout(3000);
     
     // 返回首頁

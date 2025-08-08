@@ -3,6 +3,7 @@ import { useTheme } from '../lib/theme-store'
 import ConnectionTest from './ConnectionTest'
 import DiagnosticPanel from './DiagnosticPanel'
 import { TodoPanel } from './common/TodoPanel'
+import TableSettings from './TableSettings'
 
 interface SettingsPageProps {
   onBack: () => void
@@ -31,9 +32,9 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
     },
     { 
       id: 'restaurant' as SettingsTab, 
-      label: '餐廳設定', 
-      icon: '🍽️',
-      description: '基本資訊、營運設定'
+      label: '桌台設定', 
+      icon: '🪑',
+      description: '桌台參數、區域管理'
     },
     { 
       id: 'notifications' as SettingsTab, 
@@ -69,7 +70,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
       case 'system':
         return <SystemSettings />
       case 'restaurant':
-        return <RestaurantSettings />
+        return <TableSettings />
       case 'notifications':
         return <NotificationSettings />
       case 'todo':
@@ -429,13 +430,6 @@ const SystemSettings: React.FC = () => {
     </div>
   )
 }
-
-const RestaurantSettings: React.FC = () => (
-  <div className="p-6">
-    <h2 className="text-xl font-semibold text-ui-primary mb-4">🍽️ 餐廳設定</h2>
-    <p className="text-ui-muted">餐廳設定功能開發中...</p>
-  </div>
-)
 
 const NotificationSettings: React.FC = () => (
   <div className="p-6">

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('TanaPOS V4-AI 端到端業務流程測試', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5178');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
   });
 
@@ -12,9 +12,9 @@ test.describe('TanaPOS V4-AI 端到端業務流程測試', () => {
     // === 階段1: 接待與帶位 ===
     console.log('📍 階段1: 接待與帶位');
     
-    // 切換到桌台管理
-    const tableManagementTab = page.locator('text=桌台管理');
-    if (await tableManagementTab.isVisible()) {
+    // 切換到桌台管理（避免嚴格模式多重匹配，限定為連結或按鈕）
+    const tableManagementTab = page.locator('a:has-text("桌台管理"), button:has-text("桌台管理")').first();
+    if (await tableManagementTab.count() > 0) {
       await tableManagementTab.click();
       await page.waitForTimeout(500);
     }
@@ -62,7 +62,7 @@ test.describe('TanaPOS V4-AI 端到端業務流程測試', () => {
     console.log('📍 階段2: 點餐服務');
     
     // 切換到點餐頁面
-    const orderingTab = page.locator('text=點餐系統, text=點餐');
+    const orderingTab = page.locator('a:has-text("點餐系統"), a:has-text("開始點餐"), button:has-text("點餐")');
     if (await orderingTab.count() > 0) {
       await orderingTab.first().click();
       await page.waitForTimeout(500);
@@ -135,7 +135,7 @@ test.describe('TanaPOS V4-AI 端到端業務流程測試', () => {
     // === 階段3: 訂單管理 ===
     console.log('📍 階段3: 訂單管理');
     
-    const ordersTab = page.locator('text=訂單管理, text=訂單');
+  const ordersTab = page.locator('a:has-text("訂單管理"), button:has-text("訂單")');
     if (await ordersTab.count() > 0) {
       await ordersTab.first().click();
       await page.waitForTimeout(500);
@@ -196,7 +196,7 @@ test.describe('TanaPOS V4-AI 端到端業務流程測試', () => {
     }
 
     // 切換到結帳頁面
-    const checkoutTab = page.locator('text=結帳系統, text=結帳');
+  const checkoutTab = page.locator('a:has-text("結帳系統"), a:has-text("結帳管理"), button:has-text("結帳")');
     if (await checkoutTab.count() > 0) {
       await checkoutTab.first().click();
       await page.waitForTimeout(500);
@@ -297,8 +297,8 @@ test.describe('TanaPOS V4-AI 端到端業務流程測試', () => {
     console.log('🏢 開始多桌台並行操作測試...');
 
     // 切換到桌台管理
-    const tableManagementTab = page.locator('text=桌台管理');
-    if (await tableManagementTab.isVisible()) {
+    const tableManagementTab = page.locator('a:has-text("桌台管理"), button:has-text("桌台管理")').first();
+    if (await tableManagementTab.count() > 0) {
       await tableManagementTab.click();
       await page.waitForTimeout(500);
     }
@@ -359,8 +359,8 @@ test.describe('TanaPOS V4-AI 端到端業務流程測試', () => {
     console.log('🚫 模擬網路中斷...');
 
     // 嘗試執行操作（應該失敗）
-    const tableManagementTab = page.locator('text=桌台管理');
-    if (await tableManagementTab.isVisible()) {
+    const tableManagementTab = page.locator('a:has-text("桌台管理"), button:has-text("桌台管理")').first();
+    if (await tableManagementTab.count() > 0) {
       await tableManagementTab.click();
     }
 
@@ -374,8 +374,9 @@ test.describe('TanaPOS V4-AI 端到端業務流程測試', () => {
     console.log('🔄 頁面刷新後狀態檢查');
 
     // 驗證基本功能仍然正常
-    if (await tableManagementTab.isVisible()) {
-      await tableManagementTab.click();
+    const tableManagementTab2 = page.locator('a:has-text("桌台管理"), button:has-text("桌台管理")').first();
+    if (await tableManagementTab2.count() > 0) {
+      await tableManagementTab2.click();
       const tables = page.locator('[data-table-number]');
       const tableCount = await tables.count();
       

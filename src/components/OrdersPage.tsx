@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, memo } from 'react'
 import usePOSStore from '../lib/store'
-import { Order, OrderItem } from '../lib/types'
+import { ORDER_STATUS_LABEL, ORDER_STATUS_COLOR, PAYMENT_STATUS_COLOR, PAYMENT_STATUS_LABEL, ORDER_ITEM_STATUS_COLOR, ORDER_ITEM_STATUS_LABEL } from '../lib/status'
+import { Order, OrderItem, Product } from '../lib/types'
+import { supabase } from '../lib/supabase'
 
 interface OrdersPageProps {
   onBack: () => void
@@ -17,6 +19,10 @@ const OrdersPage = memo(({ onBack }: OrdersPageProps) => {
   const updateOrderStatus = usePOSStore(state => state.updateOrderStatus)
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [editing, setEditing] = useState(false)
+  const [editItems, setEditItems] = useState<OrderItem[]>([])
+  const [newItem, setNewItem] = useState<{ name: string; price: number; quantity: number; note?: string }>({ name: '', price: 0, quantity: 1 })
+  const [saving, setSaving] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [dateFilter, setDateFilter] = useState<string>('today')
 
@@ -84,30 +90,100 @@ const OrdersPage = memo(({ onBack }: OrdersPageProps) => {
     return orderItems.filter(item => item.order_id === orderId)
   }
 
-  // 狀態顏色
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'confirmed': return 'bg-blue-100 text-blue-800 border-blue-200'
-      case 'preparing': return 'bg-orange-100 text-orange-800 border-orange-200'
-      case 'ready': return 'bg-green-100 text-green-800 border-green-200'
-      case 'served': return 'bg-purple-100 text-purple-800 border-purple-200'
-      case 'completed': return 'bg-gray-100 text-gray-800 border-gray-200'
-      case 'cancelled': return 'bg-red-100 text-red-800 border-red-200'
-      default: return 'bg-gray-100 text-gray-800 border-gray-200'
+  // 打開編輯
+  const openEdit = () => {
+    if (!selectedOrder) return
+    setEditItems(getOrderItems(selectedOrder.id).map(i => ({ ...i })))
+    setEditing(true)
+  }
+
+  const updateEditQty = (id: string, qty: number) => {
+    setEditItems(items => items.map(i => i.id === id ? { ...i, quantity: Math.max(1, qty), total_price: i.unit_price * Math.max(1, qty) } : i))
+  }
+  const updateEditNote = (id: string, note: string) => {
+    setEditItems(items => items.map(i => i.id === id ? { ...i, special_instructions: note } : i))
+  }
+  const removeEditItem = (id: string) => {
+    setEditItems(items => items.filter(i => i.id !== id))
+  }
+  const addEditItem = () => {
+    if (!selectedOrder || !newItem.name || newItem.price <= 0 || newItem.quantity <= 0) return
+    const id = crypto.randomUUID()
+    const item: OrderItem = {
+      id,
+      order_id: selectedOrder.id,
+      product_id: undefined,
+      product_name: newItem.name,
+      quantity: newItem.quantity,
+      unit_price: newItem.price,
+      total_price: newItem.price * newItem.quantity,
+      special_instructions: newItem.note || '',
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+    setEditItems(items => [...items, item])
+    setNewItem({ name: '', price: 0, quantity: 1 })
+  }
+
+  const saveEdits = async () => {
+    if (!selectedOrder) return
+    setSaving(true)
+    try {
+      const original = getOrderItems(selectedOrder.id)
+      const toDelete = original.filter(o => !editItems.find(e => e.id === o.id))
+      const toUpsert = editItems
+
+      // 1) 刪除移除的項目
+      if (toDelete.length > 0) {
+        const { error } = await supabase.from('order_items').delete().in('id', toDelete.map(i => i.id))
+        if (error) throw error
+      }
+      // 2) 新增/更新項目
+      if (toUpsert.length > 0) {
+        const payload = toUpsert.map(i => ({
+          id: i.id,
+          order_id: selectedOrder.id,
+          product_id: i.product_id || null,
+          product_name: i.product_name,
+          quantity: i.quantity,
+          unit_price: i.unit_price,
+          total_price: i.total_price,
+          special_instructions: i.special_instructions || '',
+          status: i.status || 'pending',
+          updated_at: new Date().toISOString(),
+          created_at: i.created_at || new Date().toISOString()
+        }))
+        const { error } = await supabase.from('order_items').upsert(payload, { onConflict: 'id' })
+        if (error) throw error
+      }
+
+      // 3) 重新計算總額並更新訂單
+      const subtotal = editItems.reduce((s, i) => s + i.total_price, 0)
+      const total = subtotal // 不計稅
+      const { error: orderErr } = await supabase
+        .from('orders')
+        .update({ subtotal, tax_amount: 0, total_amount: total, updated_at: new Date().toISOString() })
+        .eq('id', selectedOrder.id)
+      if (orderErr) throw orderErr
+
+      // 4) 同步本地 store：重載訂單
+      usePOSStore.setState({ ordersLoaded: false })
+      await loadOrders()
+
+      // 關閉
+      setEditing(false)
+    } catch (e) {
+      console.error('保存編輯失敗', e)
+      alert('保存失敗，請稍後再試')
+    } finally {
+      setSaving(false)
     }
   }
 
-  // 付款狀態顏色
-  const getPaymentStatusColor = (status: string) => {
-    switch (status) {
-      case 'unpaid': return 'bg-red-100 text-red-800 border-red-200'
-      case 'partial': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'paid': return 'bg-green-100 text-green-800 border-green-200'
-      case 'refunded': return 'bg-gray-100 text-gray-800 border-gray-200'
-      default: return 'bg-gray-100 text-gray-800 border-gray-200'
-    }
-  }
+  // 統一樣式代理
+  const getStatusColor = (status: string) => ORDER_STATUS_COLOR[(status as any) || 'pending'] || 'bg-gray-100 text-gray-800 border-gray-200'
+  const getPaymentStatusColor = (status: string) => PAYMENT_STATUS_COLOR[(status as any) || 'unpaid'] || 'bg-gray-100 text-gray-800 border-gray-200'
 
   return (
     <div className="min-h-screen bg-ui-secondary">
@@ -265,19 +341,10 @@ const OrdersPage = memo(({ onBack }: OrdersPageProps) => {
                       <div className="flex items-center justify-between">
                         <div className="flex space-x-2">
                           <span className={`px-2 py-1 text-xs rounded-full border ${getStatusColor(order.status || 'pending')}`}>
-                            {order.status === 'pending' && '待確認'}
-                            {order.status === 'confirmed' && '已確認'}
-                            {order.status === 'preparing' && '準備中'}
-                            {order.status === 'ready' && '備餐完成'}
-                            {order.status === 'served' && '已上菜'}
-                            {order.status === 'completed' && '已完成'}
-                            {order.status === 'cancelled' && '已取消'}
+                            {ORDER_STATUS_LABEL[(order.status as any) || 'pending']}
                           </span>
                           <span className={`px-2 py-1 text-xs rounded-full border ${getPaymentStatusColor(order.payment_status || 'unpaid')}`}>
-                            {order.payment_status === 'unpaid' && '未付款'}
-                            {order.payment_status === 'partial' && '部分付款'}
-                            {order.payment_status === 'paid' && '已付款'}
-                            {order.payment_status === 'refunded' && '已退款'}
+                            {PAYMENT_STATUS_LABEL[(order.payment_status as any) || 'unpaid']}
                           </span>
                         </div>
                         
@@ -313,6 +380,11 @@ const OrdersPage = memo(({ onBack }: OrdersPageProps) => {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
+                  </button>
+                </div>
+                <div className="mb-3">
+                  <button onClick={openEdit} className="px-3 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700">
+                    編輯訂單
                   </button>
                 </div>
 
@@ -418,13 +490,8 @@ const OrdersPage = memo(({ onBack }: OrdersPageProps) => {
                             <div className="text-sm font-medium">
                               NT$ {item.total_price.toLocaleString()}
                             </div>
-                            <span className={`px-2 py-1 text-xs rounded-full border ${getStatusColor(item.status || 'pending')}`}>
-                              {item.status === 'pending' && '待處理'}
-                              {item.status === 'confirmed' && '已確認'}
-                              {item.status === 'preparing' && '準備中'}
-                              {item.status === 'ready' && '完成'}
-                              {item.status === 'served' && '已上菜'}
-                              {item.status === 'cancelled' && '已取消'}
+                            <span className={`px-2 py-1 text-xs rounded-full border ${ORDER_ITEM_STATUS_COLOR[(item.status as any) || 'pending']}`}>
+                              {ORDER_ITEM_STATUS_LABEL[(item.status as any) || 'pending']}
                             </span>
                           </div>
                         </div>
@@ -501,6 +568,61 @@ const OrdersPage = memo(({ onBack }: OrdersPageProps) => {
           </div>
         </div>
       </div>
+
+      {/* 編輯訂單 Modal */}
+      {editing && selectedOrder && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg w-full max-w-2xl p-6 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">編輯訂單 #{selectedOrder.order_number}</h3>
+              <button onClick={() => setEditing(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+            <div className="space-y-3">
+              {editItems.map(item => (
+                <div key={item.id} className="border rounded p-3">
+                  <div className="flex justify-between items-center">
+                    <div className="font-medium">{item.product_name}</div>
+                    <button onClick={() => removeEditItem(item.id)} className="text-red-600 text-sm">移除</button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 mt-2">
+                    <div>
+                      <label className="text-xs text-gray-600">單價</label>
+                      <div className="text-sm">NT$ {item.unit_price.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-600">數量</label>
+                      <input type="number" min={1} value={item.quantity} onChange={e => updateEditQty(item.id, parseInt(e.target.value) || 1)} className="w-full border rounded px-2 py-1" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-600">小計</label>
+                      <div className="text-sm">NT$ {(item.unit_price * item.quantity).toLocaleString()}</div>
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <label className="text-xs text-gray-600">備註</label>
+                    <input value={item.special_instructions || ''} onChange={e => updateEditNote(item.id, e.target.value)} className="w-full border rounded px-2 py-1" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 border-t pt-4">
+              <div className="font-semibold mb-2">新增項目</div>
+              <div className="grid grid-cols-5 gap-2">
+                <input placeholder="名稱" value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })} className="col-span-2 border rounded px-2 py-1" />
+                <input type="number" placeholder="單價" value={newItem.price} onChange={e => setNewItem({ ...newItem, price: parseFloat(e.target.value) || 0 })} className="border rounded px-2 py-1" />
+                <input type="number" placeholder="數量" value={newItem.quantity} onChange={e => setNewItem({ ...newItem, quantity: parseInt(e.target.value) || 1 })} className="border rounded px-2 py-1" />
+                <button onClick={addEditItem} className="bg-blue-600 text-white rounded px-2 py-1 hover:bg-blue-700">加入</button>
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-end gap-2">
+              <button onClick={() => setEditing(false)} className="px-3 py-2 border rounded">取消</button>
+              <button onClick={saveEdits} disabled={saving} className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50">{saving ? '保存中...' : '保存變更'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 })

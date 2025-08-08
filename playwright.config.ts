@@ -22,7 +22,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:5178',
+  baseURL: 'http://localhost:5174',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -44,7 +44,13 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      // Use system Chrome on local macOS to avoid dyld VideoToolbox symbol errors from bundled headless_shell
+      use: {
+        ...devices['Desktop Chrome'],
+        // Prefer installed Chrome locally; on CI fall back to bundled browsers
+        channel: process.env.CI ? undefined : 'chrome',
+        headless: true,
+      },
     },
 
     // {
@@ -60,7 +66,11 @@ export default defineConfig({
     /* Test against mobile viewports. */
     {
       name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
+      use: {
+        ...devices['Pixel 5'],
+        channel: process.env.CI ? undefined : 'chrome',
+        headless: true,
+      },
     },
     // {
     //   name: 'Mobile Safari',
@@ -80,8 +90,9 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5178',
+  // Bypass auth during E2E to avoid Supabase dependency; align port with Vite config (5174)
+  command: 'VITE_BYPASS_AUTH=true npm run dev',
+  url: 'http://localhost:5174',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

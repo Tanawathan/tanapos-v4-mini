@@ -13,6 +13,7 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
     tables,
     cartItems,
     selectedTable,
+    orderingInfo,
     currentRestaurant,
     setSelectedTable,
     addToCart,
@@ -81,21 +82,27 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
       return
     }
 
+    // 優先使用預約資訊，回退到一般桌台資訊
+    const tableNumber = orderingInfo?.tableNumber || selectedTableInfo?.table_number?.toString() || '0'
+    const customerName = orderingInfo?.customerName || ''
+    const partySize = orderingInfo?.partySize || 1
+
     // 準備訂單資料
-    const orderData = {
+  const orderData = {
       restaurant_id: currentRestaurant.id,
       table_id: selectedTable,
-      table_number: selectedTableInfo?.table_number || 0,
-      customer_name: '', // 可以添加客戶輸入
+      table_number: parseInt(tableNumber),
+      customer_name: customerName,
       customer_phone: '', // 可以添加客戶輸入
       subtotal: getCartTotal(),
       tax_amount: 0, // 移除稅率計算
       total_amount: getCartTotal(), // 總額等於小計
       status: 'pending' as const,
       payment_status: 'unpaid' as const,
-      party_size: 1, // 可以添加人數選擇
-      notes: '',
-      created_at: new Date().toISOString(),
+      party_size: partySize,
+      notes: orderingInfo ? `預約單 - ${orderingInfo.customerName}` : '',
+  created_at: new Date().toISOString(),
+  reservation_id: orderingInfo?.reservationId,
       items: cartItems.map(item => ({
         product_id: item.id,
         product_name: item.name,
@@ -162,7 +169,16 @@ export default function OrderingPage({ onBack }: OrderingPageProps) {
                   onClick={() => setShowTableModal(true)}
                   className="px-3 py-2 border border-ui rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-ui-secondary transition-colors flex items-center space-x-2"
                 >
-                  {selectedTableInfo ? (
+                  {orderingInfo ? (
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">
+                        桌號 {orderingInfo.tableNumber} ({orderingInfo.tableName})
+                      </span>
+                      <span className="text-xs text-blue-600">
+                        {orderingInfo.customerName} · {orderingInfo.partySize}人 · 預約單
+                      </span>
+                    </div>
+                  ) : selectedTableInfo ? (
                     <span>
                       桌號 {selectedTableInfo.table_number} {selectedTableInfo.name && `(${selectedTableInfo.name})`}
                     </span>

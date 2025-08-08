@@ -15,6 +15,15 @@ import type {
 // 從環境變數取得餐廳ID，用於模擬資料
 const MOCK_RESTAURANT_ID = import.meta.env.VITE_RESTAURANT_ID || '11111111-1111-1111-1111-111111111111'
 
+// 點餐資訊接口
+interface OrderingInfo {
+  tableNumber: string
+  tableName: string
+  partySize: number
+  customerName?: string
+  reservationId?: string
+}
+
 interface POSStore {
   // 基本資料
   currentRestaurant: Restaurant | null
@@ -26,6 +35,9 @@ interface POSStore {
   // 購物車
   cartItems: CartItem[]
   selectedTable: string | null
+  
+  // 點餐資訊
+  orderingInfo: OrderingInfo | null
   
   // 訂單
   currentOrder: Order | null
@@ -41,6 +53,7 @@ interface POSStore {
   // Actions
   setCurrentRestaurant: (restaurant: Restaurant) => void
   setSelectedTable: (tableId: string | null) => void
+  setOrderingInfo: (info: OrderingInfo | null) => void
   
   // 資料載入
   loadCategories: () => Promise<void>
@@ -82,6 +95,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   tables: [],
   cartItems: [],
   selectedTable: null,
+  orderingInfo: null,
   currentOrder: null,
   orderItems: [],
   orders: [],
@@ -93,6 +107,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
   // 基本設定
   setCurrentRestaurant: (restaurant) => set({ currentRestaurant: restaurant }),
   setSelectedTable: (tableId) => set({ selectedTable: tableId }),
+  setOrderingInfo: (info) => set({ orderingInfo: info }),
 
   // 載入分類
   loadCategories: async () => {
@@ -593,10 +608,10 @@ export const usePOSStore = create<POSStore>((set, get) => ({
 
       if (orderError) throw orderError
 
-      // 創建付款記錄 - 首先獲取訂單總金額
+      // 創建付款記錄 - 首先獲取訂單總金額與 metadata
       const { data: orderData, error: fetchError } = await supabase
         .from('orders')
-        .select('total_amount')
+        .select('total_amount, metadata')
         .eq('id', orderId)
         .single()
 
@@ -629,6 +644,21 @@ export const usePOSStore = create<POSStore>((set, get) => ({
         .eq('id', tableId)
 
       if (tableError) throw tableError
+
+      // 若此訂單關聯預約，將預約標記為完成
+      const reservationId = (orderData as any)?.metadata?.reservation_id
+      if (reservationId) {
+        try {
+          const now2 = new Date().toISOString()
+          const { error: resErr } = await supabase
+            .from('table_reservations')
+            .update({ status: 'completed', completed_at: now2, updated_at: now2 })
+            .eq('id', reservationId)
+          if (resErr) console.warn('更新預約為完成失敗：', resErr.message)
+        } catch (e) {
+          console.warn('更新預約為完成發生例外：', e)
+        }
+      }
 
       // 更新本地狀態
       set((state) => ({
@@ -744,7 +774,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       set({ loading: true, error: null })
       
       // 1. 準備完整的訂單資料（匹配實際資料庫結構）
-      const newOrder: Order = {
+  const newOrder: Order = {
         id: crypto.randomUUID(),
         order_number: generateDineInOrderNumber((orderData.table_number || 1).toString()),
         restaurant_id: orderData.restaurant_id,
@@ -783,7 +813,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
         updated_by: undefined,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        metadata: null
+  metadata: orderData.reservation_id ? { reservation_id: orderData.reservation_id } : null
       }
       
       // 2. 更新本地訂單狀態
@@ -801,7 +831,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       
       // 4. 保存訂單到 Supabase 資料庫
       console.log('💾 正在保存訂單到資料庫...')
-      const { error: orderError } = await supabase
+  const { error: orderError } = await supabase
         .from('orders')
         .insert([newOrder])
       

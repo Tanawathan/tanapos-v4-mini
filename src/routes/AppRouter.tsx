@@ -34,6 +34,11 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  // Optional auth bypass for local E2E/dev
+  const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true'
+  if (bypassAuth) {
+    return <>{children}</>
+  }
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
 
   useEffect(() => {

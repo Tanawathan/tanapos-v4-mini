@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 
 test('V4-AI 頁面結構調試', async ({ page }) => {
-  await page.goto('http://localhost:5178');
+  await page.goto('/');
   await page.waitForLoadState('networkidle');
   
   console.log('📝 調試V4-AI頁面結構...');
@@ -29,7 +29,8 @@ test('V4-AI 頁面結構調試', async ({ page }) => {
   // 4. 檢查是否有文字包含特定關鍵字的元素
   const keywords = ['點餐', '桌台', '庫存', '結帳', 'POS', '管理'];
   for (const keyword of keywords) {
-    const elements = page.locator(`text*="${keyword}"`);
+  // Use getByText with exact: false to find partial matches
+  const elements = page.getByText(keyword, { exact: false });
     const count = await elements.count();
     if (count > 0) {
       console.log(`\n包含"${keyword}"的元素 (${count}個):`);

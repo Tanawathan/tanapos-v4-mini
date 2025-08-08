@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\playwright.config.ts",
-    "rootDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/tests",
+    "configFile": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/playwright.config.ts",
+    "rootDir": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": null,
@@ -37,7 +37,7 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/test-results",
+        "outputDir": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/test-results",
         "repeatEach": 1,
         "retries": 1,
         "metadata": {
@@ -45,7 +45,7 @@
         },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/tests",
+        "testDir": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -53,7 +53,7 @@
         "timeout": 30000
       },
       {
-        "outputDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/test-results",
+        "outputDir": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/test-results",
         "repeatEach": 1,
         "retries": 1,
         "metadata": {
@@ -61,7 +61,7 @@
         },
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
-        "testDir": "C:/TANAPOS/tanapos-v4-ai/tanapos-v4-mini/tests",
+        "testDir": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -75,13 +75,1546 @@
     "version": "1.54.2",
     "workers": 1,
     "webServer": {
-      "command": "npm run dev",
-      "url": "http://localhost:5178",
+      "command": "VITE_BYPASS_AUTH=true npm run dev",
+      "url": "http://localhost:5174",
       "reuseExistingServer": true,
       "timeout": 120000
     }
   },
   "suites": [
+    {
+      "title": "basic-workflow.test.ts",
+      "file": "basic-workflow.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "TanaPOS V4-AI 基本功能流程驗證",
+          "file": "basic-workflow.test.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "首頁功能驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6444,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🏠 開始測試首頁功能...\n"
+                        },
+                        {
+                          "text": "✅ 首頁功能驗證完成\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:28:35.040Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-44f2add4ba4c8a6266f8",
+              "file": "basic-workflow.test.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "桌台管理頁面導航測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4323,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🪑 開始測試桌台管理導航...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理導航測試完成\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:28:42.341Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-d350892fea24bfe61677",
+              "file": "basic-workflow.test.ts",
+              "line": 24,
+              "column": 3
+            },
+            {
+              "title": "桌台資料載入驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5616,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📊 開始測試桌台資料載入...\n"
+                        },
+                        {
+                          "text": "找到 0 個桌台元素\n"
+                        },
+                        {
+                          "text": "⚠️ 未找到桌台資料，檢查頁面結構\n"
+                        },
+                        {
+                          "text": "頁面總元素數量: 181\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:28:46.676Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-d0169154d5ab76a0d921",
+              "file": "basic-workflow.test.ts",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "POS系統導航測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6357,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🍽️ 開始測試POS系統導航...\n"
+                        },
+                        {
+                          "text": "✅ POS系統導航成功\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:28:52.296Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-53fa35f1556a8d4d6dc0",
+              "file": "basic-workflow.test.ts",
+              "line": 76,
+              "column": 3
+            },
+            {
+              "title": "響應式設計驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8237,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📱 開始測試響應式設計...\n"
+                        },
+                        {
+                          "text": "✅ 響應式設計驗證完成\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:28:58.660Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-05d29fb0fb47387b9533",
+              "file": "basic-workflow.test.ts",
+              "line": 102,
+              "column": 3
+            },
+            {
+              "title": "系統錯誤處理測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7741,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🛡️ 開始測試錯誤處理...\n"
+                        },
+                        {
+                          "text": "✅ 無嚴重錯誤\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:29:06.901Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-4015a37526f74b975e31",
+              "file": "basic-workflow.test.ts",
+              "line": 126,
+              "column": 3
+            },
+            {
+              "title": "首頁功能驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4172,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🏠 開始測試首頁功能...\n"
+                        },
+                        {
+                          "text": "✅ 首頁功能驗證完成\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:30:35.773Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-2056493af93a45bae5d5",
+              "file": "basic-workflow.test.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "桌台管理頁面導航測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3742,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🪑 開始測試桌台管理導航...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理導航測試完成\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:30:40.605Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-9067e17b4a68f66eec5b",
+              "file": "basic-workflow.test.ts",
+              "line": 24,
+              "column": 3
+            },
+            {
+              "title": "桌台資料載入驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5566,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📊 開始測試桌台資料載入...\n"
+                        },
+                        {
+                          "text": "找到 0 個桌台元素\n"
+                        },
+                        {
+                          "text": "⚠️ 未找到桌台資料，檢查頁面結構\n"
+                        },
+                        {
+                          "text": "頁面總元素數量: 181\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:30:44.360Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-d7306d4d39a9e5f5eb7d",
+              "file": "basic-workflow.test.ts",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "POS系統導航測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6104,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🍽️ 開始測試POS系統導航...\n"
+                        },
+                        {
+                          "text": "✅ POS系統導航成功\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:30:49.936Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-c325c7d18c563cf99644",
+              "file": "basic-workflow.test.ts",
+              "line": 76,
+              "column": 3
+            },
+            {
+              "title": "響應式設計驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8274,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📱 開始測試響應式設計...\n"
+                        },
+                        {
+                          "text": "✅ 響應式設計驗證完成\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:30:56.046Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-83745944edf54d575db3",
+              "file": "basic-workflow.test.ts",
+              "line": 102,
+              "column": 3
+            },
+            {
+              "title": "系統錯誤處理測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8375,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🛡️ 開始測試錯誤處理...\n"
+                        },
+                        {
+                          "text": "✅ 無嚴重錯誤\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:31:04.327Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c3004aee3fe162f3b899-892211f20de79b6d6f06",
+              "file": "basic-workflow.test.ts",
+              "line": 126,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "debug-page-structure.test.ts",
+      "file": "debug-page-structure.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "V4-AI 頁面結構調試",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3930,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "📝 調試V4-AI頁面結構...\n"
+                    },
+                    {
+                      "text": "頁面標題: \"🍽️ TanaPOS v4 AI\"\n"
+                    },
+                    {
+                      "text": "\n發現 1 個按鈕:\n"
+                    },
+                    {
+                      "text": "1. \"🚪 登出\" (可見: true)\n"
+                    },
+                    {
+                      "text": "\n發現 9 個卡片元素\n"
+                    },
+                    {
+                      "text": "\n包含\"點餐\"的元素 (6個):\n"
+                    },
+                    {
+                      "text": "  - \"手機點餐\"\n"
+                    },
+                    {
+                      "text": "  - \"顧客自助點餐系統\"\n"
+                    },
+                    {
+                      "text": "  - \"手機點餐\"\n"
+                    },
+                    {
+                      "text": "\n包含\"桌台\"的元素 (3個):\n"
+                    },
+                    {
+                      "text": "  - \"桌台管理\"\n"
+                    },
+                    {
+                      "text": "  - \"管理餐廳桌台狀態\"\n"
+                    },
+                    {
+                      "text": "  - \"桌台管理\"\n"
+                    },
+                    {
+                      "text": "\n包含\"結帳\"的元素 (3個):\n"
+                    },
+                    {
+                      "text": "  - \"結帳系統\"\n"
+                    },
+                    {
+                      "text": "  - \"處理付款和結帳\"\n"
+                    },
+                    {
+                      "text": "  - \"結帳管理\"\n"
+                    },
+                    {
+                      "text": "\n包含\"POS\"的元素 (2個):\n"
+                    },
+                    {
+                      "text": "  - \"🍽️ TanaPOS v4 AI\"\n"
+                    },
+                    {
+                      "text": "  - \"歡迎使用 TanaPOS v4 AI 系統\"\n"
+                    },
+                    {
+                      "text": "\n包含\"管理\"的元素 (15個):\n"
+                    },
+                    {
+                      "text": "  - \"管理客戶點餐和訂單\"\n"
+                    },
+                    {
+                      "text": "  - \"預約管理\"\n"
+                    },
+                    {
+                      "text": "  - \"管理預約、當日訂位、現場顧客\"\n"
+                    },
+                    {
+                      "text": "\n主要容器數量: 1\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-08-08T14:29:14.659Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "113107849d0afc355a1c-86367073de2aacddf73e",
+          "file": "debug-page-structure.test.ts",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "V4-AI 頁面結構調試",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Mobile Chrome",
+              "projectName": "Mobile Chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3355,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "📝 調試V4-AI頁面結構...\n"
+                    },
+                    {
+                      "text": "頁面標題: \"🍽️ TanaPOS v4 AI\"\n"
+                    },
+                    {
+                      "text": "\n發現 1 個按鈕:\n"
+                    },
+                    {
+                      "text": "1. \"🚪 登出\" (可見: true)\n"
+                    },
+                    {
+                      "text": "\n發現 9 個卡片元素\n"
+                    },
+                    {
+                      "text": "\n包含\"點餐\"的元素 (6個):\n"
+                    },
+                    {
+                      "text": "  - \"手機點餐\"\n"
+                    },
+                    {
+                      "text": "  - \"顧客自助點餐系統\"\n"
+                    },
+                    {
+                      "text": "  - \"手機點餐\"\n"
+                    },
+                    {
+                      "text": "\n包含\"桌台\"的元素 (3個):\n"
+                    },
+                    {
+                      "text": "  - \"桌台管理\"\n"
+                    },
+                    {
+                      "text": "  - \"管理餐廳桌台狀態\"\n"
+                    },
+                    {
+                      "text": "  - \"桌台管理\"\n"
+                    },
+                    {
+                      "text": "\n包含\"結帳\"的元素 (3個):\n"
+                    },
+                    {
+                      "text": "  - \"結帳系統\"\n"
+                    },
+                    {
+                      "text": "  - \"處理付款和結帳\"\n"
+                    },
+                    {
+                      "text": "  - \"結帳管理\"\n"
+                    },
+                    {
+                      "text": "\n包含\"POS\"的元素 (2個):\n"
+                    },
+                    {
+                      "text": "  - \"🍽️ TanaPOS v4 AI\"\n"
+                    },
+                    {
+                      "text": "  - \"歡迎使用 TanaPOS v4 AI 系統\"\n"
+                    },
+                    {
+                      "text": "\n包含\"管理\"的元素 (15個):\n"
+                    },
+                    {
+                      "text": "  - \"管理客戶點餐和訂單\"\n"
+                    },
+                    {
+                      "text": "  - \"預約管理\"\n"
+                    },
+                    {
+                      "text": "  - \"管理預約、當日訂位、現場顧客\"\n"
+                    },
+                    {
+                      "text": "\n主要容器數量: 1\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-08-08T14:31:12.719Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "113107849d0afc355a1c-078edf93515e659a3b25",
+          "file": "debug-page-structure.test.ts",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "end-to-end-workflow.test.ts",
+      "file": "end-to-end-workflow.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "TanaPOS V4-AI 端到端業務流程測試",
+          "file": "end-to-end-workflow.test.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "完整餐廳營運流程: 從入座到結帳",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/end-to-end-workflow.test.ts",
+                        "line": 27,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 2418,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🍽️ 開始完整餐廳營運流程測試...\n"
+                        },
+                        {
+                          "text": "📍 階段1: 接待與帶位\n"
+                        },
+                        {
+                          "text": "⚠️ 沒有可用桌台，無法進行完整流程測試\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:29:18.613Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/end-to-end-workflow.test.ts",
+                            "line": 27,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "bf71086562f36e2a4da8-df3cc3e32e07c481aaee",
+              "file": "end-to-end-workflow.test.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "多桌台並行操作測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/end-to-end-workflow.test.ts",
+                        "line": 312,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 4494,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🏢 開始多桌台並行操作測試...\n"
+                        },
+                        {
+                          "text": "⚠️ 可用桌台少於2個，無法進行多桌台測試\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:29:21.038Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/end-to-end-workflow.test.ts",
+                            "line": 312,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "bf71086562f36e2a4da8-6348be4d8482d96eb352",
+              "file": "end-to-end-workflow.test.ts",
+              "line": 296,
+              "column": 3
+            },
+            {
+              "title": "錯誤處理與恢復測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7444,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🔄 開始錯誤處理與恢復測試...\n"
+                        },
+                        {
+                          "text": "🚫 模擬網路中斷...\n"
+                        },
+                        {
+                          "text": "✅ 恢復網路連接\n"
+                        },
+                        {
+                          "text": "🔄 頁面刷新後狀態檢查\n"
+                        },
+                        {
+                          "text": "✅ 錯誤處理與恢復測試完成\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:29:25.540Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bf71086562f36e2a4da8-299d9231e7317f8051e3",
+              "file": "end-to-end-workflow.test.ts",
+              "line": 354,
+              "column": 3
+            },
+            {
+              "title": "完整餐廳營運流程: 從入座到結帳",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/end-to-end-workflow.test.ts",
+                        "line": 27,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 3921,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🍽️ 開始完整餐廳營運流程測試...\n"
+                        },
+                        {
+                          "text": "📍 階段1: 接待與帶位\n"
+                        },
+                        {
+                          "text": "⚠️ 沒有可用桌台，無法進行完整流程測試\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:31:16.104Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/end-to-end-workflow.test.ts",
+                            "line": 27,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "bf71086562f36e2a4da8-fd02224d6648ee68dba6",
+              "file": "end-to-end-workflow.test.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "多桌台並行操作測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/end-to-end-workflow.test.ts",
+                        "line": 312,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 3834,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🏢 開始多桌台並行操作測試...\n"
+                        },
+                        {
+                          "text": "⚠️ 可用桌台少於2個，無法進行多桌台測試\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:31:20.051Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/end-to-end-workflow.test.ts",
+                            "line": 312,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "bf71086562f36e2a4da8-005a78d70a4d39ec5c06",
+              "file": "end-to-end-workflow.test.ts",
+              "line": 296,
+              "column": 3
+            },
+            {
+              "title": "錯誤處理與恢復測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5873,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🔄 開始錯誤處理與恢復測試...\n"
+                        },
+                        {
+                          "text": "🚫 模擬網路中斷...\n"
+                        },
+                        {
+                          "text": "✅ 恢復網路連接\n"
+                        },
+                        {
+                          "text": "🔄 頁面刷新後狀態檢查\n"
+                        },
+                        {
+                          "text": "✅ 錯誤處理與恢復測試完成\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:31:23.890Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bf71086562f36e2a4da8-1db36dffdca1ac7cb1c5",
+              "file": "end-to-end-workflow.test.ts",
+              "line": 354,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "final-verification.test.ts",
+      "file": "final-verification.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "TanaPOS V4-AI 最終功能驗證",
+          "file": "final-verification.test.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "V4-AI 系統基本功能完整驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13971,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🎯 開始V4-AI系統完整驗證...\n"
+                        },
+                        {
+                          "text": "✅ 頁面標題驗證通過\n"
+                        },
+                        {
+                          "text": "✅ \"開始點餐\" 元素存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"訂單管理\" 元素存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"桌台管理\" 元素存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"結帳管理\" 元素存在且可見\n"
+                        },
+                        {
+                          "text": "🪑 測試桌台管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理頁面導航成功\n"
+                        },
+                        {
+                          "text": "✅ 返回首頁功能正常\n"
+                        },
+                        {
+                          "text": "🍽️ 測試點餐功能...\n"
+                        },
+                        {
+                          "text": "✅ 點餐功能導航成功\n"
+                        },
+                        {
+                          "text": "📋 測試訂單管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 訂單管理功能導航成功\n"
+                        },
+                        {
+                          "text": "💰 測試結帳管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 結帳管理功能導航成功\n"
+                        },
+                        {
+                          "text": "🎉 V4-AI系統功能驗證完成！\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:29:33.003Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-b6b1288e5fbde9238861",
+              "file": "final-verification.test.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 響應式設計測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9008,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📱 開始響應式設計測試...\n"
+                        },
+                        {
+                          "text": "✅ 桌面版 (1280x720): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 平板版 (768x1024): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 手機版 (375x667): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 響應式設計測試通過\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:29:46.980Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-d22f6c309521a8944736",
+              "file": "final-verification.test.ts",
+              "line": 91,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 系統穩定性測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 19932,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🛡️ 開始系統穩定性測試...\n"
+                        },
+                        {
+                          "text": "🔄 測試 桌台管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 開始點餐 功能...\n"
+                        },
+                        {
+                          "text": "✅ 開始點餐 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 訂單管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 訂單管理 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 結帳管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 結帳管理 導航完成\n"
+                        },
+                        {
+                          "text": "📊 控制台錯誤統計: 總計 0 個，嚴重錯誤 0 個\n"
+                        },
+                        {
+                          "text": "✅ 未發現嚴重系統錯誤\n"
+                        },
+                        {
+                          "text": "✅ 系統穩定性測試通過\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:29:55.992Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-c5f0e62dac9c1fcd5dd9",
+              "file": "final-verification.test.ts",
+              "line": 124,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 系統基本功能完整驗證",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13538,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🎯 開始V4-AI系統完整驗證...\n"
+                        },
+                        {
+                          "text": "✅ 頁面標題驗證通過\n"
+                        },
+                        {
+                          "text": "✅ \"開始點餐\" 元素存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"訂單管理\" 元素存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"桌台管理\" 元素存在且可見\n"
+                        },
+                        {
+                          "text": "✅ \"結帳管理\" 元素存在且可見\n"
+                        },
+                        {
+                          "text": "🪑 測試桌台管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理頁面導航成功\n"
+                        },
+                        {
+                          "text": "✅ 返回首頁功能正常\n"
+                        },
+                        {
+                          "text": "🍽️ 測試點餐功能...\n"
+                        },
+                        {
+                          "text": "✅ 點餐功能導航成功\n"
+                        },
+                        {
+                          "text": "📋 測試訂單管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 訂單管理功能導航成功\n"
+                        },
+                        {
+                          "text": "💰 測試結帳管理功能...\n"
+                        },
+                        {
+                          "text": "✅ 結帳管理功能導航成功\n"
+                        },
+                        {
+                          "text": "🎉 V4-AI系統功能驗證完成！\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:31:29.794Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-6b27d07dbbfb9830da2b",
+              "file": "final-verification.test.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 響應式設計測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8552,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📱 開始響應式設計測試...\n"
+                        },
+                        {
+                          "text": "✅ 桌面版 (1280x720): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 平板版 (768x1024): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 手機版 (375x667): 發現 2 個主要按鈕\n"
+                        },
+                        {
+                          "text": "✅ 響應式設計測試通過\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:31:43.339Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-394f843314543585f274",
+              "file": "final-verification.test.ts",
+              "line": 91,
+              "column": 3
+            },
+            {
+              "title": "V4-AI 系統穩定性測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 19389,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🛡️ 開始系統穩定性測試...\n"
+                        },
+                        {
+                          "text": "🔄 測試 桌台管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 桌台管理 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 開始點餐 功能...\n"
+                        },
+                        {
+                          "text": "✅ 開始點餐 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 訂單管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 訂單管理 導航完成\n"
+                        },
+                        {
+                          "text": "🔄 測試 結帳管理 功能...\n"
+                        },
+                        {
+                          "text": "✅ 結帳管理 導航完成\n"
+                        },
+                        {
+                          "text": "📊 控制台錯誤統計: 總計 0 個，嚴重錯誤 0 個\n"
+                        },
+                        {
+                          "text": "✅ 未發現嚴重系統錯誤\n"
+                        },
+                        {
+                          "text": "✅ 系統穩定性測試通過\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:31:51.895Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e0250d0dee710422cbc1-81fcb844860ee543feea",
+              "file": "final-verification.test.ts",
+              "line": 124,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
     {
       "title": "table-management.test.ts",
       "file": "table-management.test.ts",
@@ -97,7 +1630,66 @@
           "specs": [
             {
               "title": "桌台狀態循環測試 - Available → Seated → Dining → Payment-Pending → Cleaning → Available",
-              "ok": false,
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                        "line": 25,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 3632,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "開始測試桌台狀態循環...\n"
+                        },
+                        {
+                          "text": "沒有可用的桌台，跳過此測試\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:30:15.942Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                            "line": 25,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e03735c7ff441e4e5f70-f82ad8e2a3061bfaa741",
+              "file": "table-management.test.ts",
+              "line": 17,
+              "column": 3
+            },
+            {
+              "title": "桌台篩選功能測試",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -110,248 +1702,25 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 14908,
-                      "error": {
-                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
-                        "location": {
-                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                          "column": 33,
-                          "line": 11
-                        },
-                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 4170,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "location": {
-                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                            "column": 33,
-                            "line": 11
-                          },
-                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                          "text": "開始測試桌台篩選功能...\n"
+                        },
+                        {
+                          "text": "🎉 桌台篩選功能測試完成！\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-06T04:17:31.452Z",
+                      "startTime": "2025-08-08T14:30:19.581Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                        "column": 33,
-                        "line": 11
-                      }
-                    },
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 12203,
-                      "error": {
-                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
-                        "location": {
-                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                          "column": 33,
-                          "line": 11
-                        },
-                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                            "column": 33,
-                            "line": 11
-                          },
-                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2025-08-06T04:17:47.608Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium-retry1\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium-retry1\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium-retry1\\error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V-197af-ding-→-Cleaning-→-Available-chromium-retry1\\trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                        "column": 33,
-                        "line": 11
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "e03735c7ff441e4e5f70-f82ad8e2a3061bfaa741",
-              "file": "table-management.test.ts",
-              "line": 17,
-              "column": 3
-            },
-            {
-              "title": "桌台篩選功能測試",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 11958,
-                      "error": {
-                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
-                        "location": {
-                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                          "column": 33,
-                          "line": 11
-                        },
-                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                            "column": 33,
-                            "line": 11
-                          },
-                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-06T04:18:00.874Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                        "column": 33,
-                        "line": 11
-                      }
-                    },
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 12239,
-                      "error": {
-                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
-                        "location": {
-                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                          "column": 33,
-                          "line": 11
-                        },
-                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                            "column": 33,
-                            "line": 11
-                          },
-                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2025-08-06T04:18:13.706Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium-retry1\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium-retry1\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium-retry1\\error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台篩選功能測試-chromium-retry1\\trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                        "column": 33,
-                        "line": 11
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e03735c7ff441e4e5f70-741ff0597cc211f25abf",
@@ -361,129 +1730,56 @@
             },
             {
               "title": "桌台容量與分配測試",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
                   "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                        "line": 154,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
                   "projectId": "chromium",
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 12008,
-                      "error": {
-                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
-                        "location": {
-                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                          "column": 33,
-                          "line": 11
-                        },
-                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
+                      "status": "skipped",
+                      "duration": 3777,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "location": {
-                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                            "column": 33,
-                            "line": 11
-                          },
-                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                          "text": "開始測試桌台容量分配...\n"
+                        },
+                        {
+                          "text": "沒有找到桌台容量資訊，跳過此測試\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-06T04:18:27.073Z",
-                      "annotations": [],
-                      "attachments": [
+                      "startTime": "2025-08-08T14:30:23.764Z",
+                      "annotations": [
                         {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                        "column": 33,
-                        "line": 11
-                      }
-                    },
-                    {
-                      "workerIndex": 5,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 12283,
-                      "error": {
-                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
-                        "location": {
-                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                          "column": 33,
-                          "line": 11
-                        },
-                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
+                          "type": "skip",
                           "location": {
-                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                            "column": 33,
-                            "line": 11
-                          },
-                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                            "line": 154,
+                            "column": 12
+                          }
                         }
                       ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2025-08-06T04:18:39.956Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium-retry1\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium-retry1\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium-retry1\\error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台容量與分配測試-chromium-retry1\\trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                        "column": 33,
-                        "line": 11
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "skipped"
                 }
               ],
               "id": "e03735c7ff441e4e5f70-f9899029c967db1e2801",
@@ -493,132 +1789,277 @@
             },
             {
               "title": "桌台資訊顯示測試",
-              "ok": false,
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                        "line": 180,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 4049,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "開始測試桌台資訊顯示...\n"
+                        },
+                        {
+                          "text": "沒有找到桌台，跳過此測試\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:30:27.554Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                            "line": 180,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e03735c7ff441e4e5f70-8555be11fd77907113b1",
+              "file": "table-management.test.ts",
+              "line": 173,
+              "column": 3
+            },
+            {
+              "title": "桌台狀態循環測試 - Available → Seated → Dining → Payment-Pending → Cleaning → Available",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                        "line": 25,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 3785,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "開始測試桌台狀態循環...\n"
+                        },
+                        {
+                          "text": "沒有可用的桌台，跳過此測試\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:32:11.302Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                            "line": 25,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e03735c7ff441e4e5f70-d916002fb18c7d8907e1",
+              "file": "table-management.test.ts",
+              "line": 17,
+              "column": 3
+            },
+            {
+              "title": "桌台篩選功能測試",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
                   "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
                   "results": [
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 12092,
-                      "error": {
-                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
-                        "location": {
-                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                          "column": 33,
-                          "line": 11
-                        },
-                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 3156,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "location": {
-                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                            "column": 33,
-                            "line": 11
-                          },
-                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
+                          "text": "開始測試桌台篩選功能...\n"
+                        },
+                        {
+                          "text": "🎉 桌台篩選功能測試完成！\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-06T04:18:53.344Z",
+                      "startTime": "2025-08-08T14:32:15.095Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                        "column": 33,
-                        "line": 11
-                      }
-                    },
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e03735c7ff441e4e5f70-d3862621118bce466203",
+              "file": "table-management.test.ts",
+              "line": 111,
+              "column": 3
+            },
+            {
+              "title": "桌台容量與分配測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
                     {
-                      "workerIndex": 7,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 12494,
-                      "error": {
-                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33",
-                        "location": {
-                          "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                          "column": 33,
-                          "line": 11
-                        },
-                        "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                            "column": 33,
-                            "line": 11
-                          },
-                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"桌台管理\")').last()\u001b[22m\n\n\n\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[90m// 切換到桌台管理頁面 - 點擊桌台管理按鈕\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m tableManagementButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"桌台管理\")'\u001b[39m)\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m tableManagementButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// 等待桌台管理頁面完全載入\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'[data-testid=\"table-management-page\"], h1:has-text(\"桌台管理\")'\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts:11:33\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2025-08-06T04:19:06.327Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium-retry1\\test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium-retry1\\video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium-retry1\\error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\test-results\\table-management-TanaPOS-V4-AI-桌台管理系統-桌台資訊顯示測試-chromium-retry1\\trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\TANAPOS\\tanapos-v4-ai\\tanapos-v4-mini\\tests\\table-management.test.ts",
-                        "column": 33,
-                        "line": 11
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                        "line": 154,
+                        "column": 12
                       }
                     }
                   ],
-                  "status": "unexpected"
+                  "expectedStatus": "skipped",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 3600,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "開始測試桌台容量分配...\n"
+                        },
+                        {
+                          "text": "沒有找到桌台容量資訊，跳過此測試\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:32:18.255Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                            "line": 154,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
                 }
               ],
-              "id": "e03735c7ff441e4e5f70-8555be11fd77907113b1",
+              "id": "e03735c7ff441e4e5f70-f81774ad99ec43f4aaf5",
+              "file": "table-management.test.ts",
+              "line": 145,
+              "column": 3
+            },
+            {
+              "title": "桌台資訊顯示測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                        "line": 180,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 3549,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "開始測試桌台資訊顯示...\n"
+                        },
+                        {
+                          "text": "沒有找到桌台，跳過此測試\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:32:21.863Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/tanawatthaimain/Desktop/tanapos/tanapos-v4-mini/tests/table-management.test.ts",
+                            "line": 180,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e03735c7ff441e4e5f70-9a76220a18dc4d769af9",
               "file": "table-management.test.ts",
               "line": 173,
               "column": 3
@@ -644,10 +2085,10 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 8,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2074,
+                      "duration": 2545,
                       "errors": [],
                       "stdout": [
                         {
@@ -662,7 +2103,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-08-06T04:19:19.911Z",
+                      "startTime": "2025-08-08T14:30:31.304Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -674,6 +2115,50 @@
               "file": "table-management.test.ts",
               "line": 209,
               "column": 3
+            },
+            {
+              "title": "移動設備桌台管理測試",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1806,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "開始測試移動設備桌台管理...\n"
+                        },
+                        {
+                          "text": "移動設備上顯示 0 個桌台\n"
+                        },
+                        {
+                          "text": "🎉 移動設備測試完成！\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-08T14:32:25.424Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e03735c7ff441e4e5f70-7ab229d86257bdf8666d",
+              "file": "table-management.test.ts",
+              "line": 209,
+              "column": 3
             }
           ]
         }
@@ -682,11 +2167,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-08-06T04:17:30.567Z",
-    "duration": 111604.454,
-    "expected": 1,
-    "skipped": 0,
-    "unexpected": 4,
+    "startTime": "2025-08-08T14:28:30.782Z",
+    "duration": 237279.419,
+    "expected": 26,
+    "skipped": 10,
+    "unexpected": 0,
     "flaky": 0
   }
 }

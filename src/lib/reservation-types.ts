@@ -57,6 +57,8 @@ export interface TimeSlot {
 export interface AvailableSlots {
   date: string
   slots: TimeSlot[]
+  isHoliday?: boolean
+  holidayMessage?: string
 }
 
 export interface ReservationFormData {
