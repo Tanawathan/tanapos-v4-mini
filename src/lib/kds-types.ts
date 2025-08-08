@@ -237,14 +237,15 @@ export const CATEGORY_NAMES: Record<MenuCategory, string> = {
 };
 
 // 狀態顏色對應
+import { ORDER_STATUS_COLOR } from './status';
 export const STATUS_COLORS = {
-  [OrderStatus.PENDING]: 'bg-orange-100 text-orange-800 border-orange-200',
-  [OrderStatus.CONFIRMED]: 'bg-blue-100 text-blue-800 border-blue-200',
-  [OrderStatus.PREPARING]: 'bg-blue-100 text-blue-800 border-blue-200',
-  [OrderStatus.READY]: 'bg-green-100 text-green-800 border-green-200',
-  [OrderStatus.SERVED]: 'bg-green-100 text-green-800 border-green-200',
-  [OrderStatus.COMPLETED]: 'bg-gray-100 text-gray-800 border-gray-200',
-  [OrderStatus.CANCELLED]: 'bg-red-100 text-red-800 border-red-200'
+  [OrderStatus.PENDING]: ORDER_STATUS_COLOR.pending,
+  [OrderStatus.CONFIRMED]: ORDER_STATUS_COLOR.confirmed,
+  [OrderStatus.PREPARING]: ORDER_STATUS_COLOR.preparing,
+  [OrderStatus.READY]: ORDER_STATUS_COLOR.ready,
+  [OrderStatus.SERVED]: ORDER_STATUS_COLOR.served,
+  [OrderStatus.COMPLETED]: ORDER_STATUS_COLOR.completed,
+  [OrderStatus.CANCELLED]: ORDER_STATUS_COLOR.cancelled
 };
 
 // 緊急程度顏色

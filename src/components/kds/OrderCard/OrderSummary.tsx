@@ -139,7 +139,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
         </div>
       </div>
 
-      {/* 第二行：進度和時間 */}
+      {/* 第二行：進度與時間（緊湊模式更圖示化） */}
       <div className="flex items-center justify-between">
         <div className={`flex items-center ${isCompact ? 'space-x-2' : 'space-x-4'}`}>
           {/* 進度指示 */}
@@ -149,8 +149,10 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                order.status === 'ready' ? '✅ 已完成' : 
                '📦 待處理'}
             </span>
-            <span className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-600`}>
-              {completedItems}/{totalItems}
+            <span className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-600 flex items-center`}>
+              ✅ {completedItems}
+              <span className="mx-1 text-gray-400">/</span>
+              📦 {totalItems}
             </span>
           </div>
 
@@ -169,8 +171,8 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
 
           {/* 預估時間 */}
           {estimatedTimeRemaining > 0 && (
-            <span className={`${isCompact ? 'text-xs' : 'text-sm'} ${getUrgencyColor()}`}>
-              ⏱️ 剩餘 {estimatedTimeRemaining}分鐘
+            <span className={`${isCompact ? 'text-xs' : 'text-sm'} ${getUrgencyColor()} inline-flex items-center`}>
+              ⏱️ <span className="ml-1">{estimatedTimeRemaining}分</span>
             </span>
           )}
         </div>

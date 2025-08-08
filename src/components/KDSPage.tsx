@@ -300,6 +300,29 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
             </span>
           )}
         </div>
+        {settings.displayMode === 'compact' && (
+          <div className="mt-2 flex items-center justify-center gap-2 text-xs">
+            <button
+              onClick={handleExpandAll}
+              className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50"
+            >
+              展開全部
+            </button>
+            <button
+              onClick={handleCollapseAll}
+              className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50"
+            >
+              收合全部
+            </button>
+            <button
+              onClick={() => handleSort(sortBy === 'priority' ? 'time' : 'priority')}
+              className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50"
+              title="切換排序（時間/優先級）"
+            >
+              排序：{sortBy === 'priority' ? '優先級' : '時間'}
+            </button>
+          </div>
+        )}
       </footer>
 
       {/* 設定視窗 */}
