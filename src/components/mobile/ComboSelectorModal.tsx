@@ -10,16 +10,11 @@ interface ComboSelectorModalProps {
 const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, onClose }) => {
   const { addToCart, loadComboRules } = useMobileOrderStore()
   const [selectedOptions, setSelectedOptions] = useState<{[ruleId: string]: string[]}>({})
-  // 逐份差異選：每一份的選擇集合
-  const [selectedOptionsByPortion, setSelectedOptionsByPortion] = useState<Array<{[ruleId: string]: string[]}>>([])
   const [comboRules, setComboRules] = useState<ComboSelectionRule[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [quantity, setQuantity] = useState<number>(1)
   const [activeRuleIndex, setActiveRuleIndex] = useState<number>(0)
-  // 同組合(all) / 逐份(per)
-  const [applyMode, setApplyMode] = useState<'all' | 'per'>('all')
-  const [activePortionIndex, setActivePortionIndex] = useState<number>(0)
 
   // 載入套餐規則
   useEffect(() => {
@@ -32,13 +27,10 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
   useEffect(() => {
     if (!isOpen) {
       setSelectedOptions({})
-  setSelectedOptionsByPortion([])
       setComboRules([])
       setError(null)
   setQuantity(1)
   setActiveRuleIndex(0)
-  setApplyMode('all')
-  setActivePortionIndex(0)
     }
   }, [isOpen])
 
@@ -66,7 +58,6 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
         }
       })
   setSelectedOptions(defaultSelections)
-  setSelectedOptionsByPortion([])
   setActiveRuleIndex(0)
   setQuantity(1)
     } catch (error) {
@@ -77,19 +68,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
     }
   }
 
-  // 當份數或模式改變時，維持逐份資料長度與游標正確
-  useEffect(() => {
-    if (applyMode === 'per') {
-      setSelectedOptionsByPortion(prev => {
-        const base = prev.length ? prev.slice(0) : Array.from({ length: quantity }, () => ({ ...selectedOptions }))
-        // 調整長度
-        if (base.length > quantity) return base.slice(0, quantity)
-        while (base.length < quantity) base.push({ ...selectedOptions })
-        return base
-      })
-      setActivePortionIndex(idx => Math.min(idx, Math.max(0, quantity - 1)))
-    }
-  }, [quantity, applyMode, selectedOptions])
+  // 無逐份模式，無需同步狀態
 
   if (!isOpen || !combo) return null
 
@@ -119,54 +98,24 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
 
   const validateSelections = (): boolean => {
     if (combo.combo_type === 'fixed') return true
-    if (applyMode === 'all') {
-      for (const rule of comboRules) {
-        const selections = selectedOptions[rule.id] || []
-        if (!validateRule(selections, rule)) return false
-      }
-      return true
-    }
-    // per 逐份
-    for (let i = 0; i < quantity; i++) {
-      const per = selectedOptionsByPortion[i] || {}
-      for (const rule of comboRules) {
-        const selections = per[rule.id] || []
-        if (!validateRule(selections, rule)) return false
-      }
+    for (const rule of comboRules) {
+      const selections = selectedOptions[rule.id] || []
+      if (!validateRule(selections, rule)) return false
     }
     return true
   }
 
   const calculateTotalPrice = (): number => {
     if (combo.combo_type === 'fixed') return combo.price * quantity
-
-    if (applyMode === 'all') {
-      let totalPrice = combo.price
-      for (const rule of comboRules) {
-        const selections = selectedOptions[rule.id] || []
-        for (const optionId of selections) {
-          const option = rule.options.find(opt => opt.id === optionId)
-          if (option) totalPrice += option.additional_price
-        }
+    let totalPrice = combo.price
+    for (const rule of comboRules) {
+      const selections = selectedOptions[rule.id] || []
+      for (const optionId of selections) {
+        const option = rule.options.find(opt => opt.id === optionId)
+        if (option) totalPrice += option.additional_price
       }
-      return totalPrice * quantity
     }
-
-    // per 逐份：每份單獨計
-    let sum = 0
-    for (let i = 0; i < quantity; i++) {
-      let unit = combo.price
-      const per = selectedOptionsByPortion[i] || {}
-      for (const rule of comboRules) {
-        const selections = per[rule.id] || []
-        for (const optionId of selections) {
-          const option = rule.options.find(opt => opt.id === optionId)
-          if (option) unit += option.additional_price
-        }
-      }
-      sum += unit
-    }
-    return sum
+    return totalPrice * quantity
   }
 
   const handleAddToCart = () => {
@@ -183,39 +132,30 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
       return
     }
 
-    // 構建套餐選擇資料
-    const counts: Record<string, { rule_id: string; selected_product_id: string; additional_price: number; qty: number }> = {}
+    // 準備套餐選擇資料（套用到每一份）
+    const comboSelections: Array<{
+      rule_id: string
+      selected_product_id: string
+      quantity?: number
+      additional_price?: number
+    }> = []
 
-    const pushSel = (ruleId: string, optionId: string) => {
-      const rule = comboRules.find(r => r.id === ruleId)
-      const option = rule?.options.find(o => o.id === optionId)
-      if (!option || !option.product_id) return
-      const key = `${ruleId}::${option.product_id}`
-      if (!counts[key]) {
-        counts[key] = { rule_id: ruleId, selected_product_id: option.product_id, additional_price: option.additional_price || 0, qty: 0 }
-      }
-      counts[key].qty += 1
-    }
+    Object.entries(selectedOptions).forEach(([ruleId, selectedOptionIds]) => {
+      selectedOptionIds.forEach(optionId => {
+        const rule = comboRules.find(r => r.id === ruleId)
+        const option = rule?.options.find(o => o.id === optionId)
+        if (option && option.product_id) {
+          comboSelections.push({
+            rule_id: ruleId,
+            selected_product_id: option.product_id,
+            quantity: 1,
+            additional_price: option.additional_price || 0
+          })
+        }
+      })
+    })
 
-    if (applyMode === 'all') {
-      Object.entries(selectedOptions).forEach(([ruleId, ids]) => ids.forEach(id => {
-        for (let i = 0; i < quantity; i++) pushSel(ruleId, id)
-      }))
-    } else {
-      for (let i = 0; i < quantity; i++) {
-        const per = selectedOptionsByPortion[i] || {}
-        Object.entries(per).forEach(([ruleId, ids]) => ids.forEach(id => pushSel(ruleId, id)))
-      }
-    }
-
-    const comboSelections = Object.values(counts).map(v => ({
-      rule_id: v.rule_id,
-      selected_product_id: v.selected_product_id,
-      quantity: v.qty,
-      additional_price: v.additional_price
-    }))
-
-    addToCart(combo, comboSelections, applyMode === 'all' ? quantity : 1)
+    addToCart(combo, comboSelections, quantity)
     onClose()
   }
 
@@ -251,34 +191,14 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
               </span>
             </div>
             {combo.combo_type === 'selectable' && (
-              <div className="mt-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600">份數</span>
-                  <div className="flex items-center border rounded-lg overflow-hidden">
-                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-8 h-8 grid place-items-center bg-gray-50">-</button>
-                    <div className="px-3 text-sm min-w-[2rem] text-center">{quantity}</div>
-                    <button onClick={() => setQuantity(q => q + 1)} className="w-8 h-8 grid place-items-center bg-gray-50">+</button>
-                  </div>
+              <div className="mt-3 flex items-center gap-3">
+                <span className="text-sm text-gray-600">份數</span>
+                <div className="flex items-center border rounded-lg overflow-hidden">
+                  <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-8 h-8 grid place-items-center bg-gray-50">-</button>
+                  <div className="px-3 text-sm min-w-[2rem] text-center">{quantity}</div>
+                  <button onClick={() => setQuantity(q => q + 1)} className="w-8 h-8 grid place-items-center bg-gray-50">+</button>
                 </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="text-gray-600">套用</span>
-                  <button
-                    onClick={() => setApplyMode('all')}
-                    className={`px-2 py-1 rounded border ${applyMode==='all' ? 'border-blue-500 text-blue-700 bg-blue-50' : 'border-gray-300 text-gray-600 bg-white'}`}
-                  >同組合</button>
-                  <button
-                    onClick={() => {
-                      setApplyMode('per')
-                      setSelectedOptionsByPortion(prev => {
-                        const base = prev.length ? prev : Array.from({ length: quantity }, () => ({ ...selectedOptions }))
-                        const copy = base.slice(0, quantity)
-                        while (copy.length < quantity) copy.push({ ...selectedOptions })
-                        return copy
-                      })
-                    }}
-                    className={`px-2 py-1 rounded border ${applyMode==='per' ? 'border-blue-500 text-blue-700 bg-blue-50' : 'border-gray-300 text-gray-600 bg-white'}`}
-                  >逐份</button>
-                </div>
+                <span className="text-xs text-gray-500">此選擇將套用到每一份</span>
               </div>
             )}
           </div>
@@ -302,67 +222,13 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
                 <div>
                   <h3 className="text-lg font-medium text-gray-800 mb-3">請選擇套餐內容</h3>
 
-                  {applyMode === 'per' && (
-                    <div className="mb-2 flex items-center justify-between gap-2">
-                      <div className="flex gap-2 overflow-x-auto">
-                        {Array.from({ length: quantity }).map((_, idx) => {
-                          const per = selectedOptionsByPortion[idx] || {}
-                          const done = comboRules.every(r => validateRule(per[r.id] || [], r))
-                          return (
-                            <button
-                              key={idx}
-                              onClick={() => setActivePortionIndex(idx)}
-                              className={`px-3 py-1.5 rounded-full border text-sm whitespace-nowrap ${idx===activePortionIndex ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 bg-white text-gray-600'}`}
-                            >
-                              {done ? '✅' : '⚠️'} 第{idx+1}份
-                            </button>
-                          )
-                        })}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <button
-                          onClick={() => {
-                            // 以規則預設建立一鍵搭配
-                            const defaults: {[k: string]: string[]} = {}
-                            comboRules.forEach(rule => {
-                              const def = rule.options.filter(o => o.is_default)
-                              defaults[rule.id] = def.length ? def.map(o => o.id) : []
-                            })
-                            setSelectedOptionsByPortion(prev => {
-                              const copy = prev.slice(0)
-                              copy[activePortionIndex] = defaults
-                              return copy
-                            })
-                          }}
-                          className="px-2 py-1 rounded border border-gray-300 bg-white text-gray-700"
-                        >套用預設</button>
-                        <button
-                          onClick={() => {
-                            const current = selectedOptionsByPortion[activePortionIndex] || {}
-                            setSelectedOptionsByPortion(Array.from({ length: quantity }, () => ({ ...current })))
-                          }}
-                          className="px-2 py-1 rounded border border-blue-400 bg-blue-50 text-blue-700"
-                        >套用到全部</button>
-                        <button
-                          onClick={() => {
-                            setSelectedOptionsByPortion(prev => {
-                              const copy = prev.slice(0)
-                              copy[activePortionIndex] = {}
-                              return copy
-                            })
-                          }}
-                          className="px-2 py-1 rounded border border-gray-200 text-gray-500 bg-white"
-                        >清空此份</button>
-                      </div>
-                    </div>
-                  )}
+                  {/* 最簡化：無逐份操作與預設按鈕 */}
 
                   {/* 規則 Tabs（縮短整體長度） */}
                   <div className="mb-3 flex gap-2 overflow-x-auto">
                     {comboRules.map((rule, idx) => {
                       const hasMin = Math.max(1, rule.min_selections || 0)
-                      const current = applyMode === 'all' ? (selectedOptions[rule.id] || []) : ((selectedOptionsByPortion[activePortionIndex] || {})[rule.id] || [])
-                      const done = current.length >= hasMin
+                      const done = (selectedOptions[rule.id] || []).length >= hasMin
                       return (
                         <button
                           key={rule.id}
@@ -378,7 +244,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
                   {/* 當前規則內容（可滾動） */}
                   {comboRules[activeRuleIndex] && (() => {
                     const rule = comboRules[activeRuleIndex]
-                    const currentSelections = applyMode === 'all' ? (selectedOptions[rule.id] || []) : ((selectedOptionsByPortion[activePortionIndex] || {})[rule.id] || [])
+                    const currentSelections = selectedOptions[rule.id] || []
                     const inputType = rule.selection_type === 'single' ? 'radio' : 'checkbox'
                     return (
                       <div className={`space-y-2 max-h-64 overflow-y-auto pr-1 ${!validateRule(currentSelections, rule) ? 'ring-1 ring-red-300 rounded' : ''}`}>
@@ -398,29 +264,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
                                 type={inputType}
                                 name={`rule_${rule.id}`}
                                 checked={isSelected}
-                                onChange={() => {
-                                  if (applyMode === 'all') {
-                                    handleOptionChange(rule.id, option.id, rule)
-                                  } else {
-                                    setSelectedOptionsByPortion(prev => {
-                                      const copy = prev.slice(0)
-                                      const per = { ...(copy[activePortionIndex] || {}) }
-                                      const old = per[rule.id] || []
-                                      if (rule.selection_type === 'single') {
-                                        per[rule.id] = [option.id]
-                                      } else {
-                                        if (old.includes(option.id)) {
-                                          const next = old.filter(id => id !== option.id)
-                                          if (next.length >= rule.min_selections) per[rule.id] = next
-                                        } else {
-                                          if (old.length < rule.max_selections) per[rule.id] = [...old, option.id]
-                                        }
-                                      }
-                                      copy[activePortionIndex] = per
-                                      return copy
-                                    })
-                                  }
-                                }}
+                                onChange={() => handleOptionChange(rule.id, option.id, rule)}
                                 className="mr-2"
                               />
                               <div className="flex-1 flex items-center justify-between gap-2">
