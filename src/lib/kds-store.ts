@@ -50,7 +50,10 @@ const defaultSettings: KDSSettings = {
     [MenuCategory.A_LA_CARTE]: 15,
     [MenuCategory.ADDITIONAL]: 8,
     [MenuCategory.DESSERTS]: 12
-  }
+  },
+  // 新增：功能旗標（預設關閉，不影響既有功能）
+  mobileLandscapeMode: false,
+  longPressQuickActions: true
 };
 
 // 預設篩選條件

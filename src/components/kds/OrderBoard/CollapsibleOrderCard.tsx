@@ -30,6 +30,7 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
   
   // 獲取 KDS store 的更新函數
   const { updateMenuItemStatus } = useKDSStore();
+  const { settings } = useKDSStore();
 
   // 每分鐘更新一次時間，確保持續時間顯示準確
   useEffect(() => {
@@ -141,10 +142,32 @@ export const CollapsibleOrderCard: React.FC<CollapsibleOrderCardProps> = ({
       {!isExpanded && (
         <div 
           className="p-2 md:p-3 cursor-pointer hover:bg-gray-50 transition-colors kds-order-card-compact"
-          onClick={() => onToggleExpand(order.id)}
+          onClick={() => { if (!showQuickActions) onToggleExpand(order.id); }}
           onContextMenu={(e) => {
             e.preventDefault();
             setShowQuickActions(!showQuickActions);
+          }}
+          onTouchStart={(e) => {
+            if (!settings.longPressQuickActions) return;
+            // 長按觸發快速操作（~500ms）
+            const target = e.currentTarget as HTMLElement & { __lpTimer?: any };
+            target.__lpTimer = setTimeout(() => {
+              setShowQuickActions(true);
+            }, 500);
+          }}
+          onTouchEnd={(e) => {
+            const target = e.currentTarget as HTMLElement & { __lpTimer?: any };
+            if (target.__lpTimer) {
+              clearTimeout(target.__lpTimer);
+              target.__lpTimer = undefined;
+            }
+          }}
+          onTouchMove={(e) => {
+            const target = e.currentTarget as HTMLElement & { __lpTimer?: any };
+            if (target.__lpTimer) {
+              clearTimeout(target.__lpTimer);
+              target.__lpTimer = undefined;
+            }
           }}
         >
           <OrderSummary

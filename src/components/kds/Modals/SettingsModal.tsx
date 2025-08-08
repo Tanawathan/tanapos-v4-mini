@@ -124,6 +124,40 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </label>
               </div>
 
+              {/* 實驗性：行動裝置橫向模式 */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="mobileLandscapeMode"
+                  checked={!!formData.mobileLandscapeMode}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    mobileLandscapeMode: e.target.checked
+                  })}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="mobileLandscapeMode" className="ml-2 text-sm text-gray-700">
+                  行動裝置橫向優化（實驗）
+                </label>
+              </div>
+
+              {/* 長按快速操作 */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="longPressQuickActions"
+                  checked={!!formData.longPressQuickActions}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    longPressQuickActions: e.target.checked
+                  })}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="longPressQuickActions" className="ml-2 text-sm text-gray-700">
+                  長按顯示快速操作
+                </label>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   顯示模式

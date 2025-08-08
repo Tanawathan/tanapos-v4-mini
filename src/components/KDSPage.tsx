@@ -174,7 +174,7 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
   }
 
   return (
-    <div className="min-h-screen bg-ui-secondary flex flex-col kds-container">
+  <div className={`min-h-screen bg-ui-secondary flex flex-col kds-container ${settings.mobileLandscapeMode ? 'kds-mobile-landscape' : ''}`}>
       {/* 靜默更新指示器 */}
       {isLoading && !isInitialLoad && (
         <div className="fixed top-4 right-4 z-50 bg-blue-500 text-white px-3 py-1 rounded-full text-sm shadow-lg">
@@ -239,9 +239,9 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
       </header>
 
       {/* 主要內容區域 */}
-      <main className="p-3 md:p-4 lg:p-6 flex-1 min-h-0 overflow-hidden kds-main">
+  <main className={`p-3 md:p-4 lg:p-6 flex-1 min-h-0 overflow-hidden kds-main ${settings.mobileLandscapeMode ? 'pb-20' : ''}`}>
         {/* 針對平板橫向優化的響應式網格佈局 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-6 h-full kds-grid">
+        <div className={`grid gap-3 md:gap-4 lg:gap-6 h-full kds-grid ${settings.mobileLandscapeMode ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3'}`}>
           {/* 待處理訂單 */}
           <OrderColumn
             title="待處理"
@@ -278,7 +278,7 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
       </main>
 
       {/* 底部統計欄 */}
-      <footer className="bg-white border-t border-gray-200 px-3 md:px-6 py-2 md:py-4 flex-shrink-0 kds-footer">
+  <footer className={`bg-white border-t border-gray-200 px-3 md:px-6 py-2 md:py-4 flex-shrink-0 kds-footer ${settings.mobileLandscapeMode ? 'fixed bottom-0 left-0 right-0 z-40' : ''}`}>
         <div className="flex items-center justify-center flex-wrap gap-3 md:gap-8 text-xs md:text-sm text-gray-600 kds-footer-stats">
           <span className="hidden md:inline">📈 即時統計:</span>
           <span>待處理 <strong className="text-orange-600">{stats.pendingOrders}</strong></span>

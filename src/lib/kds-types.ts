@@ -192,6 +192,9 @@ export interface KDSSettings {
   defaultSort: 'time' | 'priority' | 'table'; // 預設排序
   categoriesVisible: MenuCategory[]; // 顯示的分類
   estimatedTimes: Record<MenuCategory, number>; // 各分類預估時間
+  // 實驗/顯示旗標（不影響既有功能，預設關閉）
+  mobileLandscapeMode?: boolean; // 行動裝置橫向優先佈局
+  longPressQuickActions?: boolean; // 長按顯示快速操作
 }
 
 // KDS 篩選條件
