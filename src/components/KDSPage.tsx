@@ -216,9 +216,11 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
             </div>
             
             <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
-              <div className="hidden md:block">
-                <StatsPanel stats={stats} />
-              </div>
+              {!settings.hideStats && (
+                <div className="hidden md:block">
+                  <StatsPanel stats={stats} />
+                </div>
+              )}
               
               <SortControl
                 sortBy={sortBy}
@@ -241,9 +243,11 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
           </div>
           
           {/* 在小螢幕上顯示統計資訊 */}
-          <div className="md:hidden mt-2 pt-2 border-t border-ui">
-            <StatsPanel stats={stats} />
-          </div>
+          {!settings.hideStats && (
+            <div className="md:hidden mt-2 pt-2 border-t border-ui">
+              <StatsPanel stats={stats} />
+            </div>
+          )}
         </div>
       </header>
 
@@ -287,19 +291,21 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
       </main>
 
       {/* 底部統計欄 */}
-  <footer className={`bg-white border-t border-gray-200 px-3 md:px-6 py-2 md:py-4 flex-shrink-0 kds-footer ${settings.mobileLandscapeMode ? 'fixed bottom-0 left-0 right-0 z-40' : ''}`}>
-        <div className="flex items-center justify-center flex-wrap gap-3 md:gap-8 text-xs md:text-sm text-gray-600 kds-footer-stats">
-          <span className="hidden md:inline">📈 即時統計:</span>
-          <span>待處理 <strong className="text-orange-600">{stats.pendingOrders}</strong></span>
-          <span>製作中 <strong className="text-blue-600">{stats.inProgressOrders}</strong></span>
-          <span>完成 <strong className="text-green-600">{stats.completedOrders}</strong></span>
-          <span>平均 <strong>{stats.averagePrepTime}分鐘</strong></span>
-          {stats.overdueOrders > 0 && (
-            <span className="text-red-600">
-              超時 <strong>{stats.overdueOrders}</strong>
-            </span>
-          )}
-        </div>
+      <footer className={`bg-white border-t border-gray-200 px-3 md:px-6 py-2 md:py-4 flex-shrink-0 kds-footer ${settings.mobileLandscapeMode ? 'fixed bottom-0 left-0 right-0 z-40' : ''}`}>
+        {!settings.hideStats && (
+          <div className="flex items-center justify-center flex-wrap gap-3 md:gap-8 text-xs md:text-sm text-gray-600 kds-footer-stats">
+            <span className="hidden md:inline">📈 即時統計:</span>
+            <span>待處理 <strong className="text-orange-600">{stats.pendingOrders}</strong></span>
+            <span>製作中 <strong className="text-blue-600">{stats.inProgressOrders}</strong></span>
+            <span>完成 <strong className="text-green-600">{stats.completedOrders}</strong></span>
+            <span>平均 <strong>{stats.averagePrepTime}分鐘</strong></span>
+            {stats.overdueOrders > 0 && (
+              <span className="text-red-600">
+                超時 <strong>{stats.overdueOrders}</strong>
+              </span>
+            )}
+          </div>
+        )}
         {settings.displayMode === 'compact' && (
           <div className="mt-2 flex items-center justify-center gap-2 text-xs">
             <button

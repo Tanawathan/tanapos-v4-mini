@@ -195,6 +195,7 @@ export interface KDSSettings {
   // 實驗/顯示旗標（不影響既有功能，預設關閉）
   mobileLandscapeMode?: boolean; // 行動裝置橫向優先佈局
   longPressQuickActions?: boolean; // 長按顯示快速操作
+  hideStats?: boolean; // 隱藏上下統計（適合廚房只看卡片）
 }
 
 // KDS 篩選條件

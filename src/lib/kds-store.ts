@@ -53,7 +53,8 @@ const defaultSettings: KDSSettings = {
   },
   // 新增：功能旗標（預設關閉，不影響既有功能）
   mobileLandscapeMode: false,
-  longPressQuickActions: true
+  longPressQuickActions: true,
+  hideStats: false
 };
 
 // 預設篩選條件
