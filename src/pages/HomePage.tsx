@@ -151,10 +151,15 @@ const HomePage: React.FC = () => {
               <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
                 <div className="text-4xl mb-4">📅</div>
                 <h3 className="text-xl font-semibold mb-2">預約管理</h3>
-                <p className="text-gray-600 mb-4">管理客戶預約訂位</p>
+                <p className="text-gray-600 mb-2">管理預約、當日訂位、現場顧客</p>
+                <div className="text-xs text-gray-500 mb-4 space-y-1">
+                  <div>• 支援當日預約功能</div>
+                  <div>• 現場顧客快速登記</div>
+                  <div>• 性別和姓氏記錄</div>
+                </div>
                 <Link 
                   to="/reservations"
-                  className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 w-full transition-colors inline-block"
+                  className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 w-full transition-colors inline-block text-center"
                 >
                   預約管理
                 </Link>

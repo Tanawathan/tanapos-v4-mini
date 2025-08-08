@@ -30,13 +30,12 @@ export default function ReservationForm({ onSubmit, onCancel, isLoading = false 
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // 設定預設日期為明天
+  // 設定預設日期為今天
   useEffect(() => {
-    const tomorrow = new Date()
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    const today = new Date()
     setFormData(prev => ({
       ...prev,
-      reservation_date: tomorrow.toISOString().split('T')[0]
+      reservation_date: today.toISOString().split('T')[0]
     }))
   }, [])
 
@@ -113,8 +112,17 @@ export default function ReservationForm({ onSubmit, onCancel, isLoading = false 
       newErrors.reservation_date = '請選擇預約日期'
     } else {
       const selectedDate = new Date(formData.reservation_date)
-      if (!ReservationService.isValidReservationDate(selectedDate)) {
-        newErrors.reservation_date = '只能預約7天內的日期'
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      
+      if (selectedDate < today) {
+        newErrors.reservation_date = '不能選擇過去的日期'
+      } else {
+        const maxDate = new Date(today)
+        maxDate.setDate(today.getDate() + 7)
+        if (selectedDate > maxDate) {
+          newErrors.reservation_date = '只能預約7天內的日期'
+        }
       }
     }
 
@@ -138,17 +146,20 @@ export default function ReservationForm({ onSubmit, onCancel, isLoading = false 
     }
   }
 
-  // 生成日期選項（未來7天）
+  // 生成日期選項（今天開始的7天）
   const getDateOptions = () => {
     const dates = []
     const today = new Date()
     
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 0; i <= 7; i++) {
       const date = new Date(today)
       date.setDate(today.getDate() + i)
+      const label = i === 0 ? '今天' : 
+                   i === 1 ? '明天' : 
+                   `${date.getMonth() + 1}/${date.getDate()} (${['日', '一', '二', '三', '四', '五', '六'][date.getDay()]})`
       dates.push({
         value: date.toISOString().split('T')[0],
-        label: `${date.getMonth() + 1}/${date.getDate()} (${['日', '一', '二', '三', '四', '五', '六'][date.getDay()]})`
+        label
       })
     }
     

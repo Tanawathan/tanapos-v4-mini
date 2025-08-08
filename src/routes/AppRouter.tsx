@@ -12,6 +12,7 @@ import MobileOrderingPage from '../components/MobileOrderingPage'
 import { KDSPage } from '../components/KDSPage'
 import LoginPage from '../components/LoginPage'
 import ReservationManagementPage from '../pages/ReservationManagementPage'
+import EnhancedReservationPage from '../pages/EnhancedReservationPage'
 import { withRouterNavigation } from '../components/withRouterNavigation'
 import { supabase } from '../lib/supabase'
 
@@ -25,6 +26,7 @@ const MenuManagementPageWithRouter = withRouterNavigation(MenuManagementPage)
 const MobileOrderingPageWithRouter = withRouterNavigation(MobileOrderingPage)
 const KDSPageWithRouter = withRouterNavigation(KDSPage)
 const ReservationManagementPageWithRouter = withRouterNavigation(ReservationManagementPage)
+const EnhancedReservationPageWithRouter = withRouterNavigation(EnhancedReservationPage)
 
 // 保護路由組件
 interface ProtectedRouteProps {
@@ -156,6 +158,14 @@ const AppRouter: React.FC = () => {
         />
         <Route 
           path="/reservations" 
+          element={
+            <ProtectedRoute>
+              <EnhancedReservationPageWithRouter />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/reservations/legacy" 
           element={
             <ProtectedRoute>
               <ReservationManagementPageWithRouter />
