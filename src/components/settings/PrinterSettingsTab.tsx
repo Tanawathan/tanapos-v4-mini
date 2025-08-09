@@ -14,7 +14,7 @@ const Label: React.FC<{title: string; desc?: string; children: React.ReactNode}>
 export const PrinterSettingsTab: React.FC = () => {
   const {
     enabled, endpoint, vendorId, productId, autoPrintOnCheckout, openCashDrawer, cutPaper, charset,
-    testResult, lastError, setConfig, saveToStorage, runTestPrint
+  testResult, lastError, setConfig, saveToStorage, runTestPrint
   } = usePrinterStore()
 
   useEffect(()=>{ saveToStorage() }, [enabled, endpoint, vendorId, productId, autoPrintOnCheckout, openCashDrawer, cutPaper, charset, saveToStorage])
@@ -60,6 +60,27 @@ export const PrinterSettingsTab: React.FC = () => {
           </Label>
           <Label title="列印後切紙" desc="送出 GS V 指令">
             <input type="checkbox" checked={cutPaper} onChange={e=>setConfig({cutPaper: e.target.checked})} />
+          </Label>
+          <div className="my-4 h-px bg-ui" />
+          <Label title="LOGO 圖片 (Base64)" desc="貼上 data:image/png;base64,... 或選擇檔案">
+            <div className="flex flex-col items-end gap-2">
+              <input
+                type="text"
+                placeholder="data:image/png;base64,...."
+                onChange={e=>setConfig({logoBase64: e.target.value || undefined})}
+                className="border rounded px-2 py-1 w-60 text-xs"
+              />
+              <input type="file" accept="image/*" className="text-xs" onChange={e=>{
+                const file = e.target.files?.[0]; if(!file) return; const r=new FileReader(); r.onload=()=>setConfig({logoBase64: r.result as string}); r.readAsDataURL(file);
+              }} />
+              <button onClick={()=>setConfig({logoBase64: undefined})} className="text-xs text-red-600 underline">移除</button>
+            </div>
+          </Label>
+          <Label title="QR Code 內容" desc="收據底部 QR (付款/連結)">
+            <input type="text" onChange={e=>setConfig({qrData: e.target.value || undefined})} className="border rounded px-2 py-1 w-60 text-sm" />
+          </Label>
+          <Label title="條碼(Code128)" desc="僅 ASCII，例: ORDER123">
+            <input type="text" onChange={e=>setConfig({barcode: e.target.value || undefined})} className="border rounded px-2 py-1 w-60 text-sm" />
           </Label>
           <div className="pt-4">
             <button onClick={runTestPrint} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">送出測試列印</button>

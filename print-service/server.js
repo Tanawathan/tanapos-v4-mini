@@ -3,6 +3,7 @@ import cors from 'cors';
 import { BufferHelper } from 'escpos-buffer';
 import usb from 'escpos-usb';
 import iconv from 'iconv-lite';
+import Jimp from 'jimp';
 
 const app = express();
 app.use(cors());
@@ -50,7 +51,7 @@ function buildReceiptLines(payload){
     paymentMethod = '',
     received,
     change,
-    footer = '謝謝光臨'
+  footer = '謝謝光臨'
   } = payload;
   const lines = [];
   lines.push(centerText(restaurantName));
@@ -123,18 +124,93 @@ function encodeLines(lines, { charset='GB18030', openCashDrawer=true, cutPaper=t
   return Buffer.concat(cmds);
 }
 
+// 產生簡易 QR Code (ESC/POS GS ( k 指令) - 使用模型2)
+function buildQRCode(data){
+  const bytes = Buffer.from(data, 'utf8');
+  const storeLen = bytes.length + 3;
+  const pL = storeLen & 0xFF;
+  const pH = (storeLen >> 8) & 0xFF;
+  return Buffer.concat([
+    // 型號選擇 49 = model 2
+    Buffer.from([0x1D,0x28,0x6B,0x04,0x00,0x31,0x41,0x32,0x00]),
+    // 誤差等級 49 65 48~51 -> 51 高
+    Buffer.from([0x1D,0x28,0x6B,0x03,0x00,0x31,0x45,0x31]),
+    // 儲存資料
+    Buffer.from([0x1D,0x28,0x6B,pL,pH,0x31,0x50,0x30]),
+    bytes,
+    // 列印 QR
+    Buffer.from([0x1D,0x28,0x6B,0x03,0x00,0x31,0x51,0x30])
+  ]);
+}
+
+// Code128 條碼 (簡化, 使用 ESC/POS 指令) data ASCII only
+function buildCode128(data){
+  const bytes = Buffer.from(data, 'ascii');
+  return Buffer.concat([
+    Buffer.from([0x1D,0x68,0x50]), // height
+    Buffer.from([0x1D,0x77,0x02]), // module width
+    Buffer.from([0x1D,0x48,0x02]), // print code below
+    Buffer.from([0x1D,0x6B,0x49, bytes.length]), // Code128
+    bytes
+  ]);
+}
+
+async function buildLogoBuffer(base64){
+  try {
+    if(!base64) return null;
+    const img = await Jimp.read(Buffer.from(base64.split(',').pop(), 'base64'));
+    // Resize width to 384 dots max
+    if (img.bitmap.width > 384) img.resize(384, Jimp.AUTO);
+    // Convert to monochrome threshold
+    img.grayscale().contrast(0.3);
+    const width = img.bitmap.width;
+    const height = img.bitmap.height;
+    const bytesPerLine = Math.ceil(width / 8);
+    const imageBuffer = Buffer.alloc(bytesPerLine * height);
+    for (let y=0; y<height; y++) {
+      for (let x=0; x<width; x++) {
+        const idx = (y * width + x) * 4;
+        const pixel = img.bitmap.data[idx]; // after grayscale R=G=B
+        if (pixel < 128) {
+          imageBuffer[y*bytesPerLine + (x>>3)] |= (0x80 >> (x & 0x7));
+        }
+      }
+    }
+    // ESC * m nL nH data  (m=33 for 24-dot double density) -> using raster GS v 0
+    const header = Buffer.from([0x1D,0x76,0x30,0x00, bytesPerLine & 0xFF, bytesPerLine >> 8, height & 0xFF, height >> 8]);
+    return Buffer.concat([header, imageBuffer]);
+  } catch (e){
+    console.warn('Logo 轉換失敗', e);
+    return null;
+  }
+}
+
 app.post('/print', async (req,res)=>{
   try {
   const payload = req.body;
-  const { charset, openCashDrawer=true, cutPaper=true, vendorId, productId } = payload;
+    const { charset, openCashDrawer=true, cutPaper=true, vendorId, productId, logoBase64, qrData, barcode } = payload;
   const lines = buildReceiptLines(payload);
   const data = encodeLines(lines, { charset, openCashDrawer, cutPaper });
   const printer = openPrinter(vendorId, productId);
     printer.open(()=>{
       try {
-        printer.write(data, ()=>{
+        const chunks = [Buffer.from('\x1B@','binary')];
+        if (logoBase64){
+          // 列印 LOGO
+          buildLogoBuffer(logoBase64).then(buf=>{
+            if (buf) printer.write(buf);
+            proceed();
+          }).catch(()=>proceed());
+        } else {
+          proceed();
+        }
+        function proceed(){
+          printer.write(data);
+          if (qrData) printer.write(buildQRCode(qrData));
+          if (barcode) printer.write(buildCode128(barcode));
+          printer.write(Buffer.from('\n'));
           printer.close();
-        });
+        }
       } catch(e){
         console.error('傳輸失敗', e);
       }

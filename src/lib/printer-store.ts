@@ -11,6 +11,9 @@ export interface PrinterConfig {
   charset: string
   testResult?: string
   lastError?: string
+  logoBase64?: string
+  qrData?: string
+  barcode?: string
 }
 
 interface PrinterState extends PrinterConfig {
@@ -33,6 +36,9 @@ export const usePrinterStore = create<PrinterState>((set, get) => ({
   charset: 'GB18030',
   testResult: undefined,
   lastError: undefined,
+  logoBase64: undefined,
+  qrData: undefined,
+  barcode: undefined,
   setConfig: (patch) => set(patch),
   loadFromStorage: () => {
     try {

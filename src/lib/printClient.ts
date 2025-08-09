@@ -29,6 +29,9 @@ export interface PrintPayload {
   cutPaper?: boolean
   vendorId?: number
   productId?: number
+  logoBase64?: string
+  qrData?: string
+  barcode?: string
 }
 
 export async function sendPrint(payload: PrintPayload, endpoint = 'http://127.0.0.1:3333/print') {
@@ -58,8 +61,11 @@ export function buildPrintPayload(params: {
   cutPaper?: boolean
   vendorId?: number
   productId?: number
+  logoBase64?: string
+  qrData?: string
+  barcode?: string
 }): PrintPayload {
-  const { tableLabel, orders, items, subtotal, tax, service, total, paymentMethod, received, change, charset, openCashDrawer, cutPaper, vendorId, productId } = params
+  const { tableLabel, orders, items, subtotal, tax, service, total, paymentMethod, received, change, charset, openCashDrawer, cutPaper, vendorId, productId, logoBase64, qrData, barcode } = params
   const orderNumbers = orders.map(o => o.order_number)
   const mappedItems: PrintOrderItemPayload[] = items.map(it => ({
     name: it.product_name || '品項',
@@ -86,6 +92,9 @@ export function buildPrintPayload(params: {
   openCashDrawer,
   cutPaper,
   vendorId,
-  productId
+  productId,
+  logoBase64,
+  qrData,
+  barcode
   }
 }
