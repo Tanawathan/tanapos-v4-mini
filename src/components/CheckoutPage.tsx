@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import usePOSStore from '../lib/store'
 import { Table, Order, OrderItem } from '../lib/types'
 import { buildPrintPayload, sendPrint } from '../lib/printClient'
+import { usePrinterStore } from '../lib/printer-store'
 
 interface CheckoutPageProps {
   onBack: () => void
@@ -39,6 +40,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const [expandedOrderIds, setExpandedOrderIds] = useState<Set<string>>(new Set())
   const [isPrinting, setIsPrinting] = useState(false)
   const [lastPrintError, setLastPrintError] = useState<string | null>(null)
+  const printerConfig = usePrinterStore(state => state)
 
   // 只在未載入時觸發資料載入，避免無限渲染
   useEffect(() => {
@@ -297,29 +299,31 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
         change: paymentMethod === 'cash' ? calculateChange() : undefined
       })
 
-      // 自動嘗試列印
-      try {
-        setIsPrinting(true)
-        setLastPrintError(null)
-        const allItems = selected.flatMap(o => getOrderItems(o.id))
-        const payload = buildPrintPayload({
-          tableLabel: tableDisplay,
-          orders: selected,
-          items: allItems,
-          subtotal,
-          tax: taxAmount,
-          service: serviceFee,
-          total: finalAmount,
-          paymentMethod,
-          received: paymentMethod === 'cash' ? parseFloat(receivedAmount) || undefined : undefined,
-          change: paymentMethod === 'cash' ? calculateChange() : undefined
-        })
-        await sendPrint(payload)
-      } catch (e:any) {
-        console.error('列印失敗', e)
-        setLastPrintError(e.message || '列印失敗')
-      } finally {
-        setIsPrinting(false)
+      // 自動嘗試列印（取決於設定）
+      if (printerConfig.enabled && printerConfig.autoPrintOnCheckout) {
+        try {
+          setIsPrinting(true)
+          setLastPrintError(null)
+          const allItems = selected.flatMap(o => getOrderItems(o.id))
+          const payload = buildPrintPayload({
+            tableLabel: tableDisplay,
+            orders: selected,
+            items: allItems,
+            subtotal,
+            tax: taxAmount,
+            service: serviceFee,
+            total: finalAmount,
+            paymentMethod,
+            received: paymentMethod === 'cash' ? parseFloat(receivedAmount) || undefined : undefined,
+            change: paymentMethod === 'cash' ? calculateChange() : undefined
+          })
+          await sendPrint(payload, printerConfig.endpoint)
+        } catch (e:any) {
+          console.error('列印失敗', e)
+          setLastPrintError(e.message || '列印失敗')
+        } finally {
+          setIsPrinting(false)
+        }
       }
 
     } catch (error) {
@@ -488,7 +492,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                             received: paymentMethod === 'cash' ? parseFloat(receivedAmount) || undefined : undefined,
                             change: successInfo.change
                           })
-                          await sendPrint(payload)
+                          await sendPrint(payload, printerConfig.endpoint)
                         } catch(e:any) {
                           console.error('重新列印失敗', e)
                           setLastPrintError(e.message || '重新列印失敗')

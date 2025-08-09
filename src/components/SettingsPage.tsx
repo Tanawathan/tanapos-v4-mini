@@ -4,13 +4,14 @@ import ConnectionTest from './ConnectionTest'
 import DiagnosticPanel from './DiagnosticPanel'
 import { TodoPanel } from './common/TodoPanel'
 import TableSettings from './TableSettings'
+import PrinterSettingsTab from './settings/PrinterSettingsTab'
 
 interface SettingsPageProps {
   onBack: () => void
 }
 
 // 設定頁面類型定義
-type SettingsTab = 'appearance' | 'system' | 'restaurant' | 'notifications' | 'todo' | 'account' | 'about'
+type SettingsTab = 'appearance' | 'system' | 'restaurant' | 'notifications' | 'todo' | 'account' | 'printer' | 'about'
 
 export default function SettingsPage({ onBack }: SettingsPageProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab>('appearance')
@@ -35,6 +36,12 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
       label: '桌台設定', 
       icon: '🪑',
       description: '桌台參數、區域管理'
+    },
+    { 
+      id: 'printer' as SettingsTab, 
+      label: '印表機', 
+      icon: '🖨️',
+      description: 'USB 收據機、自動列印'
     },
     { 
       id: 'notifications' as SettingsTab, 
@@ -71,6 +78,8 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
         return <SystemSettings />
       case 'restaurant':
         return <TableSettings />
+      case 'printer':
+        return <PrinterSettingsTab />
       case 'notifications':
         return <NotificationSettings />
       case 'todo':
