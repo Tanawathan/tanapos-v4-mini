@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import usePOSStore from '../lib/store'
 import { supabase } from '../lib/supabase'
 import { useThemeInitializer } from '../hooks/useThemeInitializer'
@@ -15,8 +15,15 @@ const HomePage: React.FC = () => {
     loadProducts,
     loadTables,
     loading,
-    error 
+    error,
+    tables
   } = usePOSStore()
+  const navigate = useNavigate()
+  const [quickStartOpen, setQuickStartOpen] = React.useState(false)
+  const [qsTable, setQsTable] = React.useState('')
+  const [qsParty, setQsParty] = React.useState('')
+  const [qsName, setQsName] = React.useState('')
+  const [qsSubmitting, setQsSubmitting] = React.useState(false)
 
   // 從環境變數獲取餐廳 ID
   const restaurantId = import.meta.env.VITE_RESTAURANT_ID
@@ -140,12 +147,15 @@ const HomePage: React.FC = () => {
                 <div className="text-4xl mb-4">📋</div>
                 <h3 className="text-xl font-semibold mb-2">點餐系統</h3>
                 <p className="text-gray-600 mb-4">管理客戶點餐和訂單</p>
-                <Link 
-                  to="/ordering"
+                <button 
+                  onClick={() => { setQuickStartOpen(true); if (!tables?.length) loadTables() }}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full transition-colors inline-block"
                 >
                   開始點餐
-                </Link>
+                </button>
+                <div className="mt-2 text-[11px] text-gray-500 text-center">
+                  <Link to="/ordering" className="underline hover:text-blue-600">直接進入 (不選桌)</Link>
+                </div>
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
@@ -249,6 +259,51 @@ const HomePage: React.FC = () => {
           </div>
         )}
       </main>
+      {quickStartOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl border">
+            <div className="p-5 border-b flex items-center justify-between">
+              <h3 className="font-semibold text-lg">🍽️ 快速開始點餐</h3>
+              <button onClick={()=>setQuickStartOpen(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm mb-1 font-medium text-gray-700">選擇桌號</label>
+                <div className="flex gap-2">
+                  <select value={qsTable} onChange={e=>setQsTable(e.target.value)} className="flex-1 border rounded-lg px-3 py-2 text-sm bg-white/90 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="">-- 選擇桌號 --</option>
+                    {tables?.sort((a:any,b:any)=>(a.table_number||0)-(b.table_number||0)).map((t:any)=>(
+                      <option key={t.id} value={t.table_number}>{t.table_number} {t.status==='occupied'? '•佔用中':''}</option>
+                    ))}
+                  </select>
+                  <input placeholder="或輸入" value={qsTable} onChange={e=>setQsTable(e.target.value)} className="w-24 border rounded-lg px-2 py-2 text-sm" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm mb-1 font-medium text-gray-700">人數 (可選)</label>
+                  <input type="number" min={1} value={qsParty} onChange={e=>setQsParty(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 font-medium text-gray-700">姓名 (可選)</label>
+                  <input value={qsName} onChange={e=>setQsName(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm" />
+                </div>
+              </div>
+              <div className="text-xs text-gray-500 leading-relaxed">
+                若只輸入桌號，將直接建立點餐上下文；人數與姓名可稍後在訂單中補充。
+              </div>
+            </div>
+            <div className="p-5 pt-0 flex flex-col gap-2">
+              <button disabled={!qsTable || qsSubmitting} onClick={()=>{
+                if(!qsTable) return; setQsSubmitting(true); const params=new URLSearchParams(); params.set('table',qsTable); if(qsParty) params.set('party',qsParty); if(qsName) params.set('name',qsName); navigate(`/ordering?${params.toString()}`); setTimeout(()=>{ setQsSubmitting(false); setQuickStartOpen(false); },100);
+              }} className="w-full bg-blue-600 disabled:opacity-40 text-white rounded-lg py-2.5 text-sm font-semibold hover:bg-blue-700 transition">
+                {qsSubmitting? '進入中...' : '開始點餐'}
+              </button>
+              <button onClick={()=>setQuickStartOpen(false)} className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-2.5 text-sm font-medium transition">取消</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
