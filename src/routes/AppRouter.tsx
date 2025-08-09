@@ -13,6 +13,7 @@ import { KDSPage } from '../components/KDSPage'
 import LoginPage from '../components/LoginPage'
 import ReservationManagementPage from '../pages/ReservationManagementPage'
 import EnhancedReservationPage from '../pages/EnhancedReservationPage'
+import { OrderingLayout } from '../ordering/components'
 import { withRouterNavigation } from '../components/withRouterNavigation'
 import { supabase } from '../lib/supabase'
 
@@ -169,6 +170,14 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           } 
         />
+          <Route 
+            path="/ordering-v2" 
+            element={
+              <ProtectedRoute>
+                <OrderingLayout />
+              </ProtectedRoute>
+            }
+          />
         <Route 
           path="/reservations/legacy" 
           element={
