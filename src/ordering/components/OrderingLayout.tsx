@@ -27,14 +27,17 @@ const OrderingLayout: React.FC = () => {
 
   // 偵測 URL query 取得桌台/預約資訊 (簡化)
   React.useEffect(()=>{
-    if (!context.tableNumber) {
+    if (!context.tableNumber && !context.takeout) {
       const params = new URLSearchParams(window.location.search)
       const table = params.get('table') || undefined
       const party = params.get('party')
       const name = params.get('name') || undefined
-      if (table) setContext({ tableNumber: table, partySize: party? Number(party): undefined, customerName: name })
+      const takeout = params.get('takeout') === '1'
+      if (takeout) {
+        setContext({ takeout: true, customerName: name, partySize: party? Number(party): undefined })
+      } else if (table) setContext({ tableNumber: table, partySize: party? Number(party): undefined, customerName: name })
     }
-  },[context.tableNumber, setContext])
+  },[context.tableNumber, context.takeout, setContext])
 
   // 載入桌台列表 (僅首次且尚未選桌號時)
   React.useEffect(()=> {
@@ -140,8 +143,8 @@ const OrderingLayout: React.FC = () => {
   }
 
   const createOrder = async () => {
-    if (items.length === 0 || submitting) return
-    if (!context.tableNumber) { alert('請先選擇桌號'); return }
+  if (items.length === 0 || submitting) return
+  if (!context.takeout && !context.tableNumber) { alert('請先選擇桌號'); return }
     try {
       setSubmitting(true)
       // 取得目前餐廳 ID (簡化：假設 tables 已綁定 currentRestaurant via localStorage or global supabase session)
@@ -173,7 +176,7 @@ const OrderingLayout: React.FC = () => {
       }
       // 取得桌台 id (若有桌號)
       let tableId: string | null = null
-      if (context.tableNumber) {
+      if (!context.takeout && context.tableNumber) {
         const { data: tableRow, error: tableErr } = await supabase
           .from('tables')
           .select('id')
@@ -185,13 +188,15 @@ const OrderingLayout: React.FC = () => {
       }
       const orderPayload: any = {
         restaurant_id: restaurantId,
-        table_number: context.tableNumber ? Number(context.tableNumber) : null,
-        table_id: tableId,
+        table_number: context.takeout ? null : (context.tableNumber ? Number(context.tableNumber) : null),
+        table_id: context.takeout ? null : tableId,
         customer_name: context.customerName || '',
         party_size: context.partySize || null,
         subtotal: totals.subtotal,
         tax_amount: totals.tax,
         total_amount: totals.total,
+        order_type: context.takeout ? 'takeout' : 'dine_in',
+        is_takeout: context.takeout || undefined,
         items: items.map(i => {
           if (i.type==='combo') {
             const comboQty = i.meta?.comboQty || 1

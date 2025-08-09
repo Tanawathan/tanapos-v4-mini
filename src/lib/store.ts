@@ -780,17 +780,21 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       set({ loading: true, error: null })
       
       // 1. 準備完整的訂單資料（匹配實際資料庫結構）
-  const newOrder: Order = {
+      const isTakeout = !!orderData.is_takeout || orderData.order_type === 'takeout'
+      const orderNumber = isTakeout
+        ? generateTakeawayOrderNumber()
+        : generateDineInOrderNumber((orderData.table_number || 1).toString())
+      const newOrder: Order = {
         id: safeId(),
-        order_number: generateDineInOrderNumber((orderData.table_number || 1).toString()),
+        order_number: orderNumber,
         restaurant_id: orderData.restaurant_id,
         table_id: orderData.table_id,
         session_id: null,
-        order_type: 'dine_in',
+        order_type: isTakeout ? 'takeout' : 'dine_in',
         customer_name: orderData.customer_name || '',
         customer_phone: orderData.customer_phone || '',
         customer_email: null,
-        table_number: orderData.table_number || null,
+        table_number: isTakeout ? null : (orderData.table_number || null),
         party_size: orderData.party_size || 1,
         subtotal: orderData.subtotal,
         discount_amount: 0,
@@ -828,12 +832,14 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       }))
       
       // 3. 更新桌台狀態為佔用
-      updateTableStatus(orderData.table_id, 'occupied', {
-        orderId: newOrder.id,
-        customer_count: orderData.party_size || 1,
-        seated_at: new Date().toISOString(),
-        order_number: newOrder.order_number
-      })
+      if (!isTakeout && orderData.table_id) {
+        updateTableStatus(orderData.table_id, 'occupied', {
+          orderId: newOrder.id,
+          customer_count: orderData.party_size || 1,
+          seated_at: new Date().toISOString(),
+          order_number: newOrder.order_number
+        })
+      }
       
       // 4. 保存訂單到 Supabase 資料庫
       console.log('💾 正在保存訂單到資料庫...')

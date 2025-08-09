@@ -33,6 +33,7 @@ interface OrderingContext {
   reservationId?: string
   partySize?: number
   customerName?: string
+  takeout?: boolean // 外帶模式
 }
 
 interface OrderingTotals { subtotal: number; tax: number; total: number }
