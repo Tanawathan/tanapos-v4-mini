@@ -34,6 +34,40 @@ export class ReservationService {
   private static readonly MAX_CAPACITY_PER_30MIN = 8
   private static readonly BUFFER_MINUTES = 15
   private static readonly ADVANCE_BOOKING_DAYS = 7
+  // 統一使用台北時區 (+08:00)
+  private static readonly TAIPEI_TZ_SUFFIX = '+08:00'
+
+  /**
+   * 將日期(YYYY-MM-DD)與時間(HH:mm)組合成台北時區的 Date 物件
+   */
+  private static createTaipeiDate(dateStr: string, timeStr: string): Date {
+    // 確保時間有分與秒
+    const base = `${dateStr}T${timeStr.length === 5 ? timeStr + ':00' : timeStr}`
+    // 若已帶時區則直接使用，否則補上 +08:00
+    const withTz = /([Z]|[+\-]\d{2}:?\d{2})$/.test(base) ? base : `${base}${this.TAIPEI_TZ_SUFFIX}`
+    return new Date(withTz)
+  }
+
+  /**
+   * 將任意輸入字串標準化為含 +08:00 的 ISO 字串（若已含時區則保持）
+   */
+  private static normalizeToTaipeiISO(input: string): string {
+    if (!input) return input
+    // 若只有到分鐘 (YYYY-MM-DDTHH:mm)
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(input)) {
+      return `${input}:00${this.TAIPEI_TZ_SUFFIX}`
+    }
+    // 若只有日期
+    if (/^\d{4}-\d{2}-\d{2}$/.test(input)) {
+      return `${input}T00:00:00${this.TAIPEI_TZ_SUFFIX}`
+    }
+    // 若已包含時區或 Z 結尾則直接返回
+    if (/([Z]|[+\-]\d{2}:?\d{2})$/.test(input)) {
+      return input
+    }
+    // 其他情況補上台北時區
+    return `${input}${this.TAIPEI_TZ_SUFFIX}`
+  }
 
   /**
    * 檢查指定日期是否為休假日
@@ -328,8 +362,8 @@ export class ReservationService {
    */
   static async createReservation(formData: ReservationFormData, restaurantId: string): Promise<Reservation> {
     try {
-      // 組合日期和時間
-      const reservationDateTime = new Date(`${formData.reservation_date}T${formData.reservation_time}`)
+  // 組合日期和時間（強制台北時區）
+  const reservationDateTime = this.createTaipeiDate(formData.reservation_date, formData.reservation_time)
       
       // 檢查可用性（包含休假日檢查）
       const { available, isHoliday } = await this.checkAvailability(restaurantId, reservationDateTime, formData.party_size)
@@ -375,6 +409,7 @@ export class ReservationService {
         adult_count: formData.adult_count,
         child_count: formData.child_count,
         child_chair_needed: formData.child_chair_needed,
+        // 以台北時區構造的 Date 轉換為 UTC ISO 儲存，保持一致性
         reservation_time: reservationDateTime.toISOString(),
         duration_minutes: mealDurationMinutes,
         estimated_end_time: estimatedEndTime.toISOString(),
@@ -449,13 +484,17 @@ export class ReservationService {
       // 準備檢查可用性的目標值
       const nextPartySize = updates.party_size ?? existing.party_size
       const nextReservationTimeISO = updates.reservation_time ?? existing.reservation_time
+      // 標準化時間（若輸入未帶時區則補上台北 +08:00）
+      const normalizedNextReservationTimeISO = updates.reservation_time 
+        ? this.normalizeToTaipeiISO(updates.reservation_time) 
+        : existing.reservation_time
 
       // 若調整了人數或時間，需要檢查可用性與休假日
       if (
         updates.party_size !== undefined ||
         updates.reservation_time !== undefined
       ) {
-        const targetDate = new Date(nextReservationTimeISO)
+  const targetDate = new Date(normalizedNextReservationTimeISO)
         const { available, isHoliday } = await this.checkAvailability(
           restaurantId,
           targetDate,
@@ -483,7 +522,7 @@ export class ReservationService {
         }
       }
 
-      const finalReservationTimeISO = updates.reservation_time ?? existing.reservation_time
+  const finalReservationTimeISO = normalizedNextReservationTimeISO
       const estimatedEndTime = (updates.reservation_time !== undefined || updates.duration_minutes !== undefined)
         ? new Date(new Date(finalReservationTimeISO).getTime() + (durationMinutes || 90) * 60 * 1000).toISOString()
         : existing.estimated_end_time
@@ -511,6 +550,7 @@ export class ReservationService {
 
       const payload: Partial<Reservation> & { updated_at: string } = {
         ...updates,
+        reservation_time: finalReservationTimeISO, // 確保寫入為標準化後的字串
         duration_minutes: durationMinutes,
         estimated_end_time: estimatedEndTime,
         updated_at: new Date().toISOString()

@@ -207,9 +207,15 @@ export default function EnhancedReservationPage() {
     const end = res.estimated_end_time
       ? new Date(res.estimated_end_time)
       : new Date(start.getTime() + (res.duration_minutes || 120) * 60000)
-    const opt: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false }
-    return `${start.toLocaleTimeString('zh-TW', opt)} ~ ${end.toLocaleTimeString('zh-TW', opt)}`
+    return `${formatTime(start)} ~ ${formatTime(end)}`
   }
+
+  // --- 時區統一顯示 (台北) 輔助函數 ---
+  const TAIPEI_LOCALE = 'zh-TW'
+  const timeOpts: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false }
+  const dateTimeOpts: Intl.DateTimeFormatOptions = { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }
+  function formatTime(d: Date) { return d.toLocaleTimeString(TAIPEI_LOCALE, timeOpts) }
+  function formatDateTime(d: Date) { return d.toLocaleString(TAIPEI_LOCALE, dateTimeOpts) }
 
   const openEdit = (res: Reservation) => {
   setEditing(res)
@@ -482,11 +488,7 @@ export default function EnhancedReservationPage() {
                         </span>
                         <span className="flex items-center">
                           <Clock className="h-4 w-4 mr-1" />
-                          {reservationTime.toLocaleTimeString('zh-TW', { 
-                            hour: '2-digit', 
-                            minute: '2-digit',
-                            hour12: false
-                          })}
+                          {formatTime(reservationTime)}
                         </span>
                         <span className="hidden md:inline text-gray-500">{formatTimeRange(reservation)}</span>
                         <span className="text-gray-500">{getTableLabel(reservation.table_id)}</span>
@@ -514,10 +516,10 @@ export default function EnhancedReservationPage() {
                   </div>
                   
           {(reservation.seated_at) && (
-                    <div className="mt-2 text-xs text-gray-500">
-            實際到店: {new Date(reservation.seated_at).toLocaleString('zh-TW')}
-                    </div>
-                  )}
+            <div className="mt-2 text-xs text-gray-500">
+              實際到店: {formatDateTime(new Date(reservation.seated_at))}
+            </div>
+          )}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {reservation.status === 'confirmed' && (
                       <>
@@ -667,7 +669,7 @@ export default function EnhancedReservationPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">時間</label>
                 <input
                   type="time"
-                  value={new Date(editing.reservation_time).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                  value={formatTime(new Date(editing.reservation_time))}
                   onChange={(e) => {
                     const t = e.target.value
                     const d = new Date(editing.reservation_time).toISOString().split('T')[0]
