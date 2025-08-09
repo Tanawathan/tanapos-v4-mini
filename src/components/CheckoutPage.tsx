@@ -315,7 +315,12 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
             total: finalAmount,
             paymentMethod,
             received: paymentMethod === 'cash' ? parseFloat(receivedAmount) || undefined : undefined,
-            change: paymentMethod === 'cash' ? calculateChange() : undefined
+            change: paymentMethod === 'cash' ? calculateChange() : undefined,
+            charset: printerConfig.charset,
+            openCashDrawer: printerConfig.openCashDrawer,
+            cutPaper: printerConfig.cutPaper,
+            vendorId: printerConfig.vendorId,
+            productId: printerConfig.productId
           })
           await sendPrint(payload, printerConfig.endpoint)
         } catch (e:any) {
@@ -490,7 +495,12 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                             total: successInfo.finalAmount,
                             paymentMethod,
                             received: paymentMethod === 'cash' ? parseFloat(receivedAmount) || undefined : undefined,
-                            change: successInfo.change
+                            change: successInfo.change,
+                            charset: printerConfig.charset,
+                            openCashDrawer: printerConfig.openCashDrawer,
+                            cutPaper: printerConfig.cutPaper,
+                            vendorId: printerConfig.vendorId,
+                            productId: printerConfig.productId
                           })
                           await sendPrint(payload, printerConfig.endpoint)
                         } catch(e:any) {

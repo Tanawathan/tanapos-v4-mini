@@ -11,10 +11,16 @@ app.use(express.json({ limit: '256kb' }));
 // 設定：根據你的印表機 vendorId/productId 做調整 (lsusb 或系統資訊查詢)
 // 可以先留空 -> 直接 new usb.USB(); 會嘗試抓第一台
 
-function openPrinter() {
+function openPrinter(vendorId, productId) {
   try {
-    const device = new usb.USB();
-    return device;
+    if (vendorId && productId) {
+      const devices = usb.getDeviceList().filter(d => {
+        const dd = d.deviceDescriptor || {}; return dd.idVendor === vendorId && dd.idProduct === productId;
+      });
+      if (devices.length === 0) throw new Error('找不到指定 USB 裝置');
+      return new usb.USB(devices[0]);
+    }
+    return new usb.USB();
   } catch (e) {
     console.error('無法開啟 USB 印表機:', e);
     throw e;
@@ -101,28 +107,33 @@ function wrap(text, width){
   return out;
 }
 
-function encodeLines(lines){
-  // ESC/POS 指令: 初始化 -> 一般字體 -> 每行 -> 切紙
+function encodeLines(lines, { charset='GB18030', openCashDrawer=true, cutPaper=true } = {}){
   const cmds = [];
+  const encoding = charset === 'BIG5' ? 'Big5' : charset; // iconv-lite Big5 key
   function push(txt){
-    cmds.push(iconv.encode(txt + '\n', 'GB18030'));
+    try {
+      cmds.push(iconv.encode(txt + '\n', encoding));
+    } catch (e){
+      // fallback to GB18030
+      cmds.push(iconv.encode(txt + '\n', 'GB18030'));
+    }
   }
-  cmds.push(Buffer.from('\x1B@','binary'));// init
+  cmds.push(Buffer.from('\x1B@','binary')); // init
+  // 指定字元集 (簡化: 只對英文/多字節使用 iconv 轉碼)
   lines.forEach(l=>push(l));
-  cmds.push(Buffer.from('\n\n','binary'));
-  // 開錢箱 (常見序列) ESC p m t1 t2
-  cmds.push(Buffer.from([0x1B,0x70,0x00,0x32,0x32]));
-  // 切紙 (部分切) GS V 1
-  cmds.push(Buffer.from([0x1D,0x56,0x01]));
+  cmds.push(Buffer.from('\n','binary'));
+  if (openCashDrawer) cmds.push(Buffer.from([0x1B,0x70,0x00,0x32,0x32]));
+  if (cutPaper) cmds.push(Buffer.from([0x1D,0x56,0x01]));
   return Buffer.concat(cmds);
 }
 
 app.post('/print', async (req,res)=>{
   try {
-    const payload = req.body;
-    const lines = buildReceiptLines(payload);
-    const data = encodeLines(lines);
-    const printer = openPrinter();
+  const payload = req.body;
+  const { charset, openCashDrawer=true, cutPaper=true, vendorId, productId } = payload;
+  const lines = buildReceiptLines(payload);
+  const data = encodeLines(lines, { charset, openCashDrawer, cutPaper });
+  const printer = openPrinter(vendorId, productId);
     printer.open(()=>{
       try {
         printer.write(data, ()=>{

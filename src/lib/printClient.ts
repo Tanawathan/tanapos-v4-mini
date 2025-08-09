@@ -24,6 +24,11 @@ export interface PrintPayload {
   paymentMethod: string
   received?: number
   change?: number
+  charset?: string
+  openCashDrawer?: boolean
+  cutPaper?: boolean
+  vendorId?: number
+  productId?: number
 }
 
 export async function sendPrint(payload: PrintPayload, endpoint = 'http://127.0.0.1:3333/print') {
@@ -48,8 +53,13 @@ export function buildPrintPayload(params: {
   paymentMethod: string
   received?: number
   change?: number
+  charset?: string
+  openCashDrawer?: boolean
+  cutPaper?: boolean
+  vendorId?: number
+  productId?: number
 }): PrintPayload {
-  const { tableLabel, orders, items, subtotal, tax, service, total, paymentMethod, received, change } = params
+  const { tableLabel, orders, items, subtotal, tax, service, total, paymentMethod, received, change, charset, openCashDrawer, cutPaper, vendorId, productId } = params
   const orderNumbers = orders.map(o => o.order_number)
   const mappedItems: PrintOrderItemPayload[] = items.map(it => ({
     name: it.product_name || '品項',
@@ -71,6 +81,11 @@ export function buildPrintPayload(params: {
     service: Math.round(service),
     total: Math.round(total),
     paymentMethod,
-    received, change
+  received, change,
+  charset,
+  openCashDrawer,
+  cutPaper,
+  vendorId,
+  productId
   }
 }
