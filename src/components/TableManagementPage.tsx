@@ -53,6 +53,21 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const [showReservationModal, setShowReservationModal] = useState(false)
   const [reservations, setReservations] = useState<Reservation[]>([])
 
+  // === 時間格式統一：強制使用 Asia/Taipei，避免不同頁面顯示不一致 ===
+  const TAIPEI_TZ = 'Asia/Taipei'
+  const formatTaipeiTime = (iso: string) => {
+    if (!iso) return ''
+    return new Date(iso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: TAIPEI_TZ })
+  }
+  const formatTaipeiDateTime = (iso: string) => {
+    if (!iso) return ''
+    return new Date(iso).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: TAIPEI_TZ })
+  }
+  const formatTaipeiFull = (iso: string) => {
+    if (!iso) return ''
+    return new Date(iso).toLocaleString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', weekday: 'short', hour12: false, timeZone: TAIPEI_TZ })
+  }
+
   useEffect(() => {
     // 只在還沒載入過時才載入，避免無限循環
     if (!tablesLoaded) {
@@ -566,7 +581,7 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                       <div className="text-sm text-gray-700 mb-3">{table.capacity} 人座</div>
                       <div className={`inline-block text-xs px-3 py-1 rounded-full font-semibold mb-3 border ${getStatusColor(display)}`}>{getStatusText(display)}</div>
                       {composite.upcomingReservation && display==='reserved' && (
-                        <div className="text-xs text-blue-700 mb-2">即將預約 {new Date(composite.upcomingReservation.reservation_time).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})} · {composite.upcomingReservation.party_size}人</div>
+                        <div className="text-xs text-blue-700 mb-2">即將預約 {formatTaipeiTime(composite.upcomingReservation.reservation_time)} · {composite.upcomingReservation.party_size}人</div>
                       )}
                       {/* 預約資訊 */}
                       {tableReservation && (
@@ -575,7 +590,7 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                           <button onClick={() => openReservationModal(tableReservation)} className={`w-full rounded-lg p-2 text-left transition-all duration-200 hover:shadow-md border ${tableReservation.status==='seated'?'bg-green-50 hover:bg-green-100 border-green-200':'bg-blue-50 hover:bg-blue-100 border-blue-200'}`}>
                             <div className={`text-xs font-semibold mb-1 ${tableReservation.status==='seated'?'text-green-800':'text-blue-800'}`}>👤 {tableReservation.customer_name}</div>
                             <div className={`text-xs mb-1 ${tableReservation.status==='seated'?'text-green-600':'text-blue-600'}`}>{tableReservation.party_size} 人 · {tableReservation.status==='confirmed'?'已確認':'已入座'}</div>
-                            <div className={`text-xs ${tableReservation.status==='seated'?'text-green-500':'text-blue-500'}`}>{new Date(tableReservation.reservation_time).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+                            <div className={`text-xs ${tableReservation.status==='seated'?'text-green-500':'text-blue-500'}`}>{formatTaipeiDateTime(tableReservation.reservation_time)}</div>
                             {tableReservation.special_requests && <div className={`text-xs mt-1 truncate ${tableReservation.status==='seated'?'text-green-400':'text-blue-400'}`}>備註: {tableReservation.special_requests}</div>}
                           </button>
                           <div className={`text-xs font-medium text-center pt-1 ${tableReservation.status==='seated'?'text-green-600':'text-blue-600'}`}>👆 點擊查看預約詳情</div>
@@ -913,14 +928,7 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                 <div className="flex items-center">
                   <span className="text-sm text-green-700 w-24">預約時間:</span>
                   <span className="font-medium">
-                    {new Date(selectedReservation.reservation_time).toLocaleString('zh-TW', {
-                      year: 'numeric',
-                      month: 'numeric',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      weekday: 'short'
-                    })}
+                    {formatTaipeiFull(selectedReservation.reservation_time)}
                   </span>
                 </div>
                 <div className="flex items-center">
