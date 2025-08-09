@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useOrderingStore } from '../state/orderingStore'
 import { useProducts } from '../hooks/useProducts'
 import ComboModal from './ComboModal'
@@ -8,6 +9,7 @@ import usePOSStore from '../../lib/store'
 const FALLBACK_RESTAURANT_ID = import.meta.env.VITE_RESTAURANT_ID || '11111111-1111-1111-1111-111111111111'
 
 const OrderingLayout: React.FC = () => {
+  const navigate = useNavigate()
   const { items, totals, category, setCategory, search, setSearch, addSingle, startComboDraft, setContext, context, clear } = useOrderingStore()
   const { list: products, loading, error, categories } = useProducts(category, search)
   const [submitting, setSubmitting] = useState(false)
@@ -242,10 +244,22 @@ const OrderingLayout: React.FC = () => {
       setSubmitting(false)
     }
   }
+  const handleBack = () => {
+    // 若有歷史紀錄則返回，否則回首頁
+    if (window.history.length > 1) navigate(-1)
+    else navigate('/')
+  }
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-ui-secondary">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block lg:w-60 p-4 border-r bg-white/80 backdrop-blur-sm">
+        <button onClick={handleBack} className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 mb-4 group">
+          <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          返回
+        </button>
         <h2 className="font-bold mb-3">分類</h2>
         <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-140px)] pr-1">
           <button onClick={()=>setCategory('all')} className={`w-full text-left px-3 py-2 rounded-md text-sm transition ${category==='all'? 'bg-blue-600 text-white shadow':'bg-ui-secondary hover:bg-blue-50'}`}>全部</button>
@@ -273,6 +287,15 @@ const OrderingLayout: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-2 md:flex-row md:items-center">
+          {/* Mobile Back Button */}
+          <div className="lg:hidden flex items-center">
+            <button onClick={handleBack} className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 px-2 py-1 rounded-md hover:bg-blue-50 active:scale-95">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              返回
+            </button>
+          </div>
           <div className="flex-1 flex gap-2">
             <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="搜尋商品" className="flex-1 border rounded-md px-3 py-2 text-sm bg-white/90 focus:ring-2 focus:ring-blue-500 outline-none"/>
             {!context.tableNumber && (
