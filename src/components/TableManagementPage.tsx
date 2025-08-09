@@ -71,18 +71,38 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     if (!currentRestaurant?.id) return
     
     try {
+      // 取得台北時區「今日」起訖 (轉為 UTC ISO) 只顯示今日訂位
+      const getTodayTaipeiRange = () => {
+        const tz = 'Asia/Taipei'
+        const todayStr = new Date().toLocaleString('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }) // YYYY-MM-DD
+        const [y,m,d] = todayStr.split('-').map(Number)
+        // 建立台北當地 00:00 與 次日 00:00
+        const startLocal = new Date(`${todayStr}T00:00:00+08:00`)
+        const endDate = new Date(Date.UTC(y, m-1, d))
+        endDate.setUTCDate(endDate.getUTCDate()+1) // 次日 (UTC 基準)
+        const endLocal = new Date(`${endDate.toLocaleString('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'})}T00:00:00+08:00`)
+        return { startISO: startLocal.toISOString(), endISO: endLocal.toISOString(), dateLabel: todayStr }
+      }
+      const { startISO, endISO } = getTodayTaipeiRange()
       const { data, error } = await supabase
         .from('table_reservations')
         .select('*')
         .eq('restaurant_id', currentRestaurant.id)
         .in('status', ['confirmed', 'seated']) // 包含已入座的預約
-        .gte('reservation_time', new Date().toISOString().split('T')[0])
+        .gte('reservation_time', startISO)
+        .lt('reservation_time', endISO)
         .order('reservation_time', { ascending: true })
 
       if (error) {
         console.error('載入預約資訊失敗:', error)
       } else {
         setReservations(data || [])
+        // 除錯：印出筆數與第一筆時間
+        if (data && data.length) {
+          console.log('📅 今日預約筆數:', data.length, '第一筆時間(UTC):', data[0].reservation_time)
+        } else {
+          console.log('📅 今日無預約資料 (range)', startISO, '→', endISO)
+        }
       }
     } catch (error) {
       console.error('載入預約資訊異常:', error)
@@ -115,6 +135,12 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   // 取得訂單的項目
   const getOrderItems = (orderId: string) => {
     return orderItems.filter(item => item.order_id === orderId)
+  }
+
+  // 統一訂單狀態 key 轉換，避免 TS 索引錯誤
+  const normalizeOrderStatus = (status: any): keyof typeof ORDER_STATUS_COLOR => {
+    const allowed: Array<keyof typeof ORDER_STATUS_COLOR> = ['pending','confirmed','preparing','ready','served','completed','cancelled'] as any
+    return allowed.includes(status) ? status : 'pending'
   }
 
   // ===== 新增：複合狀態計算邏輯 =====
@@ -564,7 +590,9 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                               <div className="text-xs font-semibold text-gray-800 mb-1">{index===0?'🍽️':'➕'} {order.order_number}</div>
                               <div className="text-xs text-gray-600 flex items-center gap-2">
                                 <span>NT$ {(order.total_amount || 0).toLocaleString()}</span>
-                                <span className={`px-2 py-0.5 rounded-full border ${ORDER_STATUS_COLOR[(order.status as any) || 'pending']}`}>{ORDER_STATUS_LABEL[(order.status as any) || 'pending']}</span>
+                                {(() => { const s = normalizeOrderStatus(order.status); return (
+                                  <span className={`px-2 py-0.5 rounded-full border ${ORDER_STATUS_COLOR[s]}`}>{ORDER_STATUS_LABEL[s]}</span>
+                                ) })()}
                               </div>
                               <div className="text-xs text-gray-500">{new Date(order.created_at || '').toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}</div>
                             </button>
