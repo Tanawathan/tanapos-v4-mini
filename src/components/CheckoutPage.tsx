@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import usePOSStore from '../lib/store'
 import { Table, Order, OrderItem } from '../lib/types'
+import { buildPrintPayload, sendPrint } from '../lib/printClient'
 
 interface CheckoutPageProps {
   onBack: () => void
@@ -36,6 +37,8 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   }>(null)
   // 展開的訂單ID集合（顯示訂單內品項）
   const [expandedOrderIds, setExpandedOrderIds] = useState<Set<string>>(new Set())
+  const [isPrinting, setIsPrinting] = useState(false)
+  const [lastPrintError, setLastPrintError] = useState<string | null>(null)
 
   // 只在未載入時觸發資料載入，避免無限渲染
   useEffect(() => {
@@ -294,6 +297,31 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
         change: paymentMethod === 'cash' ? calculateChange() : undefined
       })
 
+      // 自動嘗試列印
+      try {
+        setIsPrinting(true)
+        setLastPrintError(null)
+        const allItems = selected.flatMap(o => getOrderItems(o.id))
+        const payload = buildPrintPayload({
+          tableLabel: tableDisplay,
+          orders: selected,
+          items: allItems,
+          subtotal,
+          tax: taxAmount,
+          service: serviceFee,
+          total: finalAmount,
+          paymentMethod,
+          received: paymentMethod === 'cash' ? parseFloat(receivedAmount) || undefined : undefined,
+          change: paymentMethod === 'cash' ? calculateChange() : undefined
+        })
+        await sendPrint(payload)
+      } catch (e:any) {
+        console.error('列印失敗', e)
+        setLastPrintError(e.message || '列印失敗')
+      } finally {
+        setIsPrinting(false)
+      }
+
     } catch (error) {
       console.error('結帳失敗:', error)
       alert('❌ 結帳失敗，請稍後再試')
@@ -440,7 +468,44 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     >
                       完成
                     </button>
+                    <button
+                      onClick={async () => {
+                        if (!successInfo) return
+                        try {
+                          setIsPrinting(true)
+                          setLastPrintError(null)
+                          const selected = tableOrders.filter(o => successInfo.orderNumbers.includes(o.order_number))
+                          const allItems = selected.flatMap(o => getOrderItems(o.id))
+                          const payload = buildPrintPayload({
+                            tableLabel: successInfo.tableDisplay,
+                            orders: selected,
+                            items: allItems,
+                            subtotal: successInfo.subtotal,
+                            tax: successInfo.taxAmount,
+                            service: successInfo.serviceFee,
+                            total: successInfo.finalAmount,
+                            paymentMethod,
+                            received: paymentMethod === 'cash' ? parseFloat(receivedAmount) || undefined : undefined,
+                            change: successInfo.change
+                          })
+                          await sendPrint(payload)
+                        } catch(e:any) {
+                          console.error('重新列印失敗', e)
+                          setLastPrintError(e.message || '重新列印失敗')
+                          alert('列印失敗，請確認本機列印服務已啟動')
+                        } finally {
+                          setIsPrinting(false)
+                        }
+                      }}
+                      className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50"
+                      disabled={isPrinting}
+                    >
+                      {isPrinting ? '列印中...' : '重新列印'}
+                    </button>
                   </div>
+                  {lastPrintError && (
+                    <div className="text-xs text-red-600 mt-2">{lastPrintError}</div>
+                  )}
                 </div>
               ) : (
               <>
