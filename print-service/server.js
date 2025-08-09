@@ -13,17 +13,12 @@ app.use(express.json({ limit: '256kb' }));
 
 function openPrinter(vendorId, productId) {
   try {
-    if (vendorId && productId) {
-      const devices = usb.getDeviceList().filter(d => {
-        const dd = d.deviceDescriptor || {}; return dd.idVendor === vendorId && dd.idProduct === productId;
-      });
-      if (devices.length === 0) throw new Error('找不到指定 USB 裝置');
-      return new usb.USB(devices[0]);
-    }
-    return new usb.USB();
+    // escpos-usb 支援直接 new USB(vendorId, productId)
+    if (vendorId && productId) return new usb.USB(vendorId, productId)
+    return new usb.USB()
   } catch (e) {
-    console.error('無法開啟 USB 印表機:', e);
-    throw e;
+    console.error('無法開啟 USB 印表機:', e)
+    throw e
   }
 }
 
@@ -109,7 +104,8 @@ function wrap(text, width){
 
 function encodeLines(lines, { charset='GB18030', openCashDrawer=true, cutPaper=true } = {}){
   const cmds = [];
-  const encoding = charset === 'BIG5' ? 'Big5' : charset; // iconv-lite Big5 key
+  // iconv-lite: big5 / utf8 / gb18030 (大小寫不敏感)
+  const encoding = charset === 'BIG5' ? 'big5' : (charset || 'gb18030');
   function push(txt){
     try {
       cmds.push(iconv.encode(txt + '\n', encoding));
