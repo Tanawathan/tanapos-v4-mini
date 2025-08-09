@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import HomePage from '../pages/HomePage'
-import OrderingPage from '../components/OrderingPage'
+import OrderingPage from '../components/OrderingPage' // legacy ordering (保留備用)
 import OrdersPage from '../components/OrdersPage'
 import TableManagementPage from '../components/TableManagementPage'
 import CheckoutPage from '../components/CheckoutPage'
@@ -98,11 +98,12 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           } 
         />
+        {/* 新版點餐 (v2) 做為預設 /ordering 路由 */}
         <Route 
           path="/ordering" 
           element={
             <ProtectedRoute>
-              <OrderingPageWithRouter />
+              <OrderingLayout />
             </ProtectedRoute>
           } 
         />
@@ -170,14 +171,8 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           } 
         />
-          <Route 
-            path="/ordering-v2" 
-            element={
-              <ProtectedRoute>
-                <OrderingLayout />
-              </ProtectedRoute>
-            }
-          />
+  {/* 舊的 /ordering-v2 路由保留，導向 /ordering 以避免外部舊連結失效 */}
+  <Route path="/ordering-v2" element={<Navigate to="/ordering" replace />} />
         <Route 
           path="/reservations/legacy" 
           element={
