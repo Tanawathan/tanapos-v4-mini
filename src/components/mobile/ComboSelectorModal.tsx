@@ -72,6 +72,9 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
 
   if (!isOpen || !combo) return null
 
+  // 簡化顯示：移除末尾的「選擇」字樣以節省空間
+  const compactRuleName = (name: string) => name.replace(/選擇$/,'')
+
   const handleOptionChange = (ruleId: string, optionId: string, rule: ComboSelectionRule) => {
     setSelectedOptions(prev => {
       const currentSelections = prev[ruleId] || []
@@ -226,7 +229,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
 
                   {/* 規則 Tabs（縮短整體長度） */}
                   <div className="mb-3 flex gap-2 overflow-x-auto">
-                    {comboRules.map((rule, idx) => {
+        {comboRules.map((rule, idx) => {
                       const hasMin = Math.max(1, rule.min_selections || 0)
                       const done = (selectedOptions[rule.id] || []).length >= hasMin
                       return (
@@ -235,7 +238,7 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
                           onClick={() => setActiveRuleIndex(idx)}
                           className={`px-3 py-1.5 rounded-full border text-sm whitespace-nowrap ${idx===activeRuleIndex ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 bg-white text-gray-600'}`}
                         >
-                          {done ? '✅' : `${idx+1}.`} {rule.selection_name}
+          {done ? '✅' : `${idx+1}.`} {compactRuleName(rule.selection_name)}
                         </button>
                       )
                     })}
@@ -243,14 +246,14 @@ const ComboSelectorModal: React.FC<ComboSelectorModalProps> = ({ combo, isOpen, 
 
                   {/* 當前規則內容（可滾動） */}
                   {comboRules[activeRuleIndex] && (() => {
-                    const rule = comboRules[activeRuleIndex]
+        const rule = comboRules[activeRuleIndex]
                     const currentSelections = selectedOptions[rule.id] || []
                     const inputType = rule.selection_type === 'single' ? 'radio' : 'checkbox'
                     return (
                       <div className={`space-y-2 max-h-64 overflow-y-auto pr-1 ${!validateRule(currentSelections, rule) ? 'ring-1 ring-red-300 rounded' : ''}`}>
                         <div className="flex items-center justify-between mb-1">
                           <div className="text-sm text-gray-700">
-                            {rule.selection_name} {rule.is_required && <span className="text-red-500">*</span>}
+          {compactRuleName(rule.selection_name)} {rule.is_required && <span className="text-red-500">*</span>}
                           </div>
                           <div className="text-xs text-gray-500">
                             {rule.selection_type === 'single' ? '單選' : `${rule.min_selections}-${rule.max_selections} 選`}
