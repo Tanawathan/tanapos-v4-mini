@@ -42,6 +42,11 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [selectedTable, setSelectedTable] = useState<Table | null>(null)
   const [showStatusModal, setShowStatusModal] = useState(false)
+  const [showWalkInModal, setShowWalkInModal] = useState(false)
+  const [walkInPartySize, setWalkInPartySize] = useState<number>(2)
+  const [walkInName, setWalkInName] = useState<string>('')
+  const [walkInNotes, setWalkInNotes] = useState<string>('')
+  const [creatingWalkIn, setCreatingWalkIn] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<any>(null)
   const [showOrderModal, setShowOrderModal] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
@@ -176,6 +181,45 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const closeStatusModal = () => {
     setSelectedTable(null)
     setShowStatusModal(false)
+  }
+
+  const openWalkInModal = (table: Table) => {
+    setSelectedTable(table)
+    setWalkInPartySize(table.capacity || 2)
+    setShowWalkInModal(true)
+  }
+  const closeWalkInModal = () => {
+    setShowWalkInModal(false)
+    setWalkInPartySize(2)
+    setWalkInName('')
+    setWalkInNotes('')
+  }
+
+  const handleCreateWalkIn = async () => {
+    if (!currentRestaurant?.id || !selectedTable) return
+    try {
+      setCreatingWalkIn(true)
+      const reservation = await ReservationService.createWalkInReservation({
+        restaurantId: currentRestaurant.id,
+        tableId: selectedTable.id!,
+        partySize: walkInPartySize,
+        customerName: walkInName,
+        notes: walkInNotes
+      })
+      // 重新載入資料
+      await Promise.all([
+        loadTables(),
+        loadReservations()
+      ])
+      closeWalkInModal()
+      // 開啟預約詳情，方便直接開始點餐
+      openReservationModal(reservation as any)
+      console.log('✅ 現場帶位建立', reservation.id)
+    } catch (e:any) {
+      alert('建立現場帶位失敗:' + e.message)
+    } finally {
+      setCreatingWalkIn(false)
+    }
   }
 
   // 變更桌台狀態
@@ -592,6 +636,14 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                       >
                         變更狀態
                       </button>
+                      {table.status === 'available' && (
+                        <button
+                          onClick={() => openWalkInModal(table)}
+                          className="mt-2 w-full px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                          ⚡ 現場帶位
+                        </button>
+                      )}
                     </div>
                   </div>
                 )
@@ -685,6 +737,41 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                   </div>
                 </div>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 現場帶位模態框 */}
+      {showWalkInModal && selectedTable && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-900">⚡ 現場帶位</h3>
+              <button onClick={closeWalkInModal} className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <p className="text-gray-600 mb-4">桌號 {selectedTable.table_number} · 容量 {selectedTable.capacity} 人</p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">用餐人數</label>
+                <input type="number" min={1} max={selectedTable.capacity || 20} value={walkInPartySize} onChange={e=>setWalkInPartySize(Math.min(Number(e.target.value)||1, selectedTable.capacity||20))} className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">客戶姓名 (可選)</label>
+                <input type="text" value={walkInName} onChange={e=>setWalkInName(e.target.value)} placeholder="例如：王先生" className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">備註 (可選)</label>
+                <textarea value={walkInNotes} onChange={e=>setWalkInNotes(e.target.value)} rows={3} className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="特殊需求或備註"></textarea>
+              </div>
+              <div className="pt-2 space-y-2">
+                <button disabled={creatingWalkIn} onClick={handleCreateWalkIn} className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                  {creatingWalkIn ? '建立中...' : '✅ 確認帶位'}
+                </button>
+                <button onClick={closeWalkInModal} className="w-full px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold">取消</button>
+              </div>
             </div>
           </div>
         </div>

@@ -62,6 +62,79 @@ export class ReservationService {
   }
 
   /**
+   * 建立現場(快速)帶位預約：
+   * - 直接建立一筆已入座(seated)狀態的預約記錄並綁定指定桌台
+   * - 跳過容量 / 休假日檢查，用於臨場彈性處理
+   * - 會自動計算用餐結束時間並更新桌台狀態為 occupied
+   */
+  static async createWalkInReservation(params: {
+    restaurantId: string
+    tableId: string
+    partySize: number
+    customerName?: string
+    notes?: string
+  }): Promise<Reservation> {
+    const { restaurantId, tableId, partySize, customerName, notes } = params
+    try {
+      // 取得餐廳用餐時長設定
+      const { data: restaurantSettingsData, error: settingError } = await supabase
+        .from('restaurants')
+        .select('reservation_settings')
+        .eq('id', restaurantId)
+        .single()
+      if (settingError) throw settingError
+
+      const mealDurationMinutes = restaurantSettingsData?.reservation_settings?.reservationSettings?.mealDurationMinutes || 90
+
+      const now = new Date()
+      const estimatedEndTime = new Date(now.getTime() + mealDurationMinutes * 60 * 1000)
+
+      const walkInReservation: any = {
+        restaurant_id: restaurantId,
+        table_id: tableId,
+        customer_name: customerName?.trim() || '現場客人',
+        party_size: partySize,
+        adult_count: partySize, // 簡化：預設皆為成人
+        child_count: 0,
+        child_chair_needed: false,
+        reservation_time: now.toISOString(),
+        duration_minutes: mealDurationMinutes,
+        estimated_end_time: estimatedEndTime.toISOString(),
+        status: 'seated',
+        special_requests: notes || null,
+        customer_notes: stringifyCustomerData({
+          adults: partySize,
+          children: 0,
+          childChairNeeded: false,
+          reservationType: this.determineReservationType(partySize, 0)
+        }),
+        confirmed_at: now.toISOString(),
+        seated_at: now.toISOString(),
+        updated_at: now.toISOString()
+      }
+
+      const { data, error } = await supabase
+        .from('table_reservations')
+        .insert(walkInReservation)
+        .select()
+        .single()
+      if (error) throw error
+
+      // 更新桌台狀態為佔用
+      const { error: tableErr } = await supabase
+        .from('tables')
+        .update({ status: 'occupied', updated_at: new Date().toISOString() })
+        .eq('id', tableId)
+      if (tableErr) throw tableErr
+
+      return data as Reservation
+    } catch (error) {
+      console.error('建立現場帶位預約失敗:', error)
+      throw error
+    }
+  }
+
+  /**
    * 釋放與預約關聯的桌台：
    * - 若預約存在 table_id，將對應桌台設為 available
    * - 清空該預約的 table_id 關聯
