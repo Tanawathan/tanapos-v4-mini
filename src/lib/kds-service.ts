@@ -418,14 +418,19 @@ export class KDSService {
    */
   private static mapCategory(categoryName: string): MenuCategory {
     if (!categoryName) return MenuCategory.A_LA_CARTE;
-    
-    const name = categoryName.toLowerCase();
-    if (name.includes('appetizer') || name.includes('前菜')) return MenuCategory.APPETIZERS;
-    if (name.includes('main') || name.includes('主菜')) return MenuCategory.MAIN_COURSE;
-    if (name.includes('beverage') || name.includes('飲品')) return MenuCategory.BEVERAGES;
-    if (name.includes('dessert') || name.includes('甜點')) return MenuCategory.DESSERTS;
-    if (name.includes('additional') || name.includes('加點')) return MenuCategory.ADDITIONAL;
-    
+    // 統一為小寫並去除空白
+    const name = categoryName.toLowerCase().trim();
+    // 前菜 / 小菜 / 開胃菜
+    if (/(appetizer|前菜|小菜|開胃)/.test(name)) return MenuCategory.APPETIZERS;
+    // 主餐 / 主菜 / 套餐 (套餐視為主餐總類，子項仍以實際品類呈現)
+    if (/(main|主菜|主餐|套餐)/.test(name)) return MenuCategory.MAIN_COURSE;
+    // 飲品 / 飲料 / 飲
+    if (/(beverage|飲品|飲料)/.test(name)) return MenuCategory.BEVERAGES;
+    // 甜點 / 甜品 / 點心 / 甜食
+    if (/(dessert|甜點|甜品|點心|甜食)/.test(name)) return MenuCategory.DESSERTS;
+    // 加點 / 附加 / 追加
+    if (/(additional|加點|附加|追加)/.test(name)) return MenuCategory.ADDITIONAL;
+    // 其它情況回傳單點
     return MenuCategory.A_LA_CARTE;
   }
 
