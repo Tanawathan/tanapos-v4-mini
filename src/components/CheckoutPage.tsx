@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import usePOSStore from '../lib/store'
-import { Table, Order } from '../lib/types'
+import { Table, Order, OrderItem } from '../lib/types'
 
 interface CheckoutPageProps {
   onBack: () => void
@@ -10,6 +10,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   // 使用 selector 模式避免無限渲染
   const tables = usePOSStore(state => state.tables)
   const orders = usePOSStore(state => state.orders)
+  const orderItems = usePOSStore(state => state.orderItems) // 用於顯示訂單內容
   const tablesLoaded = usePOSStore(state => state.tablesLoaded)
   const ordersLoaded = usePOSStore(state => state.ordersLoaded)
   const loadTables = usePOSStore(state => state.loadTables)
@@ -33,6 +34,8 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
     finalAmount: number,
     change?: number
   }>(null)
+  // 展開的訂單ID集合（顯示訂單內品項）
+  const [expandedOrderIds, setExpandedOrderIds] = useState<Set<string>>(new Set())
 
   // 只在未載入時觸發資料載入，避免無限渲染
   useEffect(() => {
@@ -133,6 +136,25 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const getSelectedOrders = () => {
     if (tableOrders.length === 0) return [] as Order[]
     return tableOrders.filter(o => selectedOrderIds.has(o.id))
+  }
+
+  // 取得某訂單的品項內容
+  const getOrderItems = (orderId: string): OrderItem[] => {
+    return orderItems.filter(item => item.order_id === orderId)
+  }
+
+  // 建立品項描述（含套餐選擇）
+  const formatOrderItemLine = (item: OrderItem) => {
+    const base = `${item.quantity}× ${item.product_name}`
+    if (!item.combo_selections || item.combo_selections.length === 0) return base
+    const extras = item.combo_selections.map(sel => {
+      const rule = sel.combo_selection_rules?.selection_name || '選項'
+      const prod = sel.products?.name || ''
+      const qty = sel.quantity && sel.quantity > 1 ? `×${sel.quantity}` : ''
+      const add = sel.additional_price ? `+${sel.additional_price}` : ''
+      return `${rule}:${prod}${qty}${add}`
+    }).join(' | ')
+    return `${base} （${extras}）`
   }
 
   const calculateTotalAmount = () => {
@@ -427,7 +449,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                 <div className="bg-ui-secondary p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-medium text-ui-primary">訂單資訊</h4>
-                    <div className="flex gap-2 text-xs">
+                    <div className="flex gap-2 text-xs flex-wrap">
                       <button
                         onClick={() => setSelectedOrderIds(new Set(tableOrders.map(o => o.id)))}
                         className="px-2 py-1 border rounded hover:bg-gray-50"
@@ -436,26 +458,64 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                         onClick={() => setSelectedOrderIds(new Set())}
                         className="px-2 py-1 border rounded hover:bg-gray-50"
                       >全不選</button>
+                      <button
+                        onClick={() => setExpandedOrderIds(new Set(tableOrders.map(o => o.id)))}
+                        className="px-2 py-1 border rounded hover:bg-gray-50"
+                      >全部展開</button>
+                      <button
+                        onClick={() => setExpandedOrderIds(new Set())}
+                        className="px-2 py-1 border rounded hover:bg-gray-50"
+                      >全部收合</button>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    {tableOrders.map((order, index) => (
-                      <label key={order.id} className="flex justify-between items-center py-2 px-2 rounded hover:bg-white cursor-pointer border border-transparent">
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={selectedOrderIds.has(order.id)}
-                            onChange={(e) => {
-                              const next = new Set(selectedOrderIds)
-                              if (e.target.checked) next.add(order.id); else next.delete(order.id)
-                              setSelectedOrderIds(next)
-                            }}
-                          />
-                          <span className="text-sm text-ui-muted">{index + 1}. {order.order_number}</span>
+                    {tableOrders.map((order, index) => {
+                      const isExpanded = expandedOrderIds.has(order.id)
+                      const items = getOrderItems(order.id)
+                      return (
+                        <div key={order.id} className="border border-transparent rounded hover:bg-white">
+                          <div className="flex justify-between items-center py-2 px-2">
+                            <div className="flex items-center gap-2 flex-1">
+                              <input
+                                type="checkbox"
+                                checked={selectedOrderIds.has(order.id)}
+                                onChange={(e) => {
+                                  const next = new Set(selectedOrderIds)
+                                  if (e.target.checked) next.add(order.id); else next.delete(order.id)
+                                  setSelectedOrderIds(next)
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setExpandedOrderIds(prev => {
+                                    const next = new Set(prev)
+                                    if (next.has(order.id)) next.delete(order.id); else next.add(order.id)
+                                    return next
+                                  })
+                                }}
+                                className="text-xs text-blue-600 underline"
+                              >{isExpanded ? '收合' : '查看'}</button>
+                              <span className="text-sm text-ui-muted truncate">{index + 1}. {order.order_number}</span>
+                              {items.length > 0 && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">{items.length}項</span>
+                              )}
+                            </div>
+                            <span className="font-medium text-ui-primary ml-2">NT$ {(order.total_amount || 0).toLocaleString()}</span>
+                          </div>
+                          {isExpanded && items.length > 0 && (
+                            <div className="pb-2 px-9 text-xs space-y-1">
+                              {items.map(it => (
+                                <div key={it.id} className="flex justify-between gap-2">
+                                  <span className="text-gray-600 flex-1 leading-snug">{formatOrderItemLine(it)}</span>
+                                  <span className="text-gray-500 whitespace-nowrap">NT$ {it.total_price.toLocaleString()}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        <span className="font-medium text-ui-primary">NT$ {(order.total_amount || 0).toLocaleString()}</span>
-                      </label>
-                    ))}
+                      )
+                    })}
                     <div className="border-t pt-2 mt-2">
                       <div className="flex justify-between items-center font-semibold">
                         <span>小計（{getSelectedOrders().length} 張）</span>
