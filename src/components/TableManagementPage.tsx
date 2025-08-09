@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import usePOSStore from '../lib/store'
 import { Table } from '../lib/types'
 import { supabase } from '../lib/supabase'
@@ -117,57 +117,65 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     return orderItems.filter(item => item.order_id === orderId)
   }
 
-  // 狀態顏色映射
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'available':
-        return 'bg-green-100 text-green-800 border-green-200'
-      case 'occupied':
-        return 'bg-red-100 text-red-800 border-red-200'
-      case 'reserved':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
-      case 'cleaning':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'maintenance':
-        return 'bg-gray-100 text-gray-800 border-gray-200'
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
-    }
+  // ===== 新增：複合狀態計算邏輯 =====
+  const ACTIVE_ORDER_STATUS = useMemo(() => new Set(['pending', 'confirmed', 'preparing', 'ready', 'served']), [])
+
+  const withinTwoHours = (iso: string) => {
+    const now = Date.now()
+    const t = new Date(iso).getTime()
+    if (t < now) return false
+    const diffMin = (t - now) / 60000
+    return diffMin <= 120
   }
 
-  // 狀態文字映射
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'available':
-        return '可用'
-      case 'occupied':
-        return '佔用中'
-      case 'reserved':
-        return '已預約'
-      case 'cleaning':
-        return '清潔中'
-      case 'maintenance':
-        return '維護中'
-      default:
-        return '未知'
+  const computeCompositeStatus = (table: Table) => {
+    const tableOrders = getTableOrders(table.table_number || '')
+    const hasActiveOrders = tableOrders.some(o => ACTIVE_ORDER_STATUS.has(o.status || ''))
+    if (hasActiveOrders) {
+      return { display: 'occupied', hasActiveOrders, upcomingReservation: null, canWalkIn: false }
     }
+    // 找最近且未入座的 confirmed 預約
+    const tableResList = reservations.filter(r => r.table_id === table.id && r.status === 'confirmed')
+    const upcoming = tableResList
+      .filter(r => withinTwoHours(r.reservation_time))
+      .sort((a,b) => new Date(a.reservation_time).getTime() - new Date(b.reservation_time).getTime())[0] || null
+    if (upcoming) {
+      return { display: 'reserved', hasActiveOrders: false, upcomingReservation: upcoming, canWalkIn: false }
+    }
+    if (table.status === 'cleaning') return { display: 'cleaning', hasActiveOrders: false, upcomingReservation: null, canWalkIn: false }
+    if (table.status === 'maintenance') return { display: 'maintenance', hasActiveOrders: false, upcomingReservation: null, canWalkIn: false }
+    return { display: 'available', hasActiveOrders: false, upcomingReservation: null, canWalkIn: true }
   }
 
-  // 狀態圖示映射
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'available':
-        return '✅'
-      case 'occupied':
-        return '👥'
-      case 'reserved':
-        return '📅'
-      case 'cleaning':
-        return '🧹'
-      case 'maintenance':
-        return '🔧'
-      default:
-        return '❓'
+  // 顏色 / 文字 / 圖示映射基於 display
+  const getStatusColor = (display: string) => {
+    switch (display) {
+      case 'available': return 'bg-green-100 text-green-800 border-green-200'
+      case 'occupied': return 'bg-red-100 text-red-800 border-red-200'
+      case 'reserved': return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'cleaning': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'maintenance': return 'bg-gray-100 text-gray-800 border-gray-200'
+      default: return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+  const getStatusText = (display: string) => {
+    switch (display) {
+      case 'available': return '可用'
+      case 'occupied': return '佔用中'
+      case 'reserved': return '已預約'
+      case 'cleaning': return '清潔中'
+      case 'maintenance': return '維護中'
+      default: return '未知'
+    }
+  }
+  const getStatusIcon = (display: string) => {
+    switch (display) {
+      case 'available': return '✅'
+      case 'occupied': return '👥'
+      case 'reserved': return '📅'
+      case 'cleaning': return '🧹'
+      case 'maintenance': return '🔧'
+      default: return '❓'
     }
   }
 
@@ -511,138 +519,60 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredTables.map(table => {
                 const tableOrders = getTableOrders(table.table_number || '')
-                const tableReservation = getTableReservation(table.id!)
-                
+                const composite = computeCompositeStatus(table)
+                const display = composite.display
+                const tableReservation = getTableReservation(table.id!) // 仍保留原顯示邏輯
+                const disabledWalkInReason = !composite.canWalkIn ? (composite.hasActiveOrders ? '有未結帳訂單' : composite.upcomingReservation ? '2小時內有預約' : (display==='cleaning'?'清潔中': display==='maintenance'?'維護中':'')) : ''
                 return (
                   <div
                     key={table.id}
-                    className={`border-2 rounded-xl p-4 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${getStatusColor(table.status || 'available')}`}
+                    className={`border-2 rounded-xl p-4 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${getStatusColor(display)}`}
                   >
                     <div className="text-center">
-                      {/* 桌台圖示和狀態 */}
-                      <div className="text-4xl mb-3">
-                        {getStatusIcon(table.status || 'available')}
-                      </div>
-                      
-                      {/* 桌台基本資訊 */}
-                      <div className="font-bold text-lg text-gray-900 mb-1">
-                        桌號 {table.table_number}
-                      </div>
-                      
-                      {table.name && (
-                        <div className="text-sm text-gray-600 mb-2">
-                          ({table.name})
-                        </div>
+                      <div className="text-4xl mb-3">{getStatusIcon(display)}</div>
+                      <div className="font-bold text-lg text-gray-900 mb-1">桌號 {table.table_number}</div>
+                      {table.name && <div className="text-sm text-gray-600 mb-2">({table.name})</div>}
+                      <div className="text-sm text-gray-700 mb-3">{table.capacity} 人座</div>
+                      <div className={`inline-block text-xs px-3 py-1 rounded-full font-semibold mb-3 border ${getStatusColor(display)}`}>{getStatusText(display)}</div>
+                      {composite.upcomingReservation && display==='reserved' && (
+                        <div className="text-xs text-blue-700 mb-2">即將預約 {new Date(composite.upcomingReservation.reservation_time).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})} · {composite.upcomingReservation.party_size}人</div>
                       )}
-                      
-                      <div className="text-sm text-gray-700 mb-3">
-                        {table.capacity} 人座
-                      </div>
-                      
-                      {/* 狀態標籤 */}
-                      <div className={`inline-block text-xs px-3 py-1 rounded-full font-semibold mb-3 border ${getStatusColor(table.status || 'available')}`}>
-                        {getStatusText(table.status || 'available')}
-                      </div>
-
-                      {/* 預約資訊（如果桌台有相關預約） */}
+                      {/* 預約資訊 */}
                       {tableReservation && (
                         <div className="space-y-2 mb-3">
-                          <div className="text-xs font-semibold text-blue-800 mb-2">
-                            📅 預約資訊
-                          </div>
-                          <button
-                            onClick={() => openReservationModal(tableReservation)}
-                            className={`w-full rounded-lg p-2 text-left transition-all duration-200 hover:shadow-md border ${
-                              tableReservation.status === 'seated' 
-                                ? 'bg-green-50 hover:bg-green-100 border-green-200'
-                                : 'bg-blue-50 hover:bg-blue-100 border-blue-200'
-                            }`}
-                          >
-                            <div className={`text-xs font-semibold mb-1 ${
-                              tableReservation.status === 'seated' ? 'text-green-800' : 'text-blue-800'
-                            }`}>
-                              👤 {tableReservation.customer_name}
-                            </div>
-                            <div className={`text-xs mb-1 ${
-                              tableReservation.status === 'seated' ? 'text-green-600' : 'text-blue-600'
-                            }`}>
-                              {tableReservation.party_size} 人 · {tableReservation.status === 'confirmed' ? '已確認' : '已入座'}
-                            </div>
-                            <div className={`text-xs ${
-                              tableReservation.status === 'seated' ? 'text-green-500' : 'text-blue-500'
-                            }`}>
-                              {new Date(tableReservation.reservation_time).toLocaleString('zh-TW', {
-                                month: 'numeric',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </div>
-                            {tableReservation.special_requests && (
-                              <div className={`text-xs mt-1 truncate ${
-                                tableReservation.status === 'seated' ? 'text-green-400' : 'text-blue-400'
-                              }`}>
-                                備註: {tableReservation.special_requests}
-                              </div>
-                            )}
+                          <div className="text-xs font-semibold text-blue-800 mb-2">📅 預約資訊</div>
+                          <button onClick={() => openReservationModal(tableReservation)} className={`w-full rounded-lg p-2 text-left transition-all duration-200 hover:shadow-md border ${tableReservation.status==='seated'?'bg-green-50 hover:bg-green-100 border-green-200':'bg-blue-50 hover:bg-blue-100 border-blue-200'}`}>
+                            <div className={`text-xs font-semibold mb-1 ${tableReservation.status==='seated'?'text-green-800':'text-blue-800'}`}>👤 {tableReservation.customer_name}</div>
+                            <div className={`text-xs mb-1 ${tableReservation.status==='seated'?'text-green-600':'text-blue-600'}`}>{tableReservation.party_size} 人 · {tableReservation.status==='confirmed'?'已確認':'已入座'}</div>
+                            <div className={`text-xs ${tableReservation.status==='seated'?'text-green-500':'text-blue-500'}`}>{new Date(tableReservation.reservation_time).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+                            {tableReservation.special_requests && <div className={`text-xs mt-1 truncate ${tableReservation.status==='seated'?'text-green-400':'text-blue-400'}`}>備註: {tableReservation.special_requests}</div>}
                           </button>
-                          <div className={`text-xs font-medium text-center pt-1 ${
-                            tableReservation.status === 'seated' ? 'text-green-600' : 'text-blue-600'
-                          }`}>
-                            👆 點擊查看預約詳情
-                          </div>
+                          <div className={`text-xs font-medium text-center pt-1 ${tableReservation.status==='seated'?'text-green-600':'text-blue-600'}`}>👆 點擊查看預約詳情</div>
                         </div>
                       )}
-                      
-                      {/* 訂單資訊（如果有） */}
+                      {/* 訂單資訊 */}
                       {tableOrders.length > 0 && (
                         <div className="space-y-2 mb-3">
-                          <div className="text-xs font-semibold text-gray-800 mb-2">
-                            📋 未結帳訂單 ({tableOrders.length})
-                          </div>
-                          {tableOrders.map((order, index) => (
-                            <button
-                              key={order.id}
-                              onClick={() => openOrderModal(order)}
-                              className="w-full bg-white bg-opacity-70 hover:bg-opacity-90 rounded-lg p-2 text-left transition-all duration-200 hover:shadow-md border border-transparent hover:border-blue-200"
-                            >
-                              <div className="text-xs font-semibold text-gray-800 mb-1">
-                                {index === 0 ? '🍽️' : '➕'} {order.order_number}
-                              </div>
+                          <div className="text-xs font-semibold text-gray-800 mb-2">📋 未結帳訂單 ({tableOrders.length})</div>
+                          {tableOrders.map((order,index)=>(
+                            <button key={order.id} onClick={()=>openOrderModal(order)} className="w-full bg-white bg-opacity-70 hover:bg-opacity-90 rounded-lg p-2 text-left transition-all duration-200 hover:shadow-md border border-transparent hover:border-blue-200">
+                              <div className="text-xs font-semibold text-gray-800 mb-1">{index===0?'🍽️':'➕'} {order.order_number}</div>
                               <div className="text-xs text-gray-600 flex items-center gap-2">
                                 <span>NT$ {(order.total_amount || 0).toLocaleString()}</span>
-                                <span className={`px-2 py-0.5 rounded-full border ${ORDER_STATUS_COLOR[(order.status as any) || 'pending']}`}>
-                                  {ORDER_STATUS_LABEL[(order.status as any) || 'pending']}
-                                </span>
+                                <span className={`px-2 py-0.5 rounded-full border ${ORDER_STATUS_COLOR[(order.status as any) || 'pending']}`}>{ORDER_STATUS_LABEL[(order.status as any) || 'pending']}</span>
                               </div>
-                              <div className="text-xs text-gray-500">
-                                {new Date(order.created_at || '').toLocaleTimeString('zh-TW', {
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </div>
+                              <div className="text-xs text-gray-500">{new Date(order.created_at || '').toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}</div>
                             </button>
                           ))}
-                          <div className="text-xs text-blue-600 font-medium text-center pt-1">
-                            👆 點擊訂單查看詳情
-                          </div>
+                          <div className="text-xs text-blue-600 font-medium text-center pt-1">👆 點擊訂單查看詳情</div>
                         </div>
                       )}
-                      
-                      {/* 管理按鈕 */}
-                      <button
-                        onClick={() => openStatusModal(table)}
-                        className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg"
-                      >
-                        變更狀態
-                      </button>
-                      {table.status === 'available' && (
-                        <button
-                          onClick={() => openWalkInModal(table)}
-                          className="mt-2 w-full px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg"
-                        >
-                          ⚡ 現場帶位
-                        </button>
+                      <button onClick={()=>openStatusModal(table)} className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg">變更狀態</button>
+                      {composite.canWalkIn && (
+                        <button onClick={()=>openWalkInModal(table)} className="mt-2 w-full px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg">⚡ 現場帶位</button>
+                      )}
+                      {!composite.canWalkIn && display==='available' && disabledWalkInReason && (
+                        <div className="mt-2 text-[10px] text-red-600">⚠ 無法現場帶位：{disabledWalkInReason}</div>
                       )}
                     </div>
                   </div>
