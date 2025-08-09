@@ -82,53 +82,57 @@ export class KDSService {
     const menuItems: KDSMenuItem[] = [];
     
     (dbOrder.order_items || []).forEach((item: any) => {
-      if (item.product_name?.startsWith('[套餐]') && item.order_combo_selections?.length > 0) {
-        // 套餐項目 - 展開為多個獨立組件
-        const comboItems = this.expandComboToComponents(item);
-        menuItems.push(...comboItems);
-      } else {
-        // 一般商品項目
-        menuItems.push({
-          id: item.id,
-          order_id: item.order_id,
-          product_id: item.product_id,
-          combo_id: item.combo_id,
-          item_type: item.item_type || 'product',
-          product_name: item.product_name,
-          product_sku: item.product_sku,
-          variant_name: item.variant_name,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          total_price: item.total_price,
-          cost_price: item.cost_price || 0,
-          status: this.mapItemStatus(item.status),
-          
-          // 時間欄位
-          ordered_at: item.ordered_at || item.created_at,
-          preparation_started_at: item.preparation_started_at,
-          ready_at: item.ready_at,
-          served_at: item.served_at,
-          estimated_prep_time: item.estimated_prep_time,
-          actual_prep_time: item.actual_prep_time,
-          
-          // 廚房管理欄位
-          special_instructions: item.special_instructions,
-          modifiers: item.modifiers,
-          kitchen_station: item.kitchen_station,
-          priority_level: item.priority_level || 1,
-          quality_checked: item.quality_checked || false,
-          
-          created_at: item.created_at,
-          updated_at: item.updated_at,
-          
-          // KDS 計算欄位
-          category: this.mapCategory(item.products?.categories?.name),
-          urgencyLevel: this.calculateUrgencyLevel(item.ordered_at || item.created_at),
-          
-          // 套餐選擇
-          combo_selections: item.order_combo_selections || []
-        });
+      // 偵測是否為新版本的套餐父項 (目前下單流程：product_id 為 null 且 special_instructions 內含多個 group 標籤 '：')
+      const looksLikeComboParent = !item.product_id && /：/.test(item.special_instructions || '') && /(\||\n)/.test(item.special_instructions || '')
+      const hasSelections = (item.order_combo_selections?.length || 0) > 0
+
+      if (hasSelections) {
+        // 舊版 / 有詳細選擇記錄：展開
+        const comboItems = this.expandComboToComponents(item)
+        // 保留父項作為摘要 (不進行計時/製作) - quantity 為份數，特殊說明格式化
+        menuItems.push(this.buildParentComboItem(item, { isSummaryOnly: true }))
+        menuItems.push(...comboItems)
+        return
       }
+
+      if (looksLikeComboParent) {
+        // 新版：只有摘要字串，直接以父項顯示 (不展開子項)
+        menuItems.push(this.buildParentComboItem(item, { isSummaryOnly: true }))
+        return
+      }
+
+      // 一般商品項目或尚未符合套餐規則
+      menuItems.push({
+        id: item.id,
+        order_id: item.order_id,
+        product_id: item.product_id,
+        combo_id: item.combo_id,
+        item_type: item.item_type || 'product',
+        product_name: item.product_name,
+        product_sku: item.product_sku,
+        variant_name: item.variant_name,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total_price: item.total_price,
+        cost_price: item.cost_price || 0,
+        status: this.mapItemStatus(item.status),
+        ordered_at: item.ordered_at || item.created_at,
+        preparation_started_at: item.preparation_started_at,
+        ready_at: item.ready_at,
+        served_at: item.served_at,
+        estimated_prep_time: item.estimated_prep_time,
+        actual_prep_time: item.actual_prep_time,
+        special_instructions: item.special_instructions,
+        modifiers: item.modifiers,
+        kitchen_station: item.kitchen_station,
+        priority_level: item.priority_level || 1,
+        quality_checked: item.quality_checked || false,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        category: this.mapCategory(item.products?.categories?.name),
+        urgencyLevel: this.calculateUrgencyLevel(item.ordered_at || item.created_at),
+        combo_selections: item.order_combo_selections || []
+      })
     });
 
     // 計算總項目數和已完成項目數
@@ -197,6 +201,58 @@ export class KDSService {
       totalItems,
       completedItems
     };
+  }
+
+  /**
+   * 建立套餐父項顯示項目
+   */
+  private static buildParentComboItem(raw: any, opts: { isSummaryOnly?: boolean } = {}): KDSMenuItem {
+    return {
+      id: raw.id,
+      order_id: raw.order_id,
+      product_id: raw.product_id,
+      combo_id: raw.combo_id,
+      item_type: 'combo_parent',
+      product_name: raw.product_name?.replace(/^\[套餐]\s*/, '') || '套餐',
+      product_sku: raw.product_sku,
+      variant_name: raw.variant_name,
+      quantity: raw.quantity,
+      unit_price: raw.unit_price,
+      total_price: raw.total_price,
+      cost_price: raw.cost_price || 0,
+      status: this.mapItemStatus(raw.status),
+      ordered_at: raw.ordered_at || raw.created_at,
+      preparation_started_at: raw.preparation_started_at,
+      ready_at: raw.ready_at,
+      served_at: raw.served_at,
+      estimated_prep_time: raw.estimated_prep_time,
+      actual_prep_time: raw.actual_prep_time,
+      // 將特殊說明中以 | 或換行分隔的群組用更易讀格式呈現
+      special_instructions: this.formatComboSummary(raw.special_instructions || ''),
+      modifiers: raw.modifiers,
+      kitchen_station: '綜合區',
+      priority_level: raw.priority_level || 1,
+      quality_checked: false,
+      created_at: raw.created_at,
+      updated_at: raw.updated_at,
+      category: MenuCategory.A_LA_CARTE,
+      urgencyLevel: this.calculateUrgencyLevel(raw.ordered_at || raw.created_at),
+      combo_selections: raw.order_combo_selections || [],
+      isComboParent: true
+    }
+  }
+
+  /**
+   * 將下單端組合的摘要字串轉為 KDS 友善的多行顯示 (主餐：.. / 沙拉：..)
+   */
+  private static formatComboSummary(text: string): string {
+    if (!text) return ''
+    // 將 ' | ' 或 '\n' 替換為換行
+    return text
+      .split(/\s*\|\s*|\n/)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .join('\n')
   }
 
   /**

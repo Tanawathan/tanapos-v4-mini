@@ -139,6 +139,8 @@ export interface KDSMenuItem {
   isComboComponent?: boolean;       // 是否為套餐組件
   parentComboId?: string;           // 父套餐訂單項目ID
   componentIndex?: number;          // 在套餐中的組件索引
+  // 新增：是否為套餐父項 (僅顯示彙總，不展開子項)
+  isComboParent?: boolean;          // 由 KDSService 基於名稱/特殊說明判斷
 }
 
 // 套餐選擇 (基於 order_combo_selections 表)

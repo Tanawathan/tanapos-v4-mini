@@ -26,7 +26,13 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
   const [sortBy, setSortBy] = useState<SortOption>('priority');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(()=>{
+    try {
+      const raw = localStorage.getItem('kds-expanded-orders');
+      if (raw) return new Set(JSON.parse(raw));
+    } catch {}
+    return new Set();
+  });
 
   // 初始化數據
   useEffect(() => {
@@ -54,10 +60,24 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
 
   // 顯示模式變更時自動展開/收合
   useEffect(() => {
+    // 僅在第一次載入後若為 detailed 模式且尚無任何展開紀錄時自動展開全部
     if (settings.displayMode === 'detailed') {
-      setExpandedOrders(new Set(orders.map(o => o.id)));
+      if (expandedOrders.size === 0) {
+        const allIds = new Set(orders.map(o => o.id));
+        setExpandedOrders(allIds);
+        try { localStorage.setItem('kds-expanded-orders', JSON.stringify(Array.from(allIds))); } catch {}
+      } else {
+        // detailed 模式但已有展開紀錄 -> 只補上新訂單，保持既有展開狀態
+        let changed = false;
+        const next = new Set(expandedOrders);
+        orders.forEach(o => { if (!next.has(o.id)) { next.add(o.id); changed = true; } });
+        if (changed) {
+          setExpandedOrders(next);
+          try { localStorage.setItem('kds-expanded-orders', JSON.stringify(Array.from(next))); } catch {}
+        }
+      }
     } else {
-      setExpandedOrders(new Set());
+      // compact 模式不自動清空，保持使用者手動展開狀態
     }
   }, [settings.displayMode, orders]);
 
@@ -134,16 +154,21 @@ export const KDSPage: React.FC<KDSPageProps> = ({ onNavigateToHome }) => {
     } else {
       newExpanded.add(orderId);
     }
-    setExpandedOrders(newExpanded);
+  setExpandedOrders(newExpanded);
+  try { localStorage.setItem('kds-expanded-orders', JSON.stringify(Array.from(newExpanded))); } catch {}
   };
 
   // 批量展開/收縮
   const handleExpandAll = () => {
-    setExpandedOrders(new Set(orders.map((order) => order.id)));
+  const all = new Set(orders.map((order) => order.id));
+  setExpandedOrders(all);
+  try { localStorage.setItem('kds-expanded-orders', JSON.stringify(Array.from(all))); } catch {}
   };
 
   const handleCollapseAll = () => {
-    setExpandedOrders(new Set());
+  const empty = new Set();
+  setExpandedOrders(empty);
+  try { localStorage.setItem('kds-expanded-orders', JSON.stringify([])); } catch {}
   };
 
   // 處理訂單狀態變更

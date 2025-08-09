@@ -139,16 +139,18 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
         {/* 左側：餐點信息 */}
         <div className="flex items-center space-x-3">
           {/* 狀態切換按鈕 */}
-          <button
-            onClick={handleStatusToggle}
-            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-              isChecked 
-                ? 'bg-green-500 border-green-500 text-white' 
-                : 'border-gray-300 hover:border-green-400'
-            }`}
-          >
-            {isChecked && '✓'}
-          </button>
+          {!item.isComboParent && (
+            <button
+              onClick={handleStatusToggle}
+              className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                isChecked 
+                  ? 'bg-green-500 border-green-500 text-white' 
+                  : 'border-gray-300 hover:border-green-400'
+              }`}
+            >
+              {isChecked && '✓'}
+            </button>
+          )}
 
           {/* 餐點詳情 */}
           <div className="flex-1">
@@ -163,7 +165,7 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
               <span className="text-gray-500">x{item.quantity}</span>
               
               {/* 簡化的套餐標識 */}
-              {(item.isComboComponent || (item.combo_id && !item.isComboComponent)) && (
+              {(item.isComboComponent || item.isComboParent || (item.combo_id && !item.isComboComponent)) && (
                 <span className="px-1.5 py-0.5 bg-purple-100 text-purple-600 text-xs rounded">
                   套餐
                 </span>
@@ -172,9 +174,9 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
 
             {/* 特殊說明 - 對套餐組件進行簡化 */}
             {item.special_instructions && !item.isComboComponent && (
-              <p className="text-sm text-yellow-700 mt-1">
-                📝 {item.special_instructions}
-              </p>
+              <div className="text-xs text-yellow-800 mt-1 whitespace-pre-line leading-snug">
+                {item.isComboParent ? item.special_instructions : `📝 ${item.special_instructions}`}
+              </div>
             )}
 
           </div>
@@ -200,7 +202,7 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
 
           {/* 快速操作 */}
           <div className="flex items-center space-x-1">
-            {item.status === MenuItemStatus.PENDING && (
+            {!item.isComboParent && item.status === MenuItemStatus.PENDING && (
               <button
                 onClick={handleStartPreparing}
                 className="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded hover:bg-blue-200 transition-colors"
@@ -209,7 +211,7 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
               </button>
             )}
             
-            {item.status === MenuItemStatus.PREPARING && (
+            {!item.isComboParent && item.status === MenuItemStatus.PREPARING && (
               <button
                 onClick={handleComplete}
                 className="px-2 py-1 bg-green-100 text-green-600 text-xs rounded hover:bg-green-200 transition-colors"
@@ -219,7 +221,7 @@ export const MenuItemRow: React.FC<MenuItemRowProps> = ({
             )}
 
             {/* 品質檢查 */}
-            {item.status === MenuItemStatus.READY && (
+            {!item.isComboParent && item.status === MenuItemStatus.READY && (
               <button
                 onClick={() => {
                   // TODO: 實作品質檢查邏輯

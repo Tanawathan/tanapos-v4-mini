@@ -768,6 +768,12 @@ export const usePOSStore = create<POSStore>((set, get) => ({
 
   // 創建訂單並更新桌況
   createOrderWithTableUpdate: async (orderData) => {
+    const safeId = () => {
+      try { if (crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID() } catch {}
+      // 退化：產生符合 UUID v4 格式 8-4-4-4-12 的十六進位字串以通過 Postgres uuid 型別
+      const hex = () => Math.floor((1+Math.random())*0x10000).toString(16).slice(-4)
+      return `${hex()}${hex()}-${hex()}-${hex()}-${hex()}-${hex()}${hex()}${hex()}`
+    }
     const { updateTableStatus, clearCart, setSelectedTable } = get()
     
     try {
@@ -775,7 +781,7 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       
       // 1. 準備完整的訂單資料（匹配實際資料庫結構）
   const newOrder: Order = {
-        id: crypto.randomUUID(),
+        id: safeId(),
         order_number: generateDineInOrderNumber((orderData.table_number || 1).toString()),
         restaurant_id: orderData.restaurant_id,
         table_id: orderData.table_id,
@@ -844,31 +850,89 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       
       // 5. 保存訂單項目到 order_items 資料表
       if (orderData.items && orderData.items.length > 0) {
-        console.log('� 正在保存訂單項目...')
-        const orderItems = orderData.items.map((item: any) => ({
-          id: crypto.randomUUID(),
-          order_id: newOrder.id,
-          product_id: item.product_id,
-          product_name: item.product_name,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          total_price: item.total_price,
-          special_instructions: item.special_instructions || '',
-          status: 'pending',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }))
-        
+        console.log('🍱 正在保存訂單項目 (含套餐展開資料)...')
+        const nowISO = new Date().toISOString()
+        const orderItems: any[] = []
+        const comboSelections: any[] = []
+
+        orderData.items.forEach((item: any) => {
+          if (item.is_combo_parent) {
+            // 標準化：product_id=null, product_name 加前綴標識，特殊說明前綴 combo_id 方便 KDS 舊版解析
+            const parentId = safeId()
+            orderItems.push({
+              id: parentId,
+              order_id: newOrder.id,
+              product_id: null,
+              product_name: `[套餐] ${item.product_name || item.product_name}`,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+              total_price: item.total_price,
+              special_instructions: item.special_instructions || '',
+              status: 'pending',
+              created_at: nowISO,
+              updated_at: nowISO
+            })
+
+            // 從 special_instructions 無法回推 rule，需 orderData 內攜帶 meta.rules
+            // 若 ordering 端附帶 metaRules，利用 comboChildren 結構展開 (需於 payload 注入)
+            if (item.combo_children && item.meta_rules) {
+              // groupKey -> ruleId
+              Object.entries(item.meta_rules.groups || {}).forEach(([ruleId, ruleDef]: any) => {
+                // 聚合同一 group/product 次數
+              })
+            }
+
+            if (item.combo_children) {
+              // 為每一份子選擇建立獨立記錄（quantity=1），方便 KDS 顯示每道菜的個別 Todo
+              item.combo_children.forEach((c: any) => {
+                comboSelections.push({
+                  id: safeId(),
+                  order_item_id: orderItems[orderItems.length-1].id,
+                  rule_id: c.groupKey, // groupKey 對應 rule_id
+                  selected_product_id: c.productId,
+                  quantity: 1,
+                  additional_price: c.priceDelta || 0,
+                  created_at: nowISO
+                })
+              })
+            }
+          } else {
+            orderItems.push({
+              id: safeId(),
+              order_id: newOrder.id,
+              product_id: item.product_id,
+              product_name: item.product_name,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+              total_price: item.total_price,
+              special_instructions: item.special_instructions || '',
+              status: 'pending',
+              created_at: nowISO,
+              updated_at: nowISO
+            })
+          }
+        })
+
         const { error: itemsError } = await supabase
           .from('order_items')
           .insert(orderItems)
-        
+
         if (itemsError) {
           console.error('❌ 訂單項目保存失敗:', itemsError)
-          // 即使項目保存失敗，訂單仍然有效，所以不拋出錯誤
           console.warn('⚠️ 訂單已保存但項目保存失敗，請手動檢查')
         } else {
           console.log(`✅ ${orderItems.length} 個訂單項目已保存到資料庫`)
+        }
+
+        if (comboSelections.length > 0) {
+          const { error: comboErr } = await supabase
+            .from('order_combo_selections')
+            .insert(comboSelections)
+          if (comboErr) {
+            console.error('❌ 套餐選擇保存失敗:', comboErr)
+          } else {
+            console.log(`✅ 套餐選擇 ${comboSelections.length} 筆已保存`)
+          }
         }
       }
       
