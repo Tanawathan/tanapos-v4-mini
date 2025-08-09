@@ -311,7 +311,15 @@ const OrderingLayout: React.FC = () => {
             )}
           </div>
           {context.tableNumber && (
-            <div className="text-xs bg-blue-50 border border-blue-200 px-2 py-1 rounded">桌號 {context.tableNumber}{context.partySize? ` · ${context.partySize}人`: ''}</div>
+            <div className="flex items-center gap-2 text-xs">
+              <div className="bg-blue-50 border border-blue-200 px-2 py-1 rounded flex items-center gap-1">
+                桌號 {context.tableNumber}{context.partySize? ` · ${context.partySize}人`: ''}
+              </div>
+              <button
+                onClick={()=> { setContext({ tableNumber: undefined }) }}
+                className="px-2 py-1 rounded border text-gray-500 hover:text-blue-600 hover:border-blue-400 bg-white text-[11px]"
+              >更換</button>
+            </div>
           )}
         </div>
         {error && <div className="text-red-600 text-sm">{error}</div>}
@@ -337,7 +345,7 @@ const OrderingLayout: React.FC = () => {
 
       {/* Desktop Cart Panel */}
       <div className="hidden lg:flex w-80 border-l bg-white p-4 flex-col">
-  <h3 className="font-semibold mb-2 flex items-center gap-2">購物車 {context.tableNumber && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700">桌號 {context.tableNumber}</span>}</h3>
+  <h3 className="font-semibold mb-2 flex items-center gap-2">購物車 {context.tableNumber && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 flex items-center gap-1">桌號 {context.tableNumber}<button onClick={()=>setContext({ tableNumber: undefined })} className="ml-1 text-[10px] underline text-blue-600 hover:text-blue-800">更換</button></span>}</h3>
         <div className="space-y-2 flex-1 overflow-y-auto pr-1">
           {groupedCart.map(group => {
             const groupSubtotal = group.items.reduce((s,i)=> s + calcItemLineTotal(i),0)
