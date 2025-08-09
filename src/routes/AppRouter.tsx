@@ -2,7 +2,6 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import HomePage from '../pages/HomePage'
-import OrderingPage from '../components/OrderingPage' // legacy ordering (保留備用)
 import OrdersPage from '../components/OrdersPage'
 import TableManagementPage from '../components/TableManagementPage'
 import CheckoutPage from '../components/CheckoutPage'
@@ -17,8 +16,7 @@ import { OrderingLayout } from '../ordering/components'
 import { withRouterNavigation } from '../components/withRouterNavigation'
 import { supabase } from '../lib/supabase'
 
-// 包裝組件以支持路由導航
-const OrderingPageWithRouter = withRouterNavigation(OrderingPage)
+// 包裝組件以支持路由導航 (已移除舊 OrderingPage)
 const OrdersPageWithRouter = withRouterNavigation(OrdersPage)
 const TableManagementPageWithRouter = withRouterNavigation(TableManagementPage)
 const CheckoutPageWithRouter = withRouterNavigation(CheckoutPage)
@@ -98,7 +96,7 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           } 
         />
-        {/* 新版點餐 (v2) 做為預設 /ordering 路由 */}
+  {/* 新版點餐 (v2) 做為預設 /ordering 路由 */}
         <Route 
           path="/ordering" 
           element={
