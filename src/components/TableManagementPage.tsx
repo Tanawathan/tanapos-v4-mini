@@ -341,14 +341,19 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
       orderingInfo
     })
 
-    // 關閉模態並導航到點餐頁面
+    // 關閉模態並導航到點餐頁面 (v2 使用 /ordering + query 讓 OrderingLayout 自動讀取桌號資訊)
     setShowReservationModal(false)
     
     // 這裡可以觸發導航到點餐頁面
     console.log('🍽️ 開始點餐:', orderingInfo)
     alert(`開始為${selectedReservation.customer_name}(${selectedReservation.party_size}人)在桌台${table.table_number}點餐`)
-  // 自動導向到點餐頁
-  goTo('/ordering')
+    // 自動導向到新版點餐頁，帶上 query 參數供 OrderingLayout 取用
+    const qs = new URLSearchParams({
+      table: String(table.table_number),
+      party: String(selectedReservation.party_size || ''),
+      name: selectedReservation.customer_name || ''
+    })
+    goTo(`/ordering?${qs.toString()}`)
   }
 
   // 關閉訂單詳情模態框
