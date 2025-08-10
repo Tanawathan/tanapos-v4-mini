@@ -9,9 +9,15 @@ import SettingsPage from '../components/SettingsPage'
 import MenuManagementPage from '../components/MenuManagementPage'
 import MobileOrderingPage from '../components/MobileOrderingPage'
 import { KDSPage } from '../components/KDSPage'
+import ChefKDSPage from '../components/ChefKDSPage'
+import KDSV2Page from '../components/KDSV2Page'
 import LoginPage from '../components/LoginPage'
 import ReservationManagementPage from '../pages/ReservationManagementPage'
+import ReservationAnalyticsPage from '../pages/ReservationAnalyticsPage'
 import EnhancedReservationPage from '../pages/EnhancedReservationPage'
+import TableHotelDashboard from '../pages/TableHotelDashboard'
+import ReservationTimelinePage from '../pages/ReservationTimelinePage'
+import ReservationConsolePage from '../pages/ReservationConsolePage'
 import { OrderingLayout } from '../ordering/components'
 import { withRouterNavigation } from '../components/withRouterNavigation'
 import { supabase } from '../lib/supabase'
@@ -84,8 +90,10 @@ const AppRouter: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* 登入頁面 - 不需要認證 */}
-        <Route path="/login" element={<LoginPage onLoginSuccess={() => {}} />} />
+    {/* 登入頁面 - 不需要認證
+      原本傳入 onLoginSuccess={() => {}} 會阻斷 LoginPage 內部的預設 navigate('/') 行為，
+      造成登入成功後停留在 /login。不傳入即可讓 LoginPage 自行導向首頁。 */}
+    <Route path="/login" element={<LoginPage />} />
         
         {/* 受保護的路由 */}
         <Route 
@@ -122,6 +130,14 @@ const AppRouter: React.FC = () => {
           } 
         />
         <Route 
+          path="/tables-hotel" 
+          element={
+            <ProtectedRoute>
+              <TableHotelDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
           path="/checkout" 
           element={
             <ProtectedRoute>
@@ -136,6 +152,22 @@ const AppRouter: React.FC = () => {
               <KDSPageWithRouter />
             </ProtectedRoute>
           } 
+        />
+        <Route 
+          path="/kds/chef" 
+          element={
+            <ProtectedRoute>
+              <ChefKDSPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route
+          path="/kds/v2"
+          element={
+            <ProtectedRoute>
+              <KDSV2Page />
+            </ProtectedRoute>
+          }
         />
         <Route 
           path="/settings" 
@@ -165,14 +197,39 @@ const AppRouter: React.FC = () => {
           path="/reservations" 
           element={
             <ProtectedRoute>
-              <EnhancedReservationPageWithRouter />
+              <ReservationConsolePage />
             </ProtectedRoute>
           } 
         />
+        <Route
+          path="/reservations/timeline"
+          element={
+            <ProtectedRoute>
+              <ReservationTimelinePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reservations/console"
+          element={
+            <ProtectedRoute>
+              <ReservationConsolePage />
+            </ProtectedRoute>
+          }
+        />
   {/* 舊的 /ordering-v2 路由保留，導向 /ordering 以避免外部舊連結失效 */}
   <Route path="/ordering-v2" element={<Navigate to="/ordering" replace />} />
+        {/* 將原 legacy 管理頁改為新的統計分析頁面 (仍保留原舊檔案引用時可切到 /reservations/legacy-old) */}
         <Route 
           path="/reservations/legacy" 
+          element={
+            <ProtectedRoute>
+              <ReservationAnalyticsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/reservations/legacy-old" 
           element={
             <ProtectedRoute>
               <ReservationManagementPageWithRouter />
