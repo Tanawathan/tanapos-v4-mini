@@ -429,28 +429,44 @@ export default function ReservationConsolePage(){
                     <select value={draft.table_id||''} onChange={e=> setDraft({...draft, table_id: e.target.value || undefined})} className="flex-1 px-2 py-1 border rounded text-sm">
                       <option value="">-- 自動或稍後指派 --</option>
                       {(tables||[])
-                        .filter((t:any)=> t.is_active !== false) // 顯示所有未被停用的桌台（null 視為啟用）
+                        .filter((t:any)=> t.is_active !== false)
                         .filter((t:any)=> !t.metadata?.merged_into)
                         .sort((a:any,b:any)=> ((a.metadata?.merged_capacity)||a.capacity||0)-((b.metadata?.merged_capacity)||b.capacity||0))
                         .map((t:any)=>{
-                          // ===== 複合狀態：與桌台管理頁保持一致 =====
-                          // 避免 raw table.status 與實際顯示不一致 (例如已結帳但仍為 occupied)
+                          // ===== 進階複合狀態 (考慮用餐結束時間) =====
                           const now = Date.now()
                           const inTwoHours = (iso:string)=>{ const ts=new Date(iso).getTime(); return ts>=now && (ts-now)<=120*60000 }
-                          const hasSeated = enhanced.some(r=> r.table_id===t.id && r.status==='seated')
+                          // 現正有效(尚未到預估結束時間)的 seated 預約
+                          const activeSeated = enhanced.some(r=> {
+                            if(r.table_id!==t.id || r.status!=='seated') return false
+                            const s = new Date(r.reservation_time).getTime()
+                            const dur = (r.duration_minutes||90)*60000
+                            const end = s + dur
+                            return end > now // 還在用餐視為佔用
+                          })
+                          // 已經超過用餐時間但尚未標記完成的超時 seated 預約（不阻擋新預約，只顯示提醒）
+                          const overtimeSeated = enhanced.some(r=> {
+                            if(r.table_id!==t.id || r.status!=='seated') return false
+                            const s = new Date(r.reservation_time).getTime()
+                            const dur = (r.duration_minutes||90)*60000
+                            const end = s + dur
+                            return end <= now
+                          })
                           const hasUpcoming = enhanced.some(r=> r.table_id===t.id && r.status==='confirmed' && inTwoHours(r.reservation_time))
                           let compositeStatus: string
-                          if(hasSeated) compositeStatus='occupied'
+                          if(activeSeated) compositeStatus='occupied'
                           else if(hasUpcoming) compositeStatus='reserved'
                           else if(t.status==='cleaning') compositeStatus='cleaning'
                           else if(t.status==='maintenance') compositeStatus='maintenance'
                           else compositeStatus='available'
-                          // 若資料庫仍標記 occupied 但無 seated / upcoming，視為可用，避免下拉誤判
                           const cap = t.metadata?.merged_capacity || t.capacity
                           const warn = draft.party_size > cap
                           const mergedTag = t.metadata?.merged_with?.length? ` +${t.metadata.merged_with.length}`:''
-                          const selectable = compositeStatus==='available' || t.id===draft.table_id // 允許保留目前已選
-                          const statusTag = compositeStatus==='available'? '' : compositeStatus==='reserved'? ' (預約中)' : compositeStatus==='occupied'? ' (已佔用)' : compositeStatus==='cleaning'? ' (清潔)' : compositeStatus==='maintenance'? ' (維護)' : ''
+                          // 可選條件：可用、或目前選中的(避免跳掉)、或僅超時 (允許覆蓋)
+                          const selectable = compositeStatus==='available' || overtimeSeated || t.id===draft.table_id
+                          let statusTag = ''
+                          if(overtimeSeated && compositeStatus==='available') statusTag = ' (超時)' // 超時但釋放
+                          else statusTag = compositeStatus==='available'? '' : compositeStatus==='reserved'? ' (預約中)' : compositeStatus==='occupied'? ' (已佔用)' : compositeStatus==='cleaning'? ' (清潔)' : compositeStatus==='maintenance'? ' (維護)' : ''
                           return <option key={t.id} value={t.id} disabled={!selectable}>{`#${t.table_number || '?'} 容${cap}${mergedTag}${warn? ' (不足⚠️)':''}${statusTag}`}</option>
                         })}
                     </select>
