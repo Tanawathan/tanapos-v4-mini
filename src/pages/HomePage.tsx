@@ -132,6 +132,18 @@ const HomePage: React.FC = () => {
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+              <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow relative">
+                <div className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-full bg-blue-600 text-white font-medium shadow">Beta</div>
+                <div className="text-4xl mb-4">📊</div>
+                <h3 className="text-xl font-semibold mb-2">營運統計</h3>
+                <p className="text-gray-600 mb-4">KPI 與熱門品項概覽</p>
+                <Link
+                  to="/operations"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full transition-colors inline-block"
+                >
+                  查看統計
+                </Link>
+              </div>
               <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
                 <div className="text-4xl mb-4">📱</div>
                 <h3 className="text-xl font-semibold mb-2">手機點餐</h3>
