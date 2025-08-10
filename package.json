@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --port 5174",
     "build": "vite build",
+    "build:ai": "tsc -p tsconfig.json --outDir dist",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview --port 5174",
     "test": "vitest",
@@ -17,16 +18,29 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:headed": "playwright test --headed",
     "test:all": "npm run test:run && npm run test:e2e",
-    "test:quick": "playwright test --project=chromium tests/table-management.test.ts"
+    "test:quick": "playwright test --project=chromium tests/table-management.test.ts",
+  "ai:server": "node scripts/ai/server.mjs",
+  "ai:dev": "OPENAI_API_KEY=dev-dummy node scripts/ai/server.mjs",
+  "dev:all": "node scripts/dev-all.mjs",
+  "dev:clean": "node scripts/kill-ports.mjs && node scripts/dev-all.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",
+    "@types/moment": "^2.11.29",
+    "@types/react-big-calendar": "^1.16.2",
     "@types/react-router-dom": "^5.3.3",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.1",
     "lucide-react": "^0.536.0",
+    "moment": "^2.30.1",
+    "openai": "^4.104.0",
     "react": "^18.2.0",
+    "react-big-calendar": "^1.19.4",
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.8.0",
+    "zod": "^3.25.76",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
