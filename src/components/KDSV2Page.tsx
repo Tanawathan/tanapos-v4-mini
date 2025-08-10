@@ -22,6 +22,34 @@ const statusColor = (s: MenuItemStatus) => {
 const KDSV2Page: React.FC = () => {
   const { tasks, fetch, toggleTask, loading, error, filter, toggleCategory, clearCategories, selectAllCategories, orders, markOrderReady, markOrderServed } = useKDSV2Store() as any;
   const [mode, setMode] = useState<'category'|'table'>('category');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const audioRef = React.useRef<HTMLAudioElement|null>(null);
+  const prevTaskIdsRef = React.useRef<Set<string>>(new Set());
+
+  // 建立音效 (簡短 beep)，使用 data URI 免外部資源
+  useEffect(() => {
+    if (!audioRef.current) {
+      // 440Hz 100ms 簡單正弦波 wav base64 (生成)
+      const dataUri = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQgAAAAA/////wAA//8AAP//AAD//wAA//8AAP//AAD//wAA';
+      const el = new Audio(dataUri);
+      el.volume = 0.6;
+      audioRef.current = el;
+    }
+  }, []);
+
+  // 偵測新任務 (依 task.id) 播放提示音
+  useEffect(() => {
+    if (!soundEnabled) return;
+    const currentIds = new Set<string>();
+    tasks.forEach((t:any)=> currentIds.add(t.id));
+    let hasNew = false;
+    currentIds.forEach(id => { if (!prevTaskIdsRef.current.has(id)) hasNew = true; });
+    if (hasNew && prevTaskIdsRef.current.size>0) {
+      // 避免第一次載入就提示（prev 為空跳過）
+      try { audioRef.current?.play().catch(()=>{}); } catch {}
+    }
+    prevTaskIdsRef.current = currentIds;
+  }, [tasks, soundEnabled]);
 
   useEffect(() => { fetch(); const t = setInterval(()=>fetch(true), 15000); return ()=>clearInterval(t); }, [fetch]);
 
@@ -49,6 +77,7 @@ const KDSV2Page: React.FC = () => {
         <h1 className="text-2xl font-bold">KDS v2</h1>
         <button className="px-3 py-1 rounded bg-blue-600 text-white" onClick={()=>fetch()}>刷新</button>
         <button className="px-3 py-1 rounded bg-gray-200" onClick={()=>setMode(m => m==='category'?'table':'category')}>{mode==='category'?'切換桌台視圖':'切換分類視圖'}</button>
+  <button className={`px-3 py-1 rounded ${soundEnabled? 'bg-emerald-500 text-white':'bg-gray-200'}`} onClick={()=>setSoundEnabled(s=>!s)}>{soundEnabled? '🔔音效開':'🔕音效關'}</button>
         {loading && <span className="text-sm text-gray-500">載入中...</span>}
         <div className="flex gap-2 items-center flex-wrap">
           {allCats.map(c => (
