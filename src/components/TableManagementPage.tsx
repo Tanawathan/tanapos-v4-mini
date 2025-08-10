@@ -37,6 +37,8 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const loadTables = usePOSStore(state => state.loadTables)
   const loadOrders = usePOSStore(state => state.loadOrders)
   const updateTableStatus = usePOSStore(state => state.updateTableStatus)
+  const mergeTables = usePOSStore(state => state.mergeTables)
+  const unmergeTable = usePOSStore(state => state.unmergeTable)
   const currentRestaurant = usePOSStore(state => state.currentRestaurant)
 
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -52,6 +54,10 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [showReservationModal, setShowReservationModal] = useState(false)
   const [reservations, setReservations] = useState<Reservation[]>([])
+  // 合併桌台暫存
+  const [mergeBase, setMergeBase] = useState<Table | null>(null)
+  const [mergeSelection, setMergeSelection] = useState<Set<string>>(new Set())
+  const [showMergePanel, setShowMergePanel] = useState(false)
 
   // === 時間格式統一：強制使用 Asia/Taipei，避免不同頁面顯示不一致 ===
   const TAIPEI_TZ = 'Asia/Taipei'
@@ -124,11 +130,14 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     }
   }
 
-  // 過濾桌台
-  const filteredTables = tables.filter(table => {
-    if (statusFilter === 'all') return true
-    return table.status === statusFilter
-  })
+  // ===== 修正：過濾與統計需使用『複合狀態』而不是原始 table.status =====
+  // 原本使用 table.status 造成：
+  // 1. 結帳後 table.status 尚未更新為 available，但沒有未結帳訂單 → 卡片顯示為『可用』(computeCompositeStatus)；統計與篩選仍算在『佔用中』。
+  // 2. 有 2 小時內預約但 table.status 還是 available → 卡片顯示『已預約』；統計仍算『可用』。
+  // 以上導致「顯示可用但是被歸類在佔用中」的使用者回報。
+  // 改為：所有列表過濾與統計統一以 computeCompositeStatus(table).display 為準。
+
+  // 複合狀態計算所需常量 / 方法放到前面，確保下面可呼叫
 
   // 取得桌台相關的所有未結帳訂單
   const getTableOrders = (tableNumber: string | number) => {
@@ -175,7 +184,7 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     if (hasActiveOrders) {
       return { display: 'occupied', hasActiveOrders, upcomingReservation: null, canWalkIn: false }
     }
-    // 找最近且未入座的 confirmed 預約
+    // 找最近且未入座的 confirmed 預約 (兩小時內)
     const tableResList = reservations.filter(r => r.table_id === table.id && r.status === 'confirmed')
     const upcoming = tableResList
       .filter(r => withinTwoHours(r.reservation_time))
@@ -187,6 +196,12 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     if (table.status === 'maintenance') return { display: 'maintenance', hasActiveOrders: false, upcomingReservation: null, canWalkIn: false }
     return { display: 'available', hasActiveOrders: false, upcomingReservation: null, canWalkIn: true }
   }
+
+  // 使用複合狀態進行過濾
+  const filteredTables = tables.filter(table => {
+    if (statusFilter === 'all') return true
+    return computeCompositeStatus(table).display === statusFilter
+  })
 
   // 顏色 / 文字 / 圖示映射基於 display
   const getStatusColor = (display: string) => {
@@ -404,14 +419,15 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   }
 
   // 統計資訊
-  const stats = {
-    total: tables.length,
-    available: tables.filter(t => t.status === 'available').length,
-    occupied: tables.filter(t => t.status === 'occupied').length,
-    reserved: tables.filter(t => t.status === 'reserved').length,
-    cleaning: tables.filter(t => t.status === 'cleaning').length,
-    maintenance: tables.filter(t => t.status === 'maintenance').length
-  }
+  // 使用複合狀態統計，確保與卡片顯示一致
+  const stats = (() => {
+    const acc = { total: tables.length, available:0, occupied:0, reserved:0, cleaning:0, maintenance:0 }
+    for (const t of tables) {
+      const d = computeCompositeStatus(t).display as keyof typeof acc
+      if (d in acc) (acc as any)[d]++
+    }
+    return acc
+  })()
 
   return (
     <div className="min-h-screen bg-ui-secondary">
@@ -455,6 +471,45 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* 合併桌台控制面板 */}
+        <div className="mb-6 bg-white border rounded-lg p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-gray-800">🔗 桌台合併</h3>
+            <button onClick={()=> setShowMergePanel(s=>!s)} className="text-sm px-3 py-1 rounded border bg-gray-50 hover:bg-gray-100">{showMergePanel? '收合':'展開'}</button>
+          </div>
+          {showMergePanel && (
+            <div className="space-y-3 text-sm">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-gray-600">1) 選擇主桌：</span>
+                {tables.map(t=> (
+                  <button key={t.id} onClick={()=> { setMergeBase(t); setMergeSelection(new Set()) }} className={`px-2 py-1 rounded border text-xs ${mergeBase?.id===t.id? 'bg-blue-600 text-white border-blue-600':'bg-white hover:bg-gray-50'}`}>#{t.table_number} 容{t.capacity}</button>
+                ))}
+              </div>
+              {mergeBase && (
+                <>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <span className="text-gray-600">2) 選擇要合併的桌：</span>
+                    {tables.filter(t=> t.id!==mergeBase.id && !t.metadata?.merged_into && !(t.metadata?.merged_with?.length)).map(t=> {
+                      const selected = mergeSelection.has(t.id)
+                      return <button key={t.id} onClick={()=>{
+                        setMergeSelection(prev=>{ const n = new Set(prev); if(n.has(t.id)) n.delete(t.id); else n.add(t.id); return n })
+                      }} className={`px-2 py-1 rounded border text-xs ${selected? 'bg-emerald-600 text-white border-emerald-600':'bg-white hover:bg-gray-50'}`}>#{t.table_number} 容{t.capacity}</button>
+                    })}
+                  </div>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <button disabled={mergeSelection.size===0} onClick={async()=>{ await mergeTables(mergeBase.id, Array.from(mergeSelection)); setMergeSelection(new Set()); }} className="px-3 py-1 rounded bg-blue-600 text-white text-xs disabled:opacity-50">合併</button>
+                    {mergeBase.metadata?.merged_with?.length>0 && <button onClick={async()=>{ await unmergeTable(mergeBase.id); setMergeSelection(new Set()); }} className="px-3 py-1 rounded bg-orange-600 text-white text-xs">解除合併</button>}
+                    {mergeBase && <span className="text-xs text-gray-500">目前主桌 #{mergeBase.table_number} 總容量 { (mergeBase.metadata?.merged_capacity) || mergeBase.capacity }{mergeBase.metadata?.merged_with?.length? ` (含 ${mergeBase.metadata.merged_with.length} 桌)` : ''}</span>}
+                  </div>
+                  {mergeBase.metadata?.merged_with?.length>0 && (
+                    <div className="text-[11px] text-gray-500">已合併: {mergeBase.metadata.merged_with.map((id:string)=> { const t = tables.find(tb=> tb.id===id); return `#${t?.table_number}` }).join(', ')}</div>
+                  )}
+                </>
+              )}
+              <div className="text-[11px] text-gray-500 leading-relaxed">說明：合併後附屬桌會標記為停用 (inactive) 並加入主桌容量計算；解除合併會恢復為可用。此為前端層級記錄 (tables.metadata)，不會改變實際座位配置邏輯，後續可再擴充演算法讓自動指派考慮合併容量。</div>
+            </div>
+          )}
+        </div>
         {/* 錯誤提示 */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">

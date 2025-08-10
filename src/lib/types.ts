@@ -139,6 +139,14 @@ export interface Table {
   
   // 預留擴展欄位
   metadata?: any // jsonb
+
+  // 合併桌台（臨時使用，不修改資料表欄位，存於 metadata）
+  // 若為主桌：metadata.merged_with = [otherTableId,...]; metadata.merged_capacity = 合併後總容量
+  // 若為被合併：metadata.merged_into = baseTableId
+  // 這裡僅提供型別提示（實際欄位仍在 metadata 中）
+  merged_with_ids?: string[]
+  merged_capacity?: number
+  merged_into?: string
   
   // 動態屬性（桌台管理頁面使用）
   order_number?: string

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useOrderingStore } from '../state/orderingStore'
 import { useProducts } from '../hooks/useProducts'
 import ComboModal from './ComboModal'
@@ -25,19 +25,28 @@ const OrderingLayout: React.FC = () => {
     setTimeout(()=> setToasts(t=> t.filter(x=>x.id!==id)), 2200)
   }
 
-  // 偵測 URL query 取得桌台/預約資訊 (簡化)
+  // 偵測 URL query 取得桌台/預約資訊；若桌號不同則覆寫 (支援從桌台面板切換桌號)
+  const location = useLocation()
   React.useEffect(()=>{
-    if (!context.tableNumber && !context.takeout) {
-      const params = new URLSearchParams(window.location.search)
-      const table = params.get('table') || undefined
-      const party = params.get('party')
-      const name = params.get('name') || undefined
-      const takeout = params.get('takeout') === '1'
-      if (takeout) {
-        setContext({ takeout: true, customerName: name, partySize: party? Number(party): undefined })
-      } else if (table) setContext({ tableNumber: table, partySize: party? Number(party): undefined, customerName: name })
+    const params = new URLSearchParams(location.search)
+    const tableParam = params.get('table') || undefined
+    const party = params.get('party')
+    const name = params.get('name') || undefined
+    const takeoutFlag = params.get('takeout') === '1'
+
+    // 決定是否需要更新（takeout 或桌號改變）
+    if (takeoutFlag) {
+      if (!context.takeout || context.customerName !== name || context.partySize !== (party? Number(party): undefined)) {
+        setContext({ takeout: true, customerName: name, partySize: party? Number(party): undefined, tableNumber: undefined })
+      }
+      return
     }
-  },[context.tableNumber, context.takeout, setContext])
+    if (tableParam) {
+      if (context.takeout || context.tableNumber !== tableParam || context.partySize !== (party? Number(party): undefined) || context.customerName !== name) {
+        setContext({ tableNumber: tableParam, partySize: party? Number(party): undefined, customerName: name, takeout: false })
+      }
+    }
+  }, [location.search, context.tableNumber, context.takeout, context.partySize, context.customerName, setContext])
 
   // 載入桌台列表 (僅首次且尚未選桌號時)
   React.useEffect(()=> {

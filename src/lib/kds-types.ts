@@ -141,6 +141,8 @@ export interface KDSMenuItem {
   componentIndex?: number;          // 在套餐中的組件索引
   // 新增：是否為套餐父項 (僅顯示彙總，不展開子項)
   isComboParent?: boolean;          // 由 KDSService 基於名稱/特殊說明判斷
+  // 解析產生的虛擬項目（資料庫不存在）
+  isVirtual?: boolean;
 }
 
 // 套餐選擇 (基於 order_combo_selections 表)

@@ -5,6 +5,7 @@ import WalkInRegistration from '../components/WalkInRegistration'
 import useStore from '../lib/store'
 import { supabase } from '../lib/supabase'
 import { ReservationService } from '../services/reservationService'
+import { useReservationStore } from '../lib/reservationStore'
 import { useNavigate } from 'react-router-dom'
 
 interface Reservation {
@@ -43,6 +44,9 @@ export default function EnhancedReservationPage() {
   const navigate = useNavigate()
   
   const [viewMode, setViewMode] = useState<ViewMode>('list')
+  // 取代本地 reservations ，改用全域 reservationStore（保留原型別供編輯區使用）
+  const reservationStore = useReservationStore()
+  const reservationsWithTags = reservationStore.getReservationsWithTags() as any as Reservation[] & { tags?: string[] }[]
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -52,9 +56,13 @@ export default function EnhancedReservationPage() {
   const [originalEditing, setOriginalEditing] = useState<Reservation | null>(null)
   const [saving, setSaving] = useState(false)
   const [actionBusy, setActionBusy] = useState<string | null>(null)
+  const [tagFilters, setTagFilters] = useState<string[]>([])
 
   useEffect(() => {
-    loadReservations()
+    if (currentRestaurant?.id) {
+      reservationStore.setDate(selectedDate, currentRestaurant.id)
+      reservationStore.enableRealtime(currentRestaurant.id)
+    }
   }, [currentRestaurant?.id, selectedDate])
 
   useEffect(() => {
@@ -63,29 +71,12 @@ export default function EnhancedReservationPage() {
     }
   }, [tablesLoaded])
 
+  // 舊的 loadReservations 改為觸發 store reload
   const loadReservations = async () => {
     if (!currentRestaurant?.id) return
-    
-    try {
-      setLoading(true)
-      const { data, error } = await supabase
-        .from('table_reservations')
-        .select('*')
-        .eq('restaurant_id', currentRestaurant.id)
-        .gte('reservation_time', selectedDate + 'T00:00:00')
-        .lt('reservation_time', selectedDate + 'T23:59:59')
-        .order('reservation_time', { ascending: true })
-
-      if (!error && data) {
-        setReservations(data)
-      } else {
-        console.error('載入預約失敗:', error)
-      }
-    } catch (error) {
-      console.error('載入預約異常:', error)
-    } finally {
-      setLoading(false)
-    }
+    setLoading(true)
+    await reservationStore.loadReservations(currentRestaurant.id, selectedDate)
+    setLoading(false)
   }
 
   const handleReservationSubmit = async (formData: any) => {
@@ -164,7 +155,8 @@ export default function EnhancedReservationPage() {
     return dateString === today
   }
 
-  const filteredReservations = reservations.filter(reservation => {
+  // 來源改為帶 tags 的 store 資料
+  const filteredReservations = (reservationsWithTags as any[]).filter(reservation => {
     // 搜尋過濾
     const matchesSearch = !searchTerm || 
       reservation.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -176,7 +168,10 @@ export default function EnhancedReservationPage() {
       (filterType === 'walk_in' && reservation.is_walk_in) ||
       (filterType !== 'walk_in' && reservation.reservation_type === filterType)
 
-    return matchesSearch && matchesFilter
+  // 標籤過濾 (若有選擇標籤, 須至少命中一個)
+  const matchesTags = tagFilters.length === 0 || (reservation.tags && reservation.tags.some((t: string)=> tagFilters.includes(t)))
+
+  return matchesSearch && matchesFilter && matchesTags
   })
 
   const getReservationTypeLabel = (reservation: Reservation) => {
@@ -200,6 +195,28 @@ export default function EnhancedReservationPage() {
     if (!tableId) return '未分配桌台'
     const t = tables?.find((tb: any) => tb.id === tableId)
     return t ? `桌號 ${t.table_number}` : '已分配桌台'
+  }
+
+  // 標籤顯示
+  const tagLabel = (tag: string) => {
+    switch (tag) {
+      case 'upcoming': return '即將到店'
+      case 'arriving_now': return '抵達時間'
+      case 'late': return '遲到'
+      case 'ending_soon': return '即將結束'
+      case 'overtime': return '超時'
+      default: return tag
+    }
+  }
+  const tagStyle = (tag: string) => {
+    switch (tag) {
+      case 'upcoming': return 'bg-blue-50 text-blue-700 border-blue-200'
+      case 'arriving_now': return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      case 'late': return 'bg-orange-50 text-orange-700 border-orange-200'
+      case 'ending_soon': return 'bg-amber-50 text-amber-700 border-amber-200'
+      case 'overtime': return 'bg-red-50 text-red-700 border-red-200'
+      default: return 'bg-gray-50 text-gray-600 border-gray-200'
+    }
   }
 
   const formatTimeRange = (res: Reservation) => {
@@ -356,6 +373,12 @@ export default function EnhancedReservationPage() {
           現場登記
         </button>
         <button
+          onClick={() => navigate('/reservations/timeline')}
+          className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+        >
+          <Clock className="h-4 w-4 mr-2" /> 時間軸
+        </button>
+        <button
           onClick={loadReservations}
           className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
           disabled={loading}
@@ -406,6 +429,24 @@ export default function EnhancedReservationPage() {
             </select>
           </div>
         </div>
+        {/* 標籤過濾 */}
+        <div className="mt-4 flex flex-wrap gap-2 items-center">
+          {['upcoming','arriving_now','late','ending_soon','overtime'].map(tag => {
+            const active = tagFilters.includes(tag)
+            return (
+              <button
+                key={tag}
+                onClick={()=> setTagFilters(prev => prev.includes(tag) ? prev.filter(t=>t!==tag) : [...prev, tag])}
+                className={`px-2 py-1 text-xs rounded-full border transition ${active ? tagStyle(tag)+ ' ring-2 ring-offset-1' : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50'}`}
+              >
+                {tagLabel(tag)}
+              </button>
+            )
+          })}
+          {tagFilters.length>0 && (
+            <button onClick={()=> setTagFilters([])} className="text-xs text-blue-600 underline ml-1">清除標籤</button>
+          )}
+        </div>
       </div>
 
       {/* 統計資訊 */}
@@ -455,10 +496,11 @@ export default function EnhancedReservationPage() {
               <p>暫無預約記錄</p>
             </div>
           ) : (
-            filteredReservations.map(reservation => {
+            filteredReservations.map((reservation: any) => {
               const reservationType = getReservationTypeLabel(reservation)
               const statusType = getStatusLabel(reservation.status)
               const reservationTime = new Date(reservation.reservation_time)
+              const tags: string[] = reservation.tags || []
               
               return (
                 <div key={reservation.id} className="p-4 hover:bg-gray-50">
@@ -481,7 +523,7 @@ export default function EnhancedReservationPage() {
                         )}
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
                         <span className="flex items-center">
                           <Users className="h-4 w-4 mr-1" />
                           {reservation.party_size} 人
@@ -492,6 +534,9 @@ export default function EnhancedReservationPage() {
                         </span>
                         <span className="hidden md:inline text-gray-500">{formatTimeRange(reservation)}</span>
                         <span className="text-gray-500">{getTableLabel(reservation.table_id)}</span>
+                        {tags.map(tag => (
+                          <span key={tag} className={`px-2 py-0.5 text-xs rounded-full border ${tagStyle(tag)}`}>{tagLabel(tag)}</span>
+                        ))}
                         {reservation.customer_phone && (
                           <span>{reservation.customer_phone}</span>
                         )}

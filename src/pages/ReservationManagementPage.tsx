@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { Calendar, Clock, Users, Phone, Mail, Baby, Plus, Filter, RefreshCw, Search, ChevronDown, ChevronUp } from 'lucide-react'
 import type { Reservation, ReservationFilters } from '../lib/reservation-types'
 import { ReservationService } from '../services/reservationService'
+import { supabase } from '../lib/supabase'
 import useStore from '../lib/store'
 import ReservationForm from '../components/ReservationForm'
 
@@ -18,19 +19,52 @@ export default function ReservationManagementPage({ onBack }: ReservationManagem
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const [query, setQuery] = useState('')
   const [activeView, setActiveView] = useState<'list' | 'timeline'>('list')
-  const [filters, setFilters] = useState<ReservationFilters>({
-    status: ['pending', 'confirmed'],
-    date_range: {
+  const [filters, setFilters] = useState<any>({
+    // 初始不篩選狀態：避免『已完成』等狀態 KPI 顯示 0 與列表立即消失
+    status: [],
+    dateRange: {
       start: new Date().toISOString().split('T')[0],
       end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     }
   })
+  // 統計小卡獨立範圍（不影響下方列表）
+  const [statsRange, setStatsRange] = useState<'today'|'7d'>('today')
+  const [statsReservations, setStatsReservations] = useState<Reservation[]>([])
+  const [statsLoading, setStatsLoading] = useState(false)
 
   useEffect(() => {
     if (currentRestaurant?.id) {
       loadReservations()
     }
   }, [currentRestaurant?.id, filters])
+
+  // Realtime subscription for immediate UI updates when reservations change
+  useEffect(() => {
+    if (!currentRestaurant?.id) return
+    const channel = supabase.channel(`reservations-${currentRestaurant.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'table_reservations',
+        filter: `restaurant_id=eq.${currentRestaurant.id}`
+  }, (payload: any) => {
+        setReservations(prev => {
+          const idx = prev.findIndex(r => r.id === (payload.new as any)?.id)
+          if (payload.eventType === 'DELETE') {
+            return idx >= 0 ? prev.filter(r => r.id !== (payload.old as any)?.id) : prev
+          }
+            // upsert (INSERT or UPDATE)
+          if (idx >= 0) {
+            const clone = [...prev]
+            clone[idx] = { ...clone[idx], ...(payload.new as any) }
+            return clone
+          }
+          return [...prev, payload.new as any]
+        })
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [currentRestaurant?.id])
 
   const loadReservations = async () => {
     if (!currentRestaurant?.id) return
@@ -45,6 +79,45 @@ export default function ReservationManagementPage({ onBack }: ReservationManagem
       setLoading(false)
     }
   }
+
+  // 取得統計用資料
+  const loadStatsReservations = async () => {
+    if (!currentRestaurant?.id) return
+    try {
+      setStatsLoading(true)
+      const today = new Date(); today.setHours(0,0,0,0)
+      let startDate: string
+      let endDate: string
+      if (statsRange === 'today') {
+        startDate = today.toISOString().split('T')[0]
+        endDate = startDate
+      } else {
+        const past = new Date(today.getTime() - 6*24*60*60*1000)
+        startDate = past.toISOString().split('T')[0]
+        endDate = today.toISOString().split('T')[0]
+      }
+        // 擴大查詢範圍 (前一日 - 後一日) 再在前端以本地日期過濾，降低時區 / timestamptz 差異造成遺漏
+        const startQuery = new Date(startDate + 'T00:00:00')
+        startQuery.setDate(startQuery.getDate()-1)
+        const endQuery = new Date(endDate + 'T23:59:59')
+        endQuery.setDate(endQuery.getDate()+1)
+        const data = await ReservationService.getReservations(currentRestaurant.id, {
+          dateRange: { start: startQuery.toISOString(), end: endQuery.toISOString() }
+        })
+        // 以使用者本地日期字串做最終範圍裁剪
+        const inRange = data.filter(r => {
+          const d = new Date(r.reservation_time)
+          const local = d.toISOString().slice(0,10) // 若後端是 UTC，此處仍可能偏移；改用本地 toLocaleDateString 標準化
+          const localDate = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10)
+          return localDate >= startDate && localDate <= endDate
+        })
+        setStatsReservations(inRange)
+    } catch (e){
+      console.error('載入統計預約失敗', e)
+    } finally { setStatsLoading(false) }
+  }
+
+  useEffect(()=> { loadStatsReservations() }, [currentRestaurant?.id, statsRange, filters.status])
 
   const handleCreateReservation = async (formData: any) => {
     if (!currentRestaurant?.id) return
@@ -62,8 +135,11 @@ export default function ReservationManagementPage({ onBack }: ReservationManagem
 
   const handleStatusChange = async (reservationId: string, newStatus: Reservation['status']) => {
     try {
+  // Optimistic update
+  setReservations(prev => prev.map(r => r.id === reservationId ? { ...r, status: newStatus } : r))
       await ReservationService.updateReservationStatus(reservationId, newStatus)
-      await loadReservations() // 重新載入列表
+  // 延遲後背景同步，避免阻塞即時反饋
+  setTimeout(() => { loadReservations() }, 300)
     } catch (error) {
       console.error('更新狀態失敗:', error)
       alert('更新失敗: ' + (error as Error).message)
@@ -122,7 +198,7 @@ export default function ReservationManagementPage({ onBack }: ReservationManagem
   const filtered = useMemo(() => {
     return reservations
       .filter(r => !query || r.customer_name.includes(query) || r.customer_phone.includes(query))
-      .filter(r => !filters.status || filters.status.length === 0 || filters.status.includes(r.status))
+      .filter(r => (filters.status?.length || 0) === 0 || filters.status.includes(r.status))
       .sort((a,b) => new Date(a.reservation_time).getTime() - new Date(b.reservation_time).getTime())
   }, [reservations, query, filters.status])
 
@@ -139,12 +215,33 @@ export default function ReservationManagementPage({ onBack }: ReservationManagem
     return groups
   }, [filtered])
 
-  // 統計 KPI
+  // 統計基底列表（依統計範圍）
+  const statsBaseList = useMemo(()=> statsReservations, [statsReservations])
+
+  // 統計 KPI (筆數)
   const kpis = useMemo(() => {
     const base = { pending:0, confirmed:0, seated:0, completed:0 }
-    filtered.forEach(r => { if ((base as any)[r.status] !== undefined) (base as any)[r.status]++ })
+    statsBaseList.forEach(r => { if ((base as any)[r.status] !== undefined) (base as any)[r.status]++ })
     return base
-  }, [filtered])
+  }, [statsBaseList])
+
+  // 人數統計
+  const peopleStats = useMemo(() => {
+    const base = { pending:0, confirmed:0, seated:0, completed:0, total:0, adults:0, children:0 }
+    statsBaseList.forEach(r => {
+      const size = r.party_size || 0
+      if ((base as any)[r.status] !== undefined) (base as any)[r.status] += size
+      base.total += size
+      const childInfo = parseChildInfo(r.customer_notes)
+      if (childInfo) {
+        base.adults += childInfo.adult_count || 0
+        base.children += childInfo.child_count || 0
+      } else {
+        base.adults += size
+      }
+    })
+    return base
+  }, [statsBaseList])
 
   const toggleExpand = (id:string) => setExpandedIds(prev => { const n = new Set(prev); n.has(id)? n.delete(id): n.add(id); return n })
 
@@ -192,13 +289,13 @@ export default function ReservationManagementPage({ onBack }: ReservationManagem
               const count = reservations.filter(r=>r.status===s).length
               return (
                 <button key={s} onClick={()=>{
-                  setFilters(p=>{ const cur = new Set(p.status||[]); cur.has(s)? cur.delete(s): cur.add(s); return { ...p, status: Array.from(cur)} })
+                  setFilters((p:any)=>{ const cur = new Set(p.status||[]); cur.has(s)? cur.delete(s): cur.add(s); return { ...p, status: Array.from(cur)} })
                 }} className={`px-3 py-1 rounded-full border flex items-center gap-1 whitespace-nowrap ${active? 'bg-blue-600 text-white border-blue-600':'bg-white hover:bg-gray-50 text-gray-600'}`}>
                   {getStatusBadge(s)}<span className="text-[10px]">{count}</span>
                 </button>
               )
             })}
-            <button onClick={()=>setFilters(p=>({...p,status:[]}))} className="px-3 py-1 rounded-full border text-gray-500 hover:bg-gray-50">重置</button>
+            <button onClick={()=>setFilters((p:any)=>({...p,status:[]}))} className="px-3 py-1 rounded-full border text-gray-500 hover:bg-gray-50">重置</button>
           </div>
           <div className="sm:hidden mt-3">
             <div className="relative">
@@ -211,21 +308,36 @@ export default function ReservationManagementPage({ onBack }: ReservationManagem
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* KPI Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {(
-            [
-              { key:'pending', label:'待確認', color:'bg-amber-50 text-amber-700', value:kpis.pending },
-              { key:'confirmed', label:'已確認', color:'bg-green-50 text-green-700', value:kpis.confirmed },
-              { key:'seated', label:'已入座', color:'bg-blue-50 text-blue-700', value:kpis.seated },
-              { key:'completed', label:'已完成', color:'bg-gray-50 text-gray-600', value:kpis.completed },
-            ] as const
-          ).map(k=> (
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs text-gray-500">統計範圍</span>
+          <div className="flex gap-2">
+            {['today','7d'].map(r => (
+              <button key={r} onClick={()=> setStatsRange(r as any)} className={`px-3 py-1 rounded-full text-xs border ${statsRange===r? 'bg-indigo-600 text-white border-indigo-600':'bg-white hover:bg-gray-50 text-gray-600'}`}>{r==='today'?'當日':'過去7日'}</button>
+            ))}
+          </div>
+          {statsLoading && <span className="text-[10px] text-gray-400">載入中...</span>}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {([
+            { key:'pending', label:'待確認', color:'bg-amber-50 text-amber-700', value:kpis.pending, people: peopleStats.pending },
+            { key:'confirmed', label:'已確認', color:'bg-green-50 text-green-700', value:kpis.confirmed, people: peopleStats.confirmed },
+            { key:'seated', label:'已入座', color:'bg-blue-50 text-blue-700', value:kpis.seated, people: peopleStats.seated },
+            { key:'completed', label:'已完成', color:'bg-gray-50 text-gray-600', value:kpis.completed, people: peopleStats.completed },
+          ] as const).map(k => (
             <div key={k.key} className="p-4 rounded-lg border bg-white flex flex-col gap-1">
               <div className="text-xs font-medium text-gray-500">{k.label}</div>
               <div className="text-2xl font-semibold">{k.value}</div>
+              <div className="text-[11px] text-gray-600">{k.people} 人</div>
               <div className={`text-[10px] px-2 py-0.5 rounded-full self-start ${k.color}`}>{k.label}</div>
             </div>
           ))}
+          {/* 總人數卡片 */}
+          <div className="p-4 rounded-lg border bg-white flex flex-col gap-1 md:col-span-2 lg:col-span-1">
+            <div className="text-xs font-medium text-gray-500">總人數 ({statsRange==='today'?'當日':'過去7日'})</div>
+            <div className="text-2xl font-semibold">{peopleStats.total}</div>
+            <div className="text-[11px] text-gray-600">成人 {peopleStats.adults} · 兒童 {peopleStats.children}</div>
+            <div className="text-[10px] px-2 py-0.5 rounded-full self-start bg-purple-50 text-purple-700">人數統計</div>
+          </div>
         </div>
 
         {/* Content Area */}

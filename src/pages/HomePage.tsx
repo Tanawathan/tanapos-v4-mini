@@ -159,21 +159,27 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+              <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow relative">
+                <div className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-full bg-purple-600 text-white font-medium shadow">新</div>
                 <div className="text-4xl mb-4">📅</div>
-                <h3 className="text-xl font-semibold mb-2">預約管理</h3>
-                <p className="text-gray-600 mb-2">管理預約、當日訂位、現場顧客</p>
+                <h3 className="text-xl font-semibold mb-1">預約主控台</h3>
+                <p className="text-gray-600 mb-2">統一管理預約 / 時間軸 / 快速操作</p>
                 <div className="text-xs text-gray-500 mb-4 space-y-1">
-                  <div>• 支援當日預約功能</div>
-                  <div>• 現場顧客快速登記</div>
-                  <div>• 性別和姓氏記錄</div>
+                  <div>• 即時標籤 (即將 / 遲到 / 超時)</div>
+                  <div>• 抽屜式新增 / 編輯</div>
+                  <div>• 列表 + 時間軸整合</div>
                 </div>
                 <Link 
                   to="/reservations"
                   className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 w-full transition-colors inline-block text-center"
                 >
-                  預約管理
+                  開啟主控台
                 </Link>
+                <div className="mt-2 text-[11px] text-gray-500 text-center">
+                  <Link to="/reservations/legacy" className="underline hover:text-teal-600">舊版列表</Link>
+                  <span className="mx-2">|</span>
+                  <Link to="/reservations/timeline" className="underline hover:text-teal-600">僅時間軸</Link>
+                </div>
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">

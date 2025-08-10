@@ -96,8 +96,10 @@ export class KDSService {
       }
 
       if (looksLikeComboParent) {
-        // 新版：只有摘要字串，直接以父項顯示 (不展開子項)
+        // 新版：只有摘要字串，建立父項 + 解析摘要行產生子項 (分類歸類)
         menuItems.push(this.buildParentComboItem(item, { isSummaryOnly: true }))
+        const parsedComponents = this.parseComboSummaryToComponents(item)
+        menuItems.push(...parsedComponents)
         return
       }
 
@@ -105,7 +107,7 @@ export class KDSService {
       menuItems.push({
         id: item.id,
         order_id: item.order_id,
-        product_id: item.product_id,
+        product_id: undefined,
         combo_id: item.combo_id,
         item_type: item.item_type || 'product',
         product_name: item.product_name,
@@ -207,6 +209,11 @@ export class KDSService {
    * 建立套餐父項顯示項目
    */
   private static buildParentComboItem(raw: any, opts: { isSummaryOnly?: boolean } = {}): KDSMenuItem {
+  // 嘗試從摘要判斷主要分類（若有主餐字樣則歸類主餐，否則單點）
+  let parentCategory = MenuCategory.A_LA_CARTE
+  if (/主餐|主菜|main/i.test(raw.special_instructions || '')) parentCategory = MenuCategory.MAIN_COURSE
+  if (/前菜|appetizer|沙拉/i.test(raw.special_instructions || '')) parentCategory = MenuCategory.APPETIZERS
+    
     return {
       id: raw.id,
       order_id: raw.order_id,
@@ -235,11 +242,87 @@ export class KDSService {
       quality_checked: false,
       created_at: raw.created_at,
       updated_at: raw.updated_at,
-      category: MenuCategory.A_LA_CARTE,
+  category: parentCategory,
       urgencyLevel: this.calculateUrgencyLevel(raw.ordered_at || raw.created_at),
       combo_selections: raw.order_combo_selections || [],
       isComboParent: true
     }
+  }
+
+  /**
+   * 解析僅有摘要字串的新套餐為組件項目
+   * 範例摘要：
+   * 主餐選擇： 綠咖哩雞飯x1 豬肉帕泰x1 | 沙拉選擇： Laab 豬末香茅x2 | 甜品選擇： 冰淇淋x1 椰奶仙草x1 | 飲品： 泰式奶茶x1 凍檸茶x1
+   */
+  private static parseComboSummaryToComponents(raw: any): KDSMenuItem[] {
+    const text: string = raw.special_instructions || ''
+    if (!text) return []
+    // 以 | 或 換行 切割群組
+    const groups = text.split(/\s*\|\s*|\n/).map(s => s.trim()).filter(Boolean)
+    const components: KDSMenuItem[] = []
+    let globalIndex = 0
+
+    groups.forEach(groupLine => {
+      const [header, rest] = groupLine.split(/：|:/, 2)
+      if (!rest) return
+      const category = this.mapGroupHeaderToCategory(header)
+      // 依空白分割 item token
+      const tokens = rest.split(/\s+/).filter(Boolean)
+      tokens.forEach(tok => {
+        const m = tok.match(/(.+?)x(\d+)/i)
+        if (!m) return
+        const name = m[1]
+        const qty = parseInt(m[2]) || 1
+        const id = `${raw.id}_g${globalIndex}`
+        globalIndex++
+        components.push({
+          id,
+          order_id: raw.order_id,
+            product_id: undefined,
+          combo_id: raw.combo_id,
+          item_type: 'combo_component',
+          product_name: name,
+          product_sku: raw.product_sku,
+          variant_name: raw.variant_name,
+          quantity: qty,
+          unit_price: 0,
+          total_price: 0,
+          cost_price: 0,
+          status: this.mapItemStatus(raw.status),
+          ordered_at: raw.ordered_at || raw.created_at,
+          preparation_started_at: raw.preparation_started_at,
+          ready_at: raw.ready_at,
+          served_at: raw.served_at,
+          estimated_prep_time: this.getEstimatedPrepTimeByCategory(category),
+          actual_prep_time: raw.actual_prep_time,
+          special_instructions: `套餐: ${header.trim()}`,
+          modifiers: raw.modifiers,
+          kitchen_station: this.getKitchenStationByCategory(category),
+          priority_level: raw.priority_level || 1,
+          quality_checked: false,
+          created_at: raw.created_at,
+          updated_at: raw.updated_at,
+          category,
+          urgencyLevel: this.calculateUrgencyLevel(raw.ordered_at || raw.created_at),
+          combo_selections: [],
+          isComboComponent: true,
+          parentComboId: raw.id,
+          componentIndex: globalIndex,
+          isVirtual: true
+        })
+      })
+    })
+    return components
+  }
+
+  private static mapGroupHeaderToCategory(header: string): MenuCategory {
+    const h = header.toLowerCase()
+    if (/主餐|主菜|main/.test(h)) return MenuCategory.MAIN_COURSE
+    if (/前菜|沙拉|salad|appetizer/.test(h)) return MenuCategory.APPETIZERS
+    if (/飲|茶|咖啡|drink|beverage/.test(h)) return MenuCategory.BEVERAGES
+    if (/甜|dessert/.test(h)) return MenuCategory.DESSERTS
+    if (/加點|附加|追加|additional/.test(h)) return MenuCategory.ADDITIONAL
+    return MenuCategory.A_LA_CARTE
   }
 
   /**
@@ -323,7 +406,8 @@ export class KDSService {
         // 標記為套餐組件
         isComboComponent: true,
         parentComboId: comboBaseId,
-        componentIndex: index
+    componentIndex: index,
+    isVirtual: true
       });
     });
     

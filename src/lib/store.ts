@@ -84,6 +84,9 @@ interface POSStore {
   // 桌況管理
   updateTableStatus: (tableId: string, status: Table['status'], metadata?: any) => Promise<void>
   createOrderWithTableUpdate: (orderData: any) => Promise<Order | null>
+  // 桌台合併
+  mergeTables: (baseTableId: string, otherTableIds: string[]) => Promise<void>
+  unmergeTable: (baseTableId: string) => Promise<void>
 }
 
 export const usePOSStore = create<POSStore>((set, get) => ({
@@ -632,18 +635,22 @@ export const usePOSStore = create<POSStore>((set, get) => ({
 
       if (paymentError) throw paymentError
 
-      // 更新桌台狀態為清潔中
-      const { error: tableError } = await supabase
-        .from('tables')
-        .update({ 
-          status: 'cleaning',
-          last_cleaned_at: now,
-          current_session_id: null, // 清除當前會話
-          updated_at: now
-        })
-        .eq('id', tableId)
-
-      if (tableError) throw tableError
+      // 更新桌台狀態為清潔中 (僅對真實桌台 UUID 執行；外帶使用 takeout-* 虛擬ID 不在資料庫中)
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tableId);
+      if (tableId && isUUID) {
+        const { error: tableError } = await supabase
+          .from('tables')
+          .update({ 
+            status: 'cleaning',
+            last_cleaned_at: now,
+            current_session_id: null, // 清除當前會話
+            updated_at: now
+          })
+          .eq('id', tableId)
+        if (tableError) throw tableError
+      } else {
+        console.log('🟡 跳過桌台更新（外帶或非 UUID ID）:', tableId)
+      }
 
       // 若此訂單關聯預約，將預約標記為完成
       const reservationId = (orderData as any)?.metadata?.reservation_id
@@ -670,14 +677,14 @@ export const usePOSStore = create<POSStore>((set, get) => ({
             payment_status: 'paid' as const
           } : order
         ),
-        tables: state.tables.map(table =>
+        tables: isUUID ? state.tables.map(table =>
           table.id === tableId ? {
-            ...table,
-            status: 'cleaning' as const,
-            last_cleaned_at: now,
-            current_session_id: undefined
-          } : table
-        )
+              ...table,
+              status: 'cleaning' as const,
+              last_cleaned_at: now,
+              current_session_id: undefined
+            } : table
+        ) : state.tables
       }))
 
       console.log('✅ 結帳處理完成', { tableId, orderId, paymentData })
@@ -982,6 +989,73 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       set({ error: (error as Error).message, loading: false })
       console.error('❌ 訂單建立失敗:', error)
       return null
+    }
+  }
+  ,
+  // 合併桌台：僅在前端 metadata 標記 + 更新 Supabase tables.metadata JSON（若存在）
+  mergeTables: async (baseTableId, otherTableIds) => {
+    if(!baseTableId || !otherTableIds.length) return
+    set({ loading: true, error: null })
+    try {
+      const state = get()
+      const base = state.tables.find(t=> t.id===baseTableId)
+      const others = state.tables.filter(t=> otherTableIds.includes(t.id))
+      if(!base || others.length===0) throw new Error('桌台不存在')
+      const mergedCapacity = (base.capacity||0) + others.reduce((s,t)=> s + (t.capacity||0),0)
+      // 更新資料庫：僅寫入 base.metadata
+      const { error: upErr } = await supabase.from('tables').update({ 
+        metadata: { ...(base.metadata||{}), merged_with: others.map(o=> o.id), merged_capacity: mergedCapacity },
+        updated_at: new Date().toISOString()
+      }).eq('id', baseTableId)
+      if(upErr) throw upErr
+      // 將其他桌標記 merged_into
+      const { error: othersErr } = await supabase.from('tables').update({ 
+        metadata: { merged_into: baseTableId },
+        status: 'inactive',
+        updated_at: new Date().toISOString()
+      }).in('id', otherTableIds)
+      if(othersErr) console.warn('部分附屬桌更新失敗', othersErr.message)
+      // 本地更新
+      set({ tables: state.tables.map(t=> {
+        if(t.id===baseTableId) return { ...t, metadata: { ...(t.metadata||{}), merged_with: others.map(o=>o.id), merged_capacity: mergedCapacity } }
+        if(otherTableIds.includes(t.id)) return { ...t, metadata:{ ...(t.metadata||{}), merged_into: baseTableId }, status: 'inactive' }
+        return t
+      }) , loading:false })
+    } catch(e:any){
+      console.error('合併桌台失敗', e)
+      set({ error: e.message, loading:false })
+    }
+  },
+  unmergeTable: async (baseTableId) => {
+    if(!baseTableId) return
+    set({ loading:true, error: null })
+    try {
+      const state = get()
+      const base = state.tables.find(t=> t.id===baseTableId)
+      if(!base) throw new Error('主桌不存在')
+      const mergedIds: string[] = base.metadata?.merged_with || []
+      // 清除 base metadata
+      const { error: upErr } = await supabase.from('tables').update({ 
+        metadata: { ...(base.metadata||{}), merged_with: [], merged_capacity: base.capacity },
+        updated_at: new Date().toISOString()
+      }).eq('id', baseTableId)
+      if(upErr) throw upErr
+      if(mergedIds.length){
+        const { error: othersErr } = await supabase.from('tables').update({ 
+          metadata: {},
+          status: 'available',
+          updated_at: new Date().toISOString()
+        }).in('id', mergedIds)
+        if(othersErr) console.warn('部分解除附屬桌失敗', othersErr.message)
+      }
+      set({ tables: state.tables.map(t=> {
+        if(t.id===baseTableId) return { ...t, metadata:{ ...(t.metadata||{}), merged_with: [], merged_capacity: t.capacity } }
+        if(mergedIds.includes(t.id)) return { ...t, metadata:{}, status:'available' }
+        return t
+      }), loading:false })
+    } catch(e:any){
+      console.error('解除合併失敗', e)
+      set({ error: e.message, loading:false })
     }
   }
 }))
