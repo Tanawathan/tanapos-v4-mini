@@ -14,26 +14,38 @@
 - query-reservation-structure.js
 - diagnose-reservation-issue.cjs
 
-## 待遷移 (Batch3 - schema / SQL / execute)
+## Batch3 已遷移 (schema / SQL / execute)
 - execute-reservation-db-update.js
 - execute-reservation-extension.js
 - execute-reservation-walkin-update.js
 - update-reservation-schema.js
-- update-reservation-schema.sql
-- reservation-database-extension.sql
-- extend-reservation-for-walkin.sql
-- fix-reservation-immediate.sql
+- sql/update-reservation-schema.sql
+- sql/reservation-database-extension.sql
+- sql/extend-reservation-for-walkin.sql
+- sql/fix-reservation-immediate.sql
+
+執行示例:
+```
+node scripts/reservations/execute-reservation-db-update.js
+node scripts/reservations/execute-reservation-extension.js
+node scripts/reservations/execute-reservation-walkin-update.js
+node scripts/reservations/update-reservation-schema.js
+```
+> 多數 DDL 仍需於 Supabase Dashboard 以高權限執行。
 
 ## 改善 TODO
-- test-updated-reservation-system.cjs 目前為精簡：需補回完整執行與輸出程式碼
-- 清理硬編碼的 Supabase Keys（已部分改為 .env）
-- 加入共用 util (e.g. createClient helper)
-- 增加 README 使用示例與安全注意事項
+- test-updated-reservation-system.cjs 仍為精簡
+- 已移除硬編碼 Supabase Keys (Batch3) 並集中於 util/createSupabaseClient.cjs
+- 後續可新增 SQL 版本號與變更日誌
+- 增補更完整安全指引
 
 ## 執行方式
 ```bash
 node scripts/reservations/test-reservation-auto-assignment.cjs
 node scripts/reservations/create-test-reservations.js
+# Schema / Walk-in 更新
+node scripts/reservations/execute-reservation-extension.js
+node scripts/reservations/execute-reservation-walkin-update.js
 ```
 
 ## 環境變數需求 (.env)
