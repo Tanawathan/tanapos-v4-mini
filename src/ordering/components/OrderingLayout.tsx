@@ -50,6 +50,8 @@ const OrderingLayout: React.FC = () => {
 
   // 載入桌台列表 (僅首次且尚未選桌號時)
   React.useEffect(()=> {
+    // 外帶模式不需要載入桌台
+    if (context.takeout) return
     const loadTables = async () => {
       try {
         setLoadingTables(true)
@@ -58,11 +60,11 @@ const OrderingLayout: React.FC = () => {
           .select('id, table_number, status')
           .in('status', ['available','occupied'])
           .order('table_number', { ascending: true })
-  if (!error && data) setTables((data as any).filter((t: any)=>['available','occupied'].includes(t.status)))
+        if (!error && data) setTables((data as any).filter((t: any)=>['available','occupied'].includes(t.status)))
       } finally { setLoadingTables(false) }
     }
     if (!context.tableNumber && tables.length===0) loadTables()
-  }, [context.tableNumber, tables.length])
+  }, [context.tableNumber, tables.length, context.takeout])
 
   const handleAddProduct = async (p: any) => {
     if (p.isCombo) {
@@ -153,6 +155,7 @@ const OrderingLayout: React.FC = () => {
 
   const createOrder = async () => {
   if (items.length === 0 || submitting) return
+  // 外帶模式允許無桌號；內用仍需桌號
   if (!context.takeout && !context.tableNumber) { alert('請先選擇桌號'); return }
     try {
       setSubmitting(true)
@@ -312,14 +315,14 @@ const OrderingLayout: React.FC = () => {
           </div>
           <div className="flex-1 flex gap-2">
             <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="搜尋商品" className="flex-1 border rounded-md px-3 py-2 text-sm bg-white/90 focus:ring-2 focus:ring-blue-500 outline-none"/>
-            {!context.tableNumber && (
+            {!context.takeout && !context.tableNumber && (
               <select disabled={loadingTables} value={context.tableNumber || ''} onChange={e=> setContext({ tableNumber: e.target.value || undefined })} className="w-32 border rounded-md px-2 py-2 text-sm bg-white/90 focus:ring-2 focus:ring-blue-500 outline-none">
                 <option value="">選桌號</option>
                 {tables.map(t=> <option key={t.id} value={t.table_number}>{t.table_number}</option>)}
               </select>
             )}
           </div>
-          {context.tableNumber && (
+          {context.tableNumber && !context.takeout && (
             <div className="flex items-center gap-2 text-xs">
               <div className="bg-blue-50 border border-blue-200 px-2 py-1 rounded flex items-center gap-1">
                 桌號 {context.tableNumber}{context.partySize? ` · ${context.partySize}人`: ''}
@@ -328,6 +331,13 @@ const OrderingLayout: React.FC = () => {
                 onClick={()=> { setContext({ tableNumber: undefined }) }}
                 className="px-2 py-1 rounded border text-gray-500 hover:text-blue-600 hover:border-blue-400 bg-white text-[11px]"
               >更換</button>
+            </div>
+          )}
+          {context.takeout && (
+            <div className="flex items-center gap-2 text-xs">
+              <div className="bg-orange-50 border border-orange-300 text-orange-700 px-2 py-1 rounded flex items-center gap-1">
+                外帶訂單{context.customerName? ` · ${context.customerName}`:''}
+              </div>
             </div>
           )}
         </div>
@@ -403,7 +413,7 @@ const OrderingLayout: React.FC = () => {
         <div className="border-t pt-3 mt-3 space-y-1 text-sm">
           <div className="flex justify-between"><span>小計</span><span>NT$ {totals.subtotal}</span></div>
           <div className="flex justify-between font-bold text-lg"><span>總計</span><span>NT$ {totals.total}</span></div>
-          <button onClick={createOrder} className="w-full mt-2 bg-green-600 text-white rounded-md py-2 text-sm font-semibold disabled:opacity-50" disabled={items.length===0 || submitting || !context.tableNumber}>{submitting? '送出中...' : '送出訂單'}</button>
+          <button onClick={createOrder} className="w-full mt-2 bg-green-600 text-white rounded-md py-2 text-sm font-semibold disabled:opacity-50" disabled={items.length===0 || submitting || (!context.takeout && !context.tableNumber)}>{submitting? '送出中...' : '送出訂單'}</button>
         </div>
       </div>
 
@@ -464,7 +474,7 @@ const OrderingLayout: React.FC = () => {
             <div className="p-4 border-t space-y-1 text-sm">
               <div className="flex justify-between"><span>小計</span><span>NT$ {totals.subtotal}</span></div>
               <div className="flex justify-between font-bold text-lg"><span>總計</span><span>NT$ {totals.total}</span></div>
-              <button onClick={()=>{createOrder(); context.tableNumber && setMobileCartOpen(false)}} className="w-full mt-2 bg-green-600 text-white rounded-md py-2 text-sm font-semibold disabled:opacity-50" disabled={items.length===0 || submitting || !context.tableNumber}>{submitting? '送出中...' : '送出訂單'}</button>
+              <button onClick={()=>{createOrder(); (!context.takeout && context.tableNumber) && setMobileCartOpen(false)}} className="w-full mt-2 bg-green-600 text-white rounded-md py-2 text-sm font-semibold disabled:opacity-50" disabled={items.length===0 || submitting || (!context.takeout && !context.tableNumber)}>{submitting? '送出中...' : '送出訂單'}</button>
             </div>
           </div>
         </div>
@@ -480,7 +490,7 @@ const OrderingLayout: React.FC = () => {
           <div className="text-[11px] text-ui-muted leading-none mb-0.5">總計</div>
           <div className="font-bold text-base">NT$ {totals.total}</div>
         </div>
-  <button onClick={createOrder} disabled={items.length===0 || submitting || !context.tableNumber} className="h-10 px-5 rounded-md bg-green-600 text-white font-semibold text-sm disabled:opacity-40">{submitting? '送出中' : '送出'}</button>
+  <button onClick={createOrder} disabled={items.length===0 || submitting || (!context.takeout && !context.tableNumber)} className="h-10 px-5 rounded-md bg-green-600 text-white font-semibold text-sm disabled:opacity-40">{submitting? '送出中' : '送出'}</button>
       </div>
       {/* Toasts */}
       <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 space-y-2 w-full max-w-xs px-3">
