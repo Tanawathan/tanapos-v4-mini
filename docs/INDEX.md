@@ -74,6 +74,9 @@
 - 🚫點餐系統隱藏暫停供應餐點功能完成報告.md
 - 🎉預約系統當日預約與現場顧客功能完成報告.md
 - 🍽️餐廳預約系統營業時間與休假日管理完成報告.md
+- KDS-TODO-LIST.md
+- OrdersPage無限渲染問題解決方案.md
+- 🧪自動化測試完成報告.md
 
 ## 📘 guides (操作 / 設定 / 規則 / 指南)
 
@@ -97,3 +100,9 @@
 - 📅預約系統開發規劃文件.md
 - 🚀立即預訂功能修復指南.md
 - 平板橫向顯示優化測試指南.md
+- KDS系統：功能設計與頁面佈局.md
+- NETLIFY_DEPLOY.md
+- POS 點餐系統：定義與規則.md
+- SUPABASE-DATABASE-SETUP.md
+- SUPABASE-SETUP-GUIDE.md
+- TableStatus 系統：定義與規則.md
