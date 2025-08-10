@@ -290,11 +290,12 @@ export const usePOSStore = create<POSStore>((set, get) => ({
       console.log('🏪 從資料庫載入訂單資料...', restaurantId)
 
       // 載入訂單資料
+      // 1) 載入所有『非取消』訂單，供統計使用 (含 completed)
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select('*')
         .eq('restaurant_id', restaurantId)
-        .in('status', ['pending', 'confirmed', 'preparing', 'ready', 'served'])
+        .not('status', 'eq', 'cancelled')
         .order('created_at', { ascending: false })
 
       if (ordersError) {
