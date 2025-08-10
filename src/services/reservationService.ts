@@ -248,14 +248,16 @@ export class ReservationService {
       
       if (error) throw error
       
-      const existingCapacity = existingReservations?.reduce((sum: number, res: any) => sum + res.party_size, 0) || 0
-      const availableCapacity = this.MAX_CAPACITY_PER_30MIN - existingCapacity
+  const existingCapacity = existingReservations?.reduce((sum: number, res: any) => sum + res.party_size, 0) || 0
+  // 允許大型合併桌：若單筆預約超過系統預設 MAX，將上限動態提升到該預約人數
+  const dynamicCap = Math.max(this.MAX_CAPACITY_PER_30MIN, partySize)
+  const availableCapacity = dynamicCap - existingCapacity
       
       return {
-        available: availableCapacity >= partySize,
+        available: (existingCapacity + partySize) <= dynamicCap,
         isHoliday: false,
         capacity: {
-          total_capacity: this.MAX_CAPACITY_PER_30MIN,
+          total_capacity: dynamicCap,
           available_capacity: availableCapacity,
           existing_reservations: existingReservations || []
         }
@@ -490,23 +492,28 @@ export class ReservationService {
         : existing.reservation_time
 
       // 若調整了人數或時間，需要檢查可用性與休假日
-      if (
-        updates.party_size !== undefined ||
-        updates.reservation_time !== undefined
-      ) {
-  const targetDate = new Date(normalizedNextReservationTimeISO)
-        const { available, isHoliday } = await this.checkAvailability(
-          restaurantId,
-          targetDate,
-          nextPartySize
-        )
-
-        if (isHoliday) {
-          throw new Error('選擇的日期為休假日，無法更新為該時段')
-        }
-        if (!available) {
+      if (updates.party_size !== undefined || updates.reservation_time !== undefined) {
+        const targetDate = new Date(normalizedNextReservationTimeISO)
+        // 自行計算該 30 分鐘時段容量 (排除自身)
+        const slotStart = this.getTimeSlotStart(targetDate)
+        const slotEnd = new Date(slotStart.getTime() + 30*60*1000)
+        const { data: existingInSlot, error: slotErr } = await supabase
+          .from('table_reservations')
+          .select('id, party_size, status, reservation_time')
+          .eq('restaurant_id', restaurantId)
+          .not('status','in','(cancelled,no_show,completed)')
+          .neq('id', reservationId)
+          .gte('reservation_time', slotStart.toISOString())
+          .lt('reservation_time', slotEnd.toISOString())
+        if (slotErr) throw slotErr
+        const existingCapacityOthers = (existingInSlot||[]).reduce((s:any,r:any)=> s + (r.party_size||0),0)
+        const dynamicCap = Math.max(this.MAX_CAPACITY_PER_30MIN, nextPartySize)
+        if (existingCapacityOthers + nextPartySize > dynamicCap) {
           throw new Error('該時段容量不足，請選擇其他時間')
         }
+        // 休假日檢查
+        const isHoliday = await this.isHoliday(restaurantId, targetDate)
+        if (isHoliday) throw new Error('選擇的日期為休假日，無法更新為該時段')
       }
 
       // 取得餐廳預約設定以計算 estimated_end_time
