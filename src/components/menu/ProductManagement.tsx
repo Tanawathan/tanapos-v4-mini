@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import type { Product, ProductFilters, ProductSorting, MenuViewMode } from '../../lib/menu-types';
+import type { Product, ProductFilters, ProductSorting, MenuViewMode, CreateProductDto, UpdateProductDto } from '../../lib/menu-types';
 import { useMenuStore } from '../../stores/menuStore';
 import ProductFiltersComponent from './ProductFilters';
 import ProductGrid from './ProductGrid';
+import ProductModal from './ProductModal';
 
 export default function ProductManagement() {
   const { 
@@ -15,6 +16,7 @@ export default function ProductManagement() {
     loadCategories,
     deleteProduct,
     updateProduct,
+    createProduct,
     nextPage
   } = useMenuStore();
 
@@ -102,8 +104,16 @@ export default function ProductManagement() {
   };
 
   const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
+    setEditingProduct(product?.id ? product : null);
     setShowEditModal(true);
+  };
+
+  const handleSaveProduct = async (data: CreateProductDto | UpdateProductDto, isEdit: boolean, productId?: string) => {
+    if (isEdit && productId) {
+      await updateProduct(productId, data as UpdateProductDto);
+    } else {
+      await createProduct(data as CreateProductDto);
+    }
   };
 
   const handleDeleteProduct = async (productId: string) => {
@@ -183,27 +193,12 @@ export default function ProductManagement() {
         onLoadMore={() => nextPage()}
       />
 
-      {/* 編輯商品模態框 - 暫時佔位 */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">
-              {editingProduct?.id ? '編輯商品' : '新增商品'}
-            </h3>
-            <p className="text-gray-600 mb-4">
-              商品編輯功能將在下個階段實作
-            </p>
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                關閉
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ProductModal
+        isOpen={showEditModal}
+        product={editingProduct}
+        onClose={() => setShowEditModal(false)}
+        onSave={handleSaveProduct}
+      />
     </div>
   );
 }

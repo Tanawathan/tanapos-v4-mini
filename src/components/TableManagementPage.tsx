@@ -58,6 +58,11 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const [mergeBase, setMergeBase] = useState<Table | null>(null)
   const [mergeSelection, setMergeSelection] = useState<Set<string>>(new Set())
   const [showMergePanel, setShowMergePanel] = useState(false)
+  // 清潔自動釋放設定（從資料庫讀取）
+  const [cleaningReleaseMinutes, setCleaningReleaseMinutes] = useState<number>(5)
+  const [cleaningSettingLoading, setCleaningSettingLoading] = useState(false)
+  const [cleaningSettingSaving, setCleaningSettingSaving] = useState(false)
+  const [cleaningSettingError, setCleaningSettingError] = useState<string | null>(null)
 
   // === 時間格式統一：強制使用 Asia/Taipei，避免不同頁面顯示不一致 ===
   const TAIPEI_TZ = 'Asia/Taipei'
@@ -84,8 +89,135 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     }
     if (currentRestaurant?.id) {
       loadReservations()
+  loadCleaningSetting()
     }
   }, [currentRestaurant?.id]) // 移除依賴項，避免無限循環
+
+  // === 即時監聽預約狀態變化：結帳後自動移除桌台上的預約標籤 ===
+  useEffect(() => {
+    if (!currentRestaurant?.id) return
+    const channel = supabase
+      .channel('realtime-table-reservations')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'table_reservations',
+        filter: `restaurant_id=eq.${currentRestaurant.id}`
+      }, (payload: any) => {
+        const newRow = payload.new
+        setReservations(prev => {
+          let next = prev
+          // INSERT or UPDATE → 同步/加入；DELETE → 移除
+          if (payload.eventType === 'DELETE') {
+            return prev.filter(r => r.id !== payload.old.id)
+          }
+          if (!newRow) return prev
+          const exists = prev.some(r => r.id === newRow.id)
+            ? prev.map(r => r.id === newRow.id ? newRow : r)
+            : [...prev, newRow]
+          // 僅保留狀態為 confirmed / seated（與載入時條件一致），其它狀態如 completed / cancelled 會被自動過濾掉
+          next = exists.filter(r => ['confirmed','seated'].includes(r.status))
+          return next
+        })
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [currentRestaurant?.id])
+
+  // === 自動將 cleaning → available 排程 ===
+  // 假設清潔標準時間 5 分鐘，可依需求改成環境變數或資料庫設定
+  const CLEANING_AUTO_RELEASE_MINUTES = cleaningReleaseMinutes || 0
+  useEffect(() => {
+    if (!tables.length) return
+    let active = true
+    const releasing = new Set<string>()
+    const tick = async () => {
+      if (!active) return
+      const now = Date.now()
+      const threshold = CLEANING_AUTO_RELEASE_MINUTES * 60 * 1000
+      if (CLEANING_AUTO_RELEASE_MINUTES <= 0) return // 0 或負值代表停用自動釋放
+      // 篩選超過清潔時間的桌台（使用 last_cleaned_at 作為開始時間，若無則用 updated_at）
+      const overdue = tables.filter(t => t.status === 'cleaning').filter(t => {
+        const start = new Date(t.last_cleaned_at || t.updated_at || 0).getTime()
+        return start && (now - start) >= threshold
+      })
+      for (const table of overdue) {
+        if (releasing.has(table.id!)) continue
+        releasing.add(table.id!)
+        try {
+          await updateTableStatus(table.id!, 'available')
+          console.log('🧼 自動釋放桌台為可用:', table.table_number)
+        } catch (e) {
+          console.warn('自動釋放桌台失敗', table.id, e)
+        } finally {
+          releasing.delete(table.id!)
+        }
+      }
+    }
+    const interval = setInterval(tick, 30 * 1000) // 每 30 秒檢查一次
+    // 立即執行一次
+    tick()
+    return () => { active = false; clearInterval(interval) }
+  }, [tables, CLEANING_AUTO_RELEASE_MINUTES])
+
+  // === 載入清潔釋放時間設定 ===
+  const loadCleaningSetting = async () => {
+    if (!currentRestaurant?.id) return
+    setCleaningSettingLoading(true)
+    setCleaningSettingError(null)
+    try {
+      const { data, error } = await supabase
+        .from('restaurants')
+        .select('reservation_settings')
+        .eq('id', currentRestaurant.id)
+        .single()
+      if (error) throw error
+      const value = data?.reservation_settings?.tableCleaningAutoReleaseMinutes
+      if (typeof value === 'number' && value >= 0) {
+        setCleaningReleaseMinutes(value)
+      }
+    } catch (e:any) {
+      console.warn('讀取清潔自動釋放設定失敗', e)
+      setCleaningSettingError('讀取設定失敗')
+    } finally {
+      setCleaningSettingLoading(false)
+    }
+  }
+
+  // === 儲存清潔釋放時間設定 ===
+  const saveCleaningSetting = async () => {
+    if (!currentRestaurant?.id) return
+    if (cleaningReleaseMinutes < 0 || cleaningReleaseMinutes > 240) {
+      setCleaningSettingError('請輸入 0 ~ 240 之間的分鐘數')
+      return
+    }
+    setCleaningSettingSaving(true)
+    setCleaningSettingError(null)
+    try {
+      // 先取出舊設定，合併後更新
+      const { data: oldData, error: fetchErr } = await supabase
+        .from('restaurants')
+        .select('reservation_settings')
+        .eq('id', currentRestaurant.id)
+        .single()
+      if (fetchErr) throw fetchErr
+      const newSettings = {
+        ...(oldData?.reservation_settings || {}),
+        tableCleaningAutoReleaseMinutes: cleaningReleaseMinutes
+      }
+      const { error: updErr } = await supabase
+        .from('restaurants')
+        .update({ reservation_settings: newSettings, updated_at: new Date().toISOString() })
+        .eq('id', currentRestaurant.id)
+      if (updErr) throw updErr
+    } catch (e:any) {
+      console.error('儲存清潔設定失敗', e)
+      setCleaningSettingError('儲存失敗，請稍後再試')
+    } finally {
+      setCleaningSettingSaving(false)
+    }
+  }
 
   // 載入預約資訊
   const loadReservations = async () => {
@@ -471,6 +603,38 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* 清潔自動釋放設定 */}
+        <div className="mb-6 bg-white border rounded-lg p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-gray-800">🧼 清潔自動釋放設定</h3>
+            <button onClick={loadCleaningSetting} disabled={cleaningSettingLoading} className="text-xs px-3 py-1 rounded border bg-gray-50 hover:bg-gray-100 disabled:opacity-50">重新載入</button>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">清潔釋放分鐘數 (0=停用)</label>
+              <input
+                type="number"
+                min={0}
+                max={240}
+                value={cleaningReleaseMinutes}
+                onChange={e=> setCleaningReleaseMinutes(Number(e.target.value))}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                disabled={cleaningSettingSaving}
+              />
+              <p className="mt-1 text-xs text-gray-500">超過設定分鐘仍為清潔中將自動轉為「可用」。避免忘記釋放桌台。</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={saveCleaningSetting}
+                disabled={cleaningSettingSaving}
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >{cleaningSettingSaving? '儲存中...' : '儲存設定'}</button>
+            </div>
+          </div>
+          {cleaningSettingError && <div className="mt-2 text-sm text-red-600">{cleaningSettingError}</div>}
+          {CLEANING_AUTO_RELEASE_MINUTES>0 && <div className="mt-2 text-xs text-green-700">目前生效：{CLEANING_AUTO_RELEASE_MINUTES} 分鐘</div>}
+          {CLEANING_AUTO_RELEASE_MINUTES===0 && <div className="mt-2 text-xs text-yellow-700">已停用自動釋放</div>}
+        </div>
         {/* 合併桌台控制面板 */}
         <div className="mb-6 bg-white border rounded-lg p-4 shadow-sm">
           <div className="flex items-center justify-between mb-3">
