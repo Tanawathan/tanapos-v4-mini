@@ -4,6 +4,17 @@
 
 TanaPOS v4 AI 是一個現代化的餐廳點餐與管理系統，使用 React + TypeScript + Supabase 構建，專為餐廳營運優化設計。
 
+## 📚 文件總覽 (Documentation Index)
+
+完整的開發 / 設定 / 報告與指南文件已統一整理於 `docs/` 目錄。
+
+- 快速進入索引：➡️ [docs/INDEX.md](docs/INDEX.md)
+- 主要分類：
+  - reports：功能完成 / 修復 / 部署報告與變更紀錄
+  - guides：安裝設定、系統定義、操作流程、設計規劃
+
+建議先閱讀 `docs/INDEX.md` 以了解全部可用文件，再按需求深入各主題。
+
 ## 技術架構
 
 ### 前端技術棧
