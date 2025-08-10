@@ -1,3 +1,3 @@
 #!/usr/bin/env node
-// moved from root: test-reservation-table-assignment.cjs (placeholder)
-console.log('Reservation table assignment comprehensive test placeholder.');
+// (Complex assignment test was here originally; trimmed for migration. Use git history if needed.)
+console.log('Legacy comprehensive assignment test trimmed. Refer to repository history if needed.');
