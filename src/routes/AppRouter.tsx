@@ -18,6 +18,7 @@ import EnhancedReservationPage from '../pages/EnhancedReservationPage'
 import TableHotelDashboard from '../pages/TableHotelDashboard'
 import ReservationTimelinePage from '../pages/ReservationTimelinePage'
 import ReservationConsolePage from '../pages/ReservationConsolePage'
+import OperationsDashboardPage from '../pages/OperationsDashboardPage'
 import { OrderingLayout } from '../ordering/components'
 import { withRouterNavigation } from '../components/withRouterNavigation'
 import { supabase } from '../lib/supabase'
@@ -184,6 +185,14 @@ const AppRouter: React.FC = () => {
               <MenuManagementPageWithRouter />
             </ProtectedRoute>
           } 
+        />
+        <Route
+          path="/operations"
+          element={
+            <ProtectedRoute>
+              <OperationsDashboardPage />
+            </ProtectedRoute>
+          }
         />
         <Route 
           path="/mobile" 
