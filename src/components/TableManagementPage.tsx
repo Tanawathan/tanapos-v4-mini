@@ -310,7 +310,17 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     return diffMin <= 120
   }
 
-  const computeCompositeStatus = (table: Table) => {
+  interface CompositeStatus { display: string; hasActiveOrders: boolean; upcomingReservation: Reservation | null; canWalkIn: boolean }
+  const computeCompositeStatus = (table: Table): CompositeStatus => {
+    // 若為合併子桌，直接沿用主桌狀態（顯示與統計一致）
+    if (table.metadata?.merged_into) {
+      const base = tables.find(t => t.id === table.metadata!.merged_into)
+      if (base) {
+  const baseStatus: CompositeStatus = computeCompositeStatus(base) // 遞迴取得主桌狀態
+        // 子桌永遠不可 walk-in
+        return { ...baseStatus, canWalkIn: false }
+      }
+    }
     const tableOrders = getTableOrders(table.table_number || '')
     const hasActiveOrders = tableOrders.some(o => ACTIVE_ORDER_STATUS.has(o.status || ''))
     if (hasActiveOrders) {
@@ -326,6 +336,7 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
     }
     if (table.status === 'cleaning') return { display: 'cleaning', hasActiveOrders: false, upcomingReservation: null, canWalkIn: false }
     if (table.status === 'maintenance') return { display: 'maintenance', hasActiveOrders: false, upcomingReservation: null, canWalkIn: false }
+    if (table.status === 'inactive' && table.metadata?.merged_into) return { display: 'occupied', hasActiveOrders: false, upcomingReservation: null, canWalkIn: false }
     return { display: 'available', hasActiveOrders: false, upcomingReservation: null, canWalkIn: true }
   }
 
@@ -783,11 +794,19 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredTables.map(table => {
+                const isMergedChild = !!table.metadata?.merged_into
+                const baseTable = isMergedChild ? tables.find(t=> t.id === table.metadata!.merged_into) : null
                 const tableOrders = getTableOrders(table.table_number || '')
                 const composite = computeCompositeStatus(table)
                 const display = composite.display
-                const tableReservation = getTableReservation(table.id!) // 仍保留原顯示邏輯
-                const disabledWalkInReason = !composite.canWalkIn ? (composite.hasActiveOrders ? '有未結帳訂單' : composite.upcomingReservation ? '2小時內有預約' : (display==='cleaning'?'清潔中': display==='maintenance'?'維護中':'')) : ''
+                // 該桌或主桌的預約
+                let tableReservation = getTableReservation(table.id!)
+                let reservationFromBase = false
+                if(!tableReservation && isMergedChild && baseTable){
+                  tableReservation = getTableReservation(baseTable.id!)
+                  if(tableReservation) reservationFromBase = true
+                }
+                const disabledWalkInReason = !composite.canWalkIn ? (isMergedChild? '已合併子桌' : composite.hasActiveOrders ? '有未結帳訂單' : composite.upcomingReservation ? '2小時內有預約' : (display==='cleaning'?'清潔中': display==='maintenance'?'維護中':'')) : ''
                 return (
                   <div
                     key={table.id}
@@ -797,16 +816,19 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                       <div className="text-4xl mb-3">{getStatusIcon(display)}</div>
                       <div className="font-bold text-lg text-gray-900 mb-1">桌號 {table.table_number}</div>
                       {table.name && <div className="text-sm text-gray-600 mb-2">({table.name})</div>}
-                      <div className="text-sm text-gray-700 mb-3">{table.capacity} 人座</div>
+                      <div className="text-sm text-gray-700 mb-3">{table.capacity} 人座{isMergedChild && baseTable && baseTable.metadata?.merged_capacity ? ` → 主桌總容 ${baseTable.metadata.merged_capacity}`:''}</div>
                       <div className={`inline-block text-xs px-3 py-1 rounded-full font-semibold mb-3 border ${getStatusColor(display)}`}>{getStatusText(display)}</div>
+                      {isMergedChild && baseTable && (
+                        <div className="text-[10px] text-gray-700 mb-2">🔗 合併主桌 #{baseTable.table_number}</div>
+                      )}
                       {composite.upcomingReservation && display==='reserved' && (
                         <div className="text-xs text-blue-700 mb-2">即將預約 {formatTaipeiTime(composite.upcomingReservation.reservation_time)} · {composite.upcomingReservation.party_size}人</div>
                       )}
                       {/* 預約資訊 */}
                       {tableReservation && (
                         <div className="space-y-2 mb-3">
-                          <div className="text-xs font-semibold text-blue-800 mb-2">📅 預約資訊</div>
-                          <button onClick={() => openReservationModal(tableReservation)} className={`w-full rounded-lg p-2 text-left transition-all duration-200 hover:shadow-md border ${tableReservation.status==='seated'?'bg-green-50 hover:bg-green-100 border-green-200':'bg-blue-50 hover:bg-blue-100 border-blue-200'}`}>
+                          <div className="text-xs font-semibold text-blue-800 mb-2">📅 預約資訊{reservationFromBase? ' (主桌)':''}</div>
+                          <button onClick={() => openReservationModal(tableReservation!)} className={`w-full rounded-lg p-2 text-left transition-all duration-200 hover:shadow-md border ${tableReservation.status==='seated'?'bg-green-50 hover:bg-green-100 border-green-200':'bg-blue-50 hover:bg-blue-100 border-blue-200'}`}>
                             <div className={`text-xs font-semibold mb-1 ${tableReservation.status==='seated'?'text-green-800':'text-blue-800'}`}>👤 {tableReservation.customer_name}</div>
                             <div className={`text-xs mb-1 ${tableReservation.status==='seated'?'text-green-600':'text-blue-600'}`}>{tableReservation.party_size} 人 · {tableReservation.status==='confirmed'?'已確認':'已入座'}</div>
                             <div className={`text-xs ${tableReservation.status==='seated'?'text-green-500':'text-blue-500'}`}>{formatTaipeiDateTime(tableReservation.reservation_time)}</div>
