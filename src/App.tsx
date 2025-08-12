@@ -33,7 +33,7 @@ function App() {
   }, [restaurantId, setCurrentRestaurant, loadCategories, loadProducts, loadTables])
 
   // 使用 AppRouter 處理所有路由和認證
-  return <AppRouter />
+  return <div data-app-mounted><AppRouter /></div>
 }
 
 export default App

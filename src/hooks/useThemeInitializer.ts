@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useThemeStore } from '../lib/theme-store';
+import { addMqlChangeListener, removeMqlChangeListener } from '../utils/mqlCompat';
 
 export const useThemeInitializer = () => {
   const applyTheme = useThemeStore(state => state.applyTheme);
@@ -13,17 +14,17 @@ export const useThemeInitializer = () => {
     // 也可以在這裡設置系統偏好監聽
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
-    const handleChange = (e: MediaQueryListEvent) => {
+    const handleChange = (e: MediaQueryListEvent | { matches: boolean }) => {
       if (settings.mode === 'system') {
         useThemeStore.setState({ isDark: e.matches });
         applyTheme();
       }
     };
     
-    mediaQuery.addEventListener('change', handleChange);
+    addMqlChangeListener(mediaQuery as any, handleChange);
     
     return () => {
-      mediaQuery.removeEventListener('change', handleChange);
+      removeMqlChangeListener(mediaQuery as any, handleChange);
     };
   }, [applyTheme, settings.mode]);
 

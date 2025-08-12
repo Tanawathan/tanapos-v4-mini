@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { addMqlChangeListener, removeMqlChangeListener } from '../utils/mqlCompat';
 
 // 主題類型定義
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -156,7 +157,7 @@ export const initializeTheme = () => {
     // 更新 isDark 狀態
     useThemeStore.setState({ isDark: shouldBeDark });
     
-    const handleChange = (e: MediaQueryListEvent) => {
+    const handleChange = (e: MediaQueryListEvent | { matches: boolean }) => {
       const currentSettings = useThemeStore.getState().settings;
       if (currentSettings.mode === 'system') {
         useThemeStore.setState({ isDark: e.matches });
@@ -164,7 +165,7 @@ export const initializeTheme = () => {
       }
     };
     
-    mediaQuery.addEventListener('change', handleChange);
+    addMqlChangeListener(mediaQuery as any, handleChange);
     
     // 初始檢測用戶偏好
     const userPrefs = getUserPreferences();
