@@ -5,6 +5,7 @@ import DiagnosticPanel from './DiagnosticPanel'
 import { TodoPanel } from './common/TodoPanel'
 import TableSettings from './TableSettings'
 import PrinterSettingsTab from './settings/PrinterSettingsTab'
+import MarqueeSettings from './settings/MarqueeSettings'
 
 interface SettingsPageProps {
   onBack: () => void
@@ -389,6 +390,9 @@ const SystemSettings: React.FC = () => {
       </div>
 
       <div className="space-y-8">
+        {/* 跑馬燈設定 (Supabase: marquees) */}
+        <MarqueeSettings />
+
         {/* Supabase 連線測試 */}
         <div className="border border-ui rounded-lg p-6">
           <h3 className="text-lg font-medium text-ui-primary mb-4">📡 資料庫連線測試</h3>
