@@ -15,6 +15,8 @@ export interface KitchenTask {
   createdAt: string;
   priority: number;
   station: string;
+  orderType?: string;
+  deliveryPlatform?: string;
 }
 
 export interface MinimalOrderInfo {
@@ -23,6 +25,8 @@ export interface MinimalOrderInfo {
   tableNumber?: number;
   createdAt: string;
   status: OrderStatus;
+  orderType?: string;
+  deliveryPlatform?: string;
 }
 
 interface FetchResult {
@@ -39,7 +43,7 @@ export class KDSV2Service {
     const { data, error } = await supabase
       .from('orders')
       .select(`
-        id, order_number, table_number, created_at, status, metadata,
+        id, order_number, table_number, created_at, status, metadata, order_type,
         order_items(
           id, product_name, product_id, quantity, status, created_at, special_instructions,
           priority_level, product_sku, variant_name, combo_id,
@@ -61,7 +65,15 @@ export class KDSV2Service {
     const orders: Record<string, MinimalOrderInfo> = {};
 
   (data||[]).forEach((o: any) => {
-  orders[o.id] = { id: o.id, orderNumber: o.order_number, tableNumber: o.table_number, createdAt: o.created_at, status: this.mapOrderStatus(o.status) };
+  orders[o.id] = { 
+    id: o.id, 
+    orderNumber: o.order_number, 
+    tableNumber: o.table_number, 
+    createdAt: o.created_at, 
+    status: this.mapOrderStatus(o.status),
+    orderType: o.order_type,
+    deliveryPlatform: (o as any).delivery_platform || null
+  };
     const orderMeta = o.metadata || {};
     (o.order_items||[]).forEach((it: any) => {
         const looksLikeComboParent = !it.product_id && /：/.test(it.special_instructions || '') && /(\||\n)/.test(it.special_instructions || '');
@@ -95,7 +107,9 @@ export class KDSV2Service {
       comboParentId: undefined,
       createdAt: raw.created_at,
       priority: raw.priority_level || 1,
-      station: '綜合'
+      station: '綜合',
+      orderType: order.order_type,
+      deliveryPlatform: (order as any).delivery_platform || null
     };
   }
 
@@ -112,7 +126,9 @@ export class KDSV2Service {
       isVirtual: false,
       createdAt: raw.created_at,
       priority: raw.priority_level || 1,
-      station: this.mapStation(this.mapCategory(raw))
+      station: this.mapStation(this.mapCategory(raw)),
+      orderType: order.order_type,
+      deliveryPlatform: (order as any).delivery_platform || null
     };
   }
 
@@ -145,7 +161,9 @@ export class KDSV2Service {
           comboParentId: parent.id,
           createdAt: parent.created_at,
           priority: parent.priority_level || 1,
-          station: this.mapStation(cat)
+          station: this.mapStation(cat),
+          orderType: order.order_type,
+          deliveryPlatform: (order as any).delivery_platform || null
         });
         i++;
       });
@@ -172,7 +190,9 @@ export class KDSV2Service {
         comboParentId: parent.id,
         createdAt: parent.created_at,
         priority: parent.priority_level || 1,
-        station: this.mapStation(cat)
+        station: this.mapStation(cat),
+        orderType: order.order_type,
+        deliveryPlatform: (order as any).delivery_platform || null
       } as KitchenTask;
     });
   }

@@ -27,31 +27,61 @@ const OrderingLayout: React.FC = () => {
 
   // 偵測 URL query 取得桌台/預約資訊；若桌號不同則覆寫 (支援從桌台面板切換桌號)
   const location = useLocation()
+  const [editMode, setEditMode] = useState(false)
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null)
+  
   React.useEffect(()=>{
     const params = new URLSearchParams(location.search)
     const tableParam = params.get('table') || undefined
     const party = params.get('party')
     const name = params.get('name') || undefined
     const takeoutFlag = params.get('takeout') === '1'
+    const deliveryFlag = params.get('delivery') === '1'
+    const platform = params.get('platform') as 'uber' | 'foodpanda' || 'uber'
+    const orderId = params.get('orderId') || undefined
+    const editModeFlag = params.get('editMode') === 'true'
 
-    // 決定是否需要更新（takeout 或桌號改變）
+    // 處理編輯模式
+    if (editModeFlag && orderId) {
+      setEditMode(true)
+      setEditingOrderId(orderId)
+      // 可以在這裡載入現有訂單的項目到購物車
+      // loadExistingOrderItems(orderId)
+    } else {
+      setEditMode(false)
+      setEditingOrderId(null)
+    }
+
+    // 決定是否需要更新（takeout、delivery 或桌號改變）
+    if (deliveryFlag) {
+      if (!context.delivery || context.customerName !== name || context.deliveryPlatform !== platform) {
+        setContext({ 
+          delivery: true, 
+          takeout: false,
+          customerName: name, 
+          deliveryPlatform: platform,
+          tableNumber: undefined 
+        })
+      }
+      return
+    }
     if (takeoutFlag) {
-      if (!context.takeout || context.customerName !== name || context.partySize !== (party? Number(party): undefined)) {
-        setContext({ takeout: true, customerName: name, partySize: party? Number(party): undefined, tableNumber: undefined })
+      if (!context.takeout || context.customerName !== name || context.partySize !== (party && party.trim() ? Number(party) : undefined)) {
+        setContext({ takeout: true, delivery: false, customerName: name, partySize: party && party.trim() ? Number(party) : undefined, tableNumber: undefined })
       }
       return
     }
     if (tableParam) {
-      if (context.takeout || context.tableNumber !== tableParam || context.partySize !== (party? Number(party): undefined) || context.customerName !== name) {
-        setContext({ tableNumber: tableParam, partySize: party? Number(party): undefined, customerName: name, takeout: false })
+      if (context.takeout || context.delivery || context.tableNumber !== tableParam || context.partySize !== (party && party.trim() ? Number(party) : undefined) || context.customerName !== name) {
+        setContext({ tableNumber: tableParam, partySize: party && party.trim() ? Number(party) : undefined, customerName: name, takeout: false, delivery: false })
       }
     }
-  }, [location.search, context.tableNumber, context.takeout, context.partySize, context.customerName, setContext])
+  }, [location.search, context.tableNumber, context.takeout, context.delivery, context.partySize, context.customerName, context.deliveryPlatform, setContext])
 
   // 載入桌台列表 (僅首次且尚未選桌號時)
   React.useEffect(()=> {
-    // 外帶模式不需要載入桌台
-    if (context.takeout) return
+    // 外帶模式和外送模式不需要載入桌台
+    if (context.takeout || context.delivery) return
     const loadTables = async () => {
       try {
         setLoadingTables(true)
@@ -64,7 +94,7 @@ const OrderingLayout: React.FC = () => {
       } finally { setLoadingTables(false) }
     }
     if (!context.tableNumber && tables.length===0) loadTables()
-  }, [context.tableNumber, tables.length, context.takeout])
+  }, [context.tableNumber, tables.length, context.takeout, context.delivery])
 
   const handleAddProduct = async (p: any) => {
     if (p.isCombo) {
@@ -155,8 +185,8 @@ const OrderingLayout: React.FC = () => {
 
   const createOrder = async () => {
   if (items.length === 0 || submitting) return
-  // 外帶模式允許無桌號；內用仍需桌號
-  if (!context.takeout && !context.tableNumber) { alert('請先選擇桌號'); return }
+  // 外帶模式和外送模式允許無桌號；內用仍需桌號
+  if (!context.takeout && !context.delivery && !context.tableNumber) { alert('請先選擇桌號'); return }
     try {
       setSubmitting(true)
       // 取得目前餐廳 ID (簡化：假設 tables 已綁定 currentRestaurant via localStorage or global supabase session)
@@ -188,7 +218,7 @@ const OrderingLayout: React.FC = () => {
       }
       // 取得桌台 id (若有桌號)
       let tableId: string | null = null
-      if (!context.takeout && context.tableNumber) {
+      if (!context.takeout && !context.delivery && context.tableNumber) {
         const { data: tableRow, error: tableErr } = await supabase
           .from('tables')
           .select('id')
@@ -198,17 +228,24 @@ const OrderingLayout: React.FC = () => {
         if (tableErr) console.warn('讀取桌台失敗', tableErr)
         tableId = tableRow?.id || null
       }
+      
+      // 決定訂單類型
+      let orderType = 'dine_in'
+      if (context.takeout) orderType = 'takeout'
+      if (context.delivery) orderType = 'delivery'
+      
       const orderPayload: any = {
         restaurant_id: restaurantId,
-        table_number: context.takeout ? null : (context.tableNumber ? Number(context.tableNumber) : null),
-        table_id: context.takeout ? null : tableId,
+        table_number: (context.takeout || context.delivery) ? null : (context.tableNumber ? Number(context.tableNumber) : null),
+        table_id: (context.takeout || context.delivery) ? null : tableId,
         customer_name: context.customerName || '',
-        party_size: context.partySize || null,
+        party_size: context.partySize || (context.takeout || context.delivery ? 1 : 2),
         subtotal: totals.subtotal,
         tax_amount: totals.tax,
         total_amount: totals.total,
-        order_type: context.takeout ? 'takeout' : 'dine_in',
+        order_type: orderType,
         is_takeout: context.takeout || undefined,
+        delivery_platform: context.delivery ? context.deliveryPlatform : undefined,
         items: items.map(i => {
           if (i.type==='combo') {
             const comboQty = i.meta?.comboQty || 1
@@ -340,6 +377,14 @@ const OrderingLayout: React.FC = () => {
               </div>
             </div>
           )}
+          {context.delivery && (
+            <div className="flex items-center gap-2 text-xs">
+              <div className="bg-green-50 border border-green-300 text-green-700 px-2 py-1 rounded flex items-center gap-1">
+                外送訂單{context.customerName? ` · ${context.customerName}`:''}
+                {context.deliveryPlatform && <span className="text-green-600">· {context.deliveryPlatform === 'uber' ? 'Uber Eats' : 'Foodpanda'}</span>}
+              </div>
+            </div>
+          )}
         </div>
         {error && <div className="text-red-600 text-sm">{error}</div>}
         {loading ? (
@@ -364,7 +409,13 @@ const OrderingLayout: React.FC = () => {
 
       {/* Desktop Cart Panel */}
       <div className="hidden lg:flex w-80 border-l bg-white p-4 flex-col">
-  <h3 className="font-semibold mb-2 flex items-center gap-2">購物車 {context.tableNumber && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 flex items-center gap-1">桌號 {context.tableNumber}<button onClick={()=>setContext({ tableNumber: undefined })} className="ml-1 text-[10px] underline text-blue-600 hover:text-blue-800">更換</button></span>}</h3>
+  <h3 className="font-semibold mb-2 flex items-center gap-2">
+    {editMode ? '修改訂單' : '購物車'}
+    {editMode && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-yellow-50 border border-yellow-200 text-yellow-700">編輯模式</span>}
+    {context.tableNumber && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 flex items-center gap-1">桌號 {context.tableNumber}<button onClick={()=>setContext({ tableNumber: undefined })} className="ml-1 text-[10px] underline text-blue-600 hover:text-blue-800">更換</button></span>}
+    {context.takeout && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-orange-50 border border-orange-200 text-orange-700">外帶</span>}
+    {context.delivery && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-green-50 border border-green-200 text-green-700">外送</span>}
+  </h3>
         <div className="space-y-2 flex-1 overflow-y-auto pr-1">
           {groupedCart.map(group => {
             const groupSubtotal = group.items.reduce((s,i)=> s + calcItemLineTotal(i),0)
@@ -413,7 +464,7 @@ const OrderingLayout: React.FC = () => {
         <div className="border-t pt-3 mt-3 space-y-1 text-sm">
           <div className="flex justify-between"><span>小計</span><span>NT$ {totals.subtotal}</span></div>
           <div className="flex justify-between font-bold text-lg"><span>總計</span><span>NT$ {totals.total}</span></div>
-          <button onClick={createOrder} className="w-full mt-2 bg-green-600 text-white rounded-md py-2 text-sm font-semibold disabled:opacity-50" disabled={items.length===0 || submitting || (!context.takeout && !context.tableNumber)}>{submitting? '送出中...' : '送出訂單'}</button>
+          <button onClick={createOrder} className="w-full mt-2 bg-green-600 text-white rounded-md py-2 text-sm font-semibold disabled:opacity-50" disabled={items.length===0 || submitting || (!context.takeout && !context.delivery && !context.tableNumber)}>{submitting? '送出中...' : (editMode ? '更新訂單' : '送出訂單')}</button>
         </div>
       </div>
 
@@ -423,7 +474,13 @@ const OrderingLayout: React.FC = () => {
           <div className="flex-1 bg-black/40" onClick={()=>setMobileCartOpen(false)}></div>
           <div className="w-full max-w-sm ml-auto h-full bg-white shadow-xl flex flex-col animate-[slideIn_.25s]">
             <div className="p-4 border-b flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2">購物車 {context.tableNumber && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700">桌號 {context.tableNumber}</span>}</h3>
+              <h3 className="font-semibold flex items-center gap-2">
+                {editMode ? '修改訂單' : '購物車'}
+                {editMode && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-yellow-50 border border-yellow-200 text-yellow-700">編輯</span>}
+                {context.tableNumber && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700">桌號 {context.tableNumber}</span>}
+                {context.takeout && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-orange-50 border border-orange-200 text-orange-700">外帶</span>}
+                {context.delivery && <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-green-50 border border-green-200 text-green-700">外送</span>}
+              </h3>
               <button onClick={()=>setMobileCartOpen(false)} className="text-sm text-gray-500 hover:text-gray-700">關閉</button>
             </div>
             <div className="p-4 space-y-2 flex-1 overflow-y-auto">
@@ -474,7 +531,7 @@ const OrderingLayout: React.FC = () => {
             <div className="p-4 border-t space-y-1 text-sm">
               <div className="flex justify-between"><span>小計</span><span>NT$ {totals.subtotal}</span></div>
               <div className="flex justify-between font-bold text-lg"><span>總計</span><span>NT$ {totals.total}</span></div>
-              <button onClick={()=>{createOrder(); (!context.takeout && context.tableNumber) && setMobileCartOpen(false)}} className="w-full mt-2 bg-green-600 text-white rounded-md py-2 text-sm font-semibold disabled:opacity-50" disabled={items.length===0 || submitting || (!context.takeout && !context.tableNumber)}>{submitting? '送出中...' : '送出訂單'}</button>
+              <button onClick={()=>{createOrder(); (!context.takeout && !context.delivery && context.tableNumber) && setMobileCartOpen(false)}} className="w-full mt-2 bg-green-600 text-white rounded-md py-2 text-sm font-semibold disabled:opacity-50" disabled={items.length===0 || submitting || (!context.takeout && !context.delivery && !context.tableNumber)}>{submitting? '送出中...' : (editMode ? '更新訂單' : '送出訂單')}</button>
             </div>
           </div>
         </div>
@@ -483,14 +540,14 @@ const OrderingLayout: React.FC = () => {
       {/* Mobile Bottom Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm p-3 flex items-center gap-3 z-40">
         <button onClick={()=>setMobileCartOpen(true)} className={`relative flex items-center justify-center h-10 px-4 rounded-md border bg-ui-secondary font-medium text-sm ${justAddedId? 'animate-pulse':''}`}>
-          購物車
+          {editMode ? '修改' : '購物車'}
           {items.length>0 && <span className="ml-2 text-xs bg-blue-600 text-white rounded-full px-2 py-0.5">{items.length}</span>}
         </button>
         <div className="flex-1 text-right text-sm">
           <div className="text-[11px] text-ui-muted leading-none mb-0.5">總計</div>
           <div className="font-bold text-base">NT$ {totals.total}</div>
         </div>
-  <button onClick={createOrder} disabled={items.length===0 || submitting || (!context.takeout && !context.tableNumber)} className="h-10 px-5 rounded-md bg-green-600 text-white font-semibold text-sm disabled:opacity-40">{submitting? '送出中' : '送出'}</button>
+  <button onClick={createOrder} disabled={items.length===0 || submitting || (!context.takeout && !context.delivery && !context.tableNumber)} className="h-10 px-5 rounded-md bg-green-600 text-white font-semibold text-sm disabled:opacity-40">{submitting? '送出中' : (editMode ? '更新' : '送出')}</button>
       </div>
       {/* Toasts */}
       <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 space-y-2 w-full max-w-xs px-3">

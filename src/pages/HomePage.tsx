@@ -25,6 +25,8 @@ const HomePage: React.FC = () => {
   const [qsName, setQsName] = React.useState('')
   const [qsSubmitting, setQsSubmitting] = React.useState(false)
   const [qsTakeout, setQsTakeout] = React.useState(false)
+  const [qsOrderType, setQsOrderType] = React.useState<'dine_in' | 'takeout' | 'delivery'>('dine_in')
+  const [qsDeliveryPlatform, setQsDeliveryPlatform] = React.useState<'uber' | 'foodpanda'>('uber')
 
   // 從環境變數獲取餐廳 ID
   const restaurantId = import.meta.env.VITE_RESTAURANT_ID
@@ -242,6 +244,19 @@ const HomePage: React.FC = () => {
                 </Link>
               </div>
 
+              <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow relative">
+                <div className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-full bg-red-600 text-white font-medium shadow">v2</div>
+                <div className="text-4xl mb-4">🚀</div>
+                <h3 className="text-xl font-semibold mb-2">KDS v2 系統</h3>
+                <p className="text-gray-600 mb-4">新版廚房顯示系統</p>
+                <Link 
+                  to="/kds/v2"
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 w-full transition-colors inline-block"
+                >
+                  KDS v2 廚房
+                </Link>
+              </div>
+
               <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
                 <div className="text-4xl mb-4">📋</div>
                 <h3 className="text-xl font-semibold mb-2">菜單管理</h3>
@@ -286,46 +301,120 @@ const HomePage: React.FC = () => {
               <button onClick={()=>setQuickStartOpen(false)} className="text-gray-400 hover:text-gray-600">✕</button>
             </div>
             <div className="p-5 space-y-4">
-              <div className="flex gap-2 text-sm font-medium">
-                <button onClick={()=>setQsTakeout(false)} className={`flex-1 rounded-lg py-2 border ${!qsTakeout? 'bg-blue-600 text-white border-blue-600':'bg-white hover:bg-blue-50'}`}>內用</button>
-                <button onClick={()=>setQsTakeout(true)} className={`flex-1 rounded-lg py-2 border ${qsTakeout? 'bg-orange-500 text-white border-orange-500':'bg-white hover:bg-orange-50'}`}>外帶</button>
+              <div className="grid grid-cols-3 gap-2 text-sm font-medium">
+                <button 
+                  onClick={()=>setQsOrderType('dine_in')} 
+                  className={`rounded-lg py-2 border ${qsOrderType === 'dine_in' ? 'bg-blue-600 text-white border-blue-600':'bg-white hover:bg-blue-50'}`}
+                >
+                  內用
+                </button>
+                <button 
+                  onClick={()=>setQsOrderType('takeout')} 
+                  className={`rounded-lg py-2 border ${qsOrderType === 'takeout' ? 'bg-orange-500 text-white border-orange-500':'bg-white hover:bg-orange-50'}`}
+                >
+                  外帶
+                </button>
+                <button 
+                  onClick={()=>setQsOrderType('delivery')} 
+                  className={`rounded-lg py-2 border ${qsOrderType === 'delivery' ? 'bg-green-500 text-white border-green-500':'bg-white hover:bg-green-50'}`}
+                >
+                  外送
+                </button>
               </div>
-              {!qsTakeout && (
+              {qsOrderType === 'dine_in' && (
                 <div>
                   <label className="block text-sm mb-1 font-medium text-gray-700 mt-2">選擇桌號</label>
                   <div className="flex gap-2">
-                    <select disabled={qsTakeout} value={qsTable} onChange={e=>setQsTable(e.target.value)} className="flex-1 border rounded-lg px-3 py-2 text-sm bg-white/90 focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-40">
+                    <select disabled={qsOrderType !== 'dine_in'} value={qsTable} onChange={e=>setQsTable(e.target.value)} className="flex-1 border rounded-lg px-3 py-2 text-sm bg-white/90 focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-40">
                       <option value="">-- 選擇桌號 --</option>
                       {tables?.sort((a:any,b:any)=>(a.table_number||0)-(b.table_number||0)).map((t:any)=>(
                         <option key={t.id} value={t.table_number}>{t.table_number} {t.status==='occupied'? '•佔用中':''}</option>
                       ))}
                     </select>
-                    <input disabled={qsTakeout} placeholder="或輸入" value={qsTable} onChange={e=>setQsTable(e.target.value)} className="w-24 border rounded-lg px-2 py-2 text-sm disabled:opacity-40" />
+                    <input disabled={qsOrderType !== 'dine_in'} placeholder="或輸入" value={qsTable} onChange={e=>setQsTable(e.target.value)} className="w-24 border rounded-lg px-2 py-2 text-sm disabled:opacity-40" />
+                  </div>
+                </div>
+              )}
+              {qsOrderType === 'delivery' && (
+                <div>
+                  <label className="block text-sm mb-1 font-medium text-gray-700">外送平台</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button 
+                      onClick={()=>setQsDeliveryPlatform('uber')} 
+                      className={`rounded-lg py-2 px-3 border text-sm font-medium ${qsDeliveryPlatform === 'uber' ? 'bg-black text-white border-black':'bg-white hover:bg-gray-50 border-gray-300'}`}
+                    >
+                      Uber Eats
+                    </button>
+                    <button 
+                      onClick={()=>setQsDeliveryPlatform('foodpanda')} 
+                      className={`rounded-lg py-2 px-3 border text-sm font-medium ${qsDeliveryPlatform === 'foodpanda' ? 'bg-pink-500 text-white border-pink-500':'bg-white hover:bg-pink-50 border-gray-300'}`}
+                    >
+                      Foodpanda
+                    </button>
                   </div>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
-                {!qsTakeout && (
+                {qsOrderType === 'dine_in' && (
                   <div>
                     <label className="block text-sm mb-1 font-medium text-gray-700">人數 (可選)</label>
                     <input type="number" min={1} value={qsParty} onChange={e=>setQsParty(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm" />
                   </div>
                 )}
-                <div className={qsTakeout? 'col-span-2':'col-span-1'}>
-                  <label className="block text-sm mb-1 font-medium text-gray-700">姓名 {qsTakeout? '(可選)' : '(可選)'}</label>
-                  <input value={qsName} onChange={e=>setQsName(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm" />
+                <div className={qsOrderType === 'dine_in' ? 'col-span-1' : 'col-span-2'}>
+                  <label className="block text-sm mb-1 font-medium text-gray-700">
+                    {qsOrderType === 'delivery' ? '訂單備註' : '姓名'} 
+                    (可選)
+                  </label>
+                  <input value={qsName} onChange={e=>setQsName(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm" placeholder={qsOrderType === 'delivery' ? '外送平台訂單編號或備註' : ''} />
                 </div>
               </div>
               <div className="text-xs text-gray-500 leading-relaxed space-y-1">
-                {!qsTakeout && <div>若只輸入桌號，將直接建立點餐上下文；人數與姓名可稍後在訂單中補充。</div>}
-                {qsTakeout && <div>外帶模式不需桌號，可直接輸入客戶姓名以利取餐標示。</div>}
+                {qsOrderType === 'dine_in' && <div>若只輸入桌號，將直接建立點餐上下文；人數與姓名可稍後在訂單中補充。</div>}
+                {qsOrderType === 'takeout' && <div>外帶模式不需桌號，可直接輸入客戶姓名以利取餐標示。</div>}
+                {qsOrderType === 'delivery' && <div>外送模式請選擇對應的外送平台，備註欄可填入平台訂單編號方便對帳。</div>}
               </div>
             </div>
             <div className="p-5 pt-0 flex flex-col gap-2">
-              <button disabled={(!qsTakeout && !qsTable) || qsSubmitting} onClick={()=>{
-                if(!qsTakeout && !qsTable) return; setQsSubmitting(true); const params=new URLSearchParams(); if(qsTakeout){ params.set('takeout','1'); } else { params.set('table',qsTable); if(qsParty) params.set('party',qsParty); } if(qsName) params.set('name',qsName); navigate(`/ordering?${params.toString()}`); setTimeout(()=>{ setQsSubmitting(false); setQuickStartOpen(false); },100);
-              }} className={`w-full ${qsTakeout? 'bg-orange-500 hover:bg-orange-600':'bg-blue-600 hover:bg-blue-700'} disabled:opacity-40 text-white rounded-lg py-2.5 text-sm font-semibold transition`}>
-                {qsSubmitting? '進入中...' : (qsTakeout? '開始外帶點餐':'開始點餐')}
+              <button 
+                disabled={
+                  (qsOrderType === 'dine_in' && !qsTable) || 
+                  qsSubmitting
+                } 
+                onClick={()=>{
+                  if(qsOrderType === 'dine_in' && !qsTable) return; 
+                  
+                  setQsSubmitting(true); 
+                  const params = new URLSearchParams(); 
+                  
+                  if(qsOrderType === 'takeout'){ 
+                    params.set('takeout','1'); 
+                  } else if(qsOrderType === 'delivery') {
+                    params.set('delivery','1');
+                    params.set('platform', qsDeliveryPlatform);
+                  } else { 
+                    params.set('table',qsTable); 
+                    if(qsParty) params.set('party',qsParty); 
+                  } 
+                  
+                  if(qsName) params.set('name',qsName); 
+                  navigate(`/ordering?${params.toString()}`); 
+                  
+                  setTimeout(()=>{ 
+                    setQsSubmitting(false); 
+                    setQuickStartOpen(false); 
+                  },100);
+                }} 
+                className={`w-full ${
+                  qsOrderType === 'takeout' ? 'bg-orange-500 hover:bg-orange-600' :
+                  qsOrderType === 'delivery' ? 'bg-green-500 hover:bg-green-600' :
+                  'bg-blue-600 hover:bg-blue-700'
+                } disabled:opacity-40 text-white rounded-lg py-2.5 text-sm font-semibold transition`}
+              >
+                {qsSubmitting ? '進入中...' : 
+                 qsOrderType === 'takeout' ? '開始外帶點餐' :
+                 qsOrderType === 'delivery' ? `開始${qsDeliveryPlatform === 'uber' ? 'Uber' : 'Foodpanda'}點餐` :
+                 '開始點餐'}
               </button>
               <button onClick={()=>setQuickStartOpen(false)} className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-2.5 text-sm font-medium transition">取消</button>
             </div>

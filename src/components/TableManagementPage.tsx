@@ -63,6 +63,8 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   const [cleaningSettingLoading, setCleaningSettingLoading] = useState(false)
   const [cleaningSettingSaving, setCleaningSettingSaving] = useState(false)
   const [cleaningSettingError, setCleaningSettingError] = useState<string | null>(null)
+  const [deletingItemId, setDeletingItemId] = useState<string | null>(null)
+  const [modalOrderItems, setModalOrderItems] = useState<any[]>([]) // 專門為模態框維護的訂單項目狀態
 
   // === 時間格式統一：強制使用 Asia/Taipei，避免不同頁面顯示不一致 ===
   const TAIPEI_TZ = 'Asia/Taipei'
@@ -472,7 +474,84 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
   // 開啟訂單詳情模態框
   const openOrderModal = (order: any) => {
     setSelectedOrder(order)
+    setModalOrderItems(getOrderItems(order.id)) // 初始化模態框專用的訂單項目狀態
     setShowOrderModal(true)
+  }
+
+  // 跳轉到點餐頁面加點訂單
+  const goToEditOrder = (order: any) => {
+    // 構造點餐頁面的 URL，帶上必要的參數
+    const tableNumber = order.table_number || 'unknown'
+    const orderId = order.id
+    const partySize = order.party_size || 1
+    
+    // 跳轉到點餐頁面，讓使用者可以加點新的訂單項目
+    const orderingUrl = `/ordering?table=${tableNumber}&orderId=${orderId}&editMode=true&party=${partySize}`
+    goTo(orderingUrl)
+  }
+
+  // 刪除訂單項目
+  const deleteOrderItem = async (itemId: string, orderId: string) => {
+    if (!confirm('確定要刪除這個訂單項目嗎？')) return
+
+    setDeletingItemId(itemId) // 設置載入狀態
+
+    try {
+      // 1. 先獲取當前訂單項目用於計算
+      const currentItems = getOrderItems(orderId)
+      const itemToDelete = currentItems.find(item => item.id === itemId)
+      if (!itemToDelete) {
+        console.error('找不到要刪除的項目')
+        return
+      }
+
+      // 2. 刪除訂單項目
+      const { error: deleteError } = await supabase
+        .from('order_items')
+        .delete()
+        .eq('id', itemId)
+
+      if (deleteError) throw deleteError
+
+      // 3. 立即從模態框狀態中移除刪除的項目，實現即時 UI 更新
+      setModalOrderItems(prev => prev.filter(item => item.id !== itemId))
+
+      // 4. 重新計算訂單總金額
+      const remainingItems = currentItems.filter(item => item.id !== itemId)
+      const newSubtotal = remainingItems.reduce((sum, item) => sum + item.total_price, 0)
+      
+      // 5. 立即更新 selectedOrder 的金額，讓模態框底部金額即時更新
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder((prev: any) => prev ? {
+          ...prev,
+          subtotal: newSubtotal,
+          total_amount: newSubtotal
+        } : null)
+      }
+
+      // 6. 更新資料庫中的訂單總金額
+      // 6. 更新資料庫中的訂單總金額
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ 
+          subtotal: newSubtotal,
+          total_amount: newSubtotal, // 簡化計算，暫不包含稅費
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', orderId)
+
+      if (updateError) throw updateError
+
+      // 7. 在背景靜默重新載入數據，確保全局狀態同步
+      loadOrders() // 不等待，讓它在背景執行
+      
+      console.log('✅ 訂單項目刪除成功')
+    } catch (error) {
+      console.error('❌ 刪除訂單項目失敗:', error)
+      alert('刪除失敗，請稍後再試')
+    } finally {
+      setDeletingItemId(null) // 清除載入狀態
+    }
   }
 
   // 打開預約詳情模態
@@ -1024,11 +1103,11 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">訂單狀態</div>
-                  <div className="font-semibold">{selectedOrder.status}</div>
+                  <div className="font-semibold">{ORDER_STATUS_LABEL[normalizeOrderStatus(selectedOrder.status)]}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">客人數量</div>
-                  <div className="font-semibold">{selectedOrder.customer_count || 1} 人</div>
+                  <div className="font-semibold">{selectedOrder.party_size || selectedOrder.customer_count || 1} 人</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">下單時間</div>
@@ -1067,8 +1146,8 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
             <div className="mb-6">
               <h4 className="font-semibold text-gray-900 mb-3">訂單項目</h4>
               <div className="space-y-3">
-                {getOrderItems(selectedOrder.id).length > 0 ? (
-                  getOrderItems(selectedOrder.id).map((item, index) => (
+                {modalOrderItems.length > 0 ? (
+                  modalOrderItems.map((item, index) => (
                     <div key={index} className="bg-gray-50 rounded-lg p-3">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
@@ -1078,9 +1157,31 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
                             <div className="text-xs text-blue-600 mt-1">備註：{item.special_instructions}</div>
                           )}
                         </div>
-                        <div className="text-right">
-                          <div className="font-medium">x{item.quantity}</div>
-                          <div className="text-sm text-gray-600">NT$ {item.total_price.toLocaleString()}</div>
+                        <div className="text-right flex items-center gap-3">
+                          <div>
+                            <div className="font-medium">x{item.quantity}</div>
+                            <div className="text-sm text-gray-600">NT$ {item.total_price.toLocaleString()}</div>
+                          </div>
+                          <button
+                            onClick={() => deleteOrderItem(item.id, selectedOrder.id)}
+                            disabled={deletingItemId === item.id}
+                            className={`p-1 rounded transition-colors ${
+                              deletingItemId === item.id 
+                                ? 'text-gray-400 cursor-not-allowed' 
+                                : 'text-red-500 hover:text-red-700 hover:bg-red-50'
+                            }`}
+                            title={deletingItemId === item.id ? '刪除中...' : '刪除此項目'}
+                          >
+                            {deletingItemId === item.id ? (
+                              <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                            ) : (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            )}
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -1122,13 +1223,24 @@ export default function TableManagementPage({ onBack }: TableManagementPageProps
               </div>
             )}
 
-            {/* 關閉按鈕 */}
-            <button
-              onClick={closeOrderModal}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-            >
-              關閉
-            </button>
+            {/* 操作按鈕 */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => goToEditOrder(selectedOrder)}
+                className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                加點訂單
+              </button>
+              <button
+                onClick={closeOrderModal}
+                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              >
+                關閉
+              </button>
+            </div>
           </div>
         </div>
       )}

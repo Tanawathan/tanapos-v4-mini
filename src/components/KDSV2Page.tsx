@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useKDSV2Store } from '../lib/kds-v2-store';
 import { MenuCategory, MenuItemStatus } from '../lib/kds-types';
+import OrderTimer from './OrderTimer';
 
 const categoryLabels: Record<string,string> = {
   [MenuCategory.APPETIZERS]: '前菜',
@@ -21,7 +22,7 @@ const statusColor = (s: MenuItemStatus) => {
 
 const KDSV2Page: React.FC = () => {
   const { tasks, fetch, toggleTask, loading, error, filter, toggleCategory, clearCategories, selectAllCategories, orders, markOrderReady, markOrderServed } = useKDSV2Store() as any;
-  const [mode, setMode] = useState<'category'|'table'>('category');
+  const [mode, setMode] = useState<'category'|'table'|'order'>('category');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const audioRef = React.useRef<HTMLAudioElement|null>(null);
   const prevTaskIdsRef = React.useRef<Set<string>>(new Set());
@@ -62,12 +63,56 @@ const KDSV2Page: React.FC = () => {
   const grouped = useMemo(() => {
     if (mode==='table') {
       const map: Record<string, any[]> = {};
-      activeTasks.forEach((t: any) => { const key = t.tableNumber? `桌 ${t.tableNumber}` : '外帶'; (map[key] ||= []).push(t); });
-      return Object.entries(map).map(([k,v]) => ({ key: k, items: v }));
+      activeTasks.forEach((t: any) => { 
+        let key;
+        if (t.tableNumber) {
+          key = `桌 ${t.tableNumber}`;
+        } else if (t.orderType === 'delivery') {
+          key = t.deliveryPlatform ? `${t.deliveryPlatform} 外送` : '外送';
+        } else {
+          key = '外帶';
+        }
+        (map[key] ||= []).push(t); 
+      });
+      return Object.entries(map).map(([k,v]) => ({ 
+        key: k, 
+        items: v,
+        earliestCreatedAt: v.reduce((earliest, item) => {
+          return !earliest || item.createdAt < earliest ? item.createdAt : earliest;
+        }, null)
+      }));
+    } else if (mode==='order') {
+      const map: Record<string, any[]> = {};
+      activeTasks.forEach((t: any) => { 
+        // 創建更詳細的訂單標題
+        let orderInfo = t.orderNumber;
+        if (t.tableNumber) {
+          orderInfo += ` (桌 ${t.tableNumber})`;
+        } else if (t.orderType === 'delivery') {
+          orderInfo += ` (${t.deliveryPlatform || ''}外送)`;
+        } else {
+          orderInfo += ` (外帶)`;
+        }
+        const key = `訂單 ${orderInfo}`;
+        (map[key] ||= []).push(t); 
+      });
+      return Object.entries(map).map(([k,v]) => ({ 
+        key: k, 
+        items: v,
+        earliestCreatedAt: v.reduce((earliest, item) => {
+          return !earliest || item.createdAt < earliest ? item.createdAt : earliest;
+        }, null)
+      }));
     } else {
       const map: Record<string, any[]> = {};
       activeTasks.forEach((t: any) => { (map[t.category] ||= []).push(t); });
-      return Object.entries(map).map(([k,v]) => ({ key: categoryLabels[k] || k, items: v }));
+      return Object.entries(map).map(([k,v]) => ({ 
+        key: categoryLabels[k] || k, 
+        items: v,
+        earliestCreatedAt: v.reduce((earliest, item) => {
+          return !earliest || item.createdAt < earliest ? item.createdAt : earliest;
+        }, null)
+      }));
     }
   }, [activeTasks, mode]);
 
@@ -76,8 +121,17 @@ const KDSV2Page: React.FC = () => {
       <header className="flex flex-wrap items-center gap-4">
         <h1 className="text-2xl font-bold">KDS v2</h1>
         <button className="px-3 py-1 rounded bg-blue-600 text-white" onClick={()=>fetch()}>刷新</button>
-        <button className="px-3 py-1 rounded bg-gray-200" onClick={()=>setMode(m => m==='category'?'table':'category')}>{mode==='category'?'切換桌台視圖':'切換分類視圖'}</button>
-  <button className={`px-3 py-1 rounded ${soundEnabled? 'bg-emerald-500 text-white':'bg-gray-200'}`} onClick={()=>setSoundEnabled(s=>!s)}>{soundEnabled? '🔔音效開':'🔕音效關'}</button>
+        <button 
+          className="px-3 py-1 rounded bg-gray-200" 
+          onClick={()=>setMode(m => {
+            if (m === 'category') return 'table';
+            if (m === 'table') return 'order';
+            return 'category';
+          })}
+        >
+          {mode === 'category' ? '切換桌台視圖' : mode === 'table' ? '切換訂單視圖' : '切換分類視圖'}
+        </button>
+        <button className={`px-3 py-1 rounded ${soundEnabled? 'bg-emerald-500 text-white':'bg-gray-200'}`} onClick={()=>setSoundEnabled(s=>!s)}>{soundEnabled? '🔔音效開':'🔕音效關'}</button>
         {loading && <span className="text-sm text-gray-500">載入中...</span>}
         <div className="flex gap-2 items-center flex-wrap">
           {allCats.map(c => (
@@ -93,9 +147,17 @@ const KDSV2Page: React.FC = () => {
           <div key={group.key} className="bg-white rounded shadow p-2 flex flex-col">
             <div className="font-semibold text-lg mb-2 flex items-start justify-between gap-2">
               <div className="flex flex-col gap-1 flex-1">
-                <span>{group.key}</span>
-                {mode==='table' && (()=> {
-                  // 在桌台視圖：於標題旁邊顯示每個訂單的完成/送出按鈕
+                <div className="flex items-center gap-2">
+                  <span>{group.key}</span>
+                  {group.earliestCreatedAt && (
+                    <OrderTimer 
+                      createdAt={group.earliestCreatedAt} 
+                      className="ml-2"
+                    />
+                  )}
+                </div>
+                {(mode==='table' || mode==='order') && (()=> {
+                  // 在桌台視圖或訂單視圖：於標題旁邊顯示每個訂單的完成/送出按鈕
                   const orderIds = Array.from(new Set(group.items.map((i:any)=> i.orderId)));
                   return (
                     <div className="flex flex-wrap gap-2">

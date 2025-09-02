@@ -3,6 +3,7 @@ import usePOSStore from '../lib/store'
 import { Table, Order, OrderItem } from '../lib/types'
 import { buildPrintPayload, sendPrint } from '../lib/printClient'
 import { usePrinterStore } from '../lib/printer-store'
+import { ORDER_STATUS_LABEL, ORDER_STATUS_COLOR, PAYMENT_STATUS_LABEL, PAYMENT_STATUS_COLOR } from '../lib/status'
 
 interface CheckoutPageProps {
   onBack: () => void
@@ -42,17 +43,41 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const [lastPrintError, setLastPrintError] = useState<string | null>(null)
   const printerConfig = usePrinterStore(state => state)
 
-  // 只在未載入時觸發資料載入，避免無限渲染
+  // 只在未載入時觸發資料載入，並且頁面打開時自動刷新
   useEffect(() => {
-    if (!tablesLoaded) {
-      console.log('🔄 CheckoutPage: 載入桌台資料...')
-      loadTables()
-    }
-    if (!ordersLoaded) {
-      console.log('🔄 CheckoutPage: 載入訂單資料...')
+    console.log('🔄 CheckoutPage: 頁面載入，開始刷新資料...')
+    // 重置 loaded 狀態以強制刷新
+    usePOSStore.setState({ tablesLoaded: false, ordersLoaded: false })
+    loadTables()
+    loadOrders()
+  }, [loadTables, loadOrders])
+
+  // 自動定期刷新訂單資料
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('🔄 CheckoutPage: 定期刷新訂單資料...')
       loadOrders()
-    }
-  }, [tablesLoaded, ordersLoaded, loadTables, loadOrders])
+    }, 10000) // 每10秒刷新一次
+
+    return () => clearInterval(interval)
+  }, [loadOrders])
+
+  // 取得訂單狀態顯示
+  const getOrderStatusDisplay = (status: string) => {
+    return ORDER_STATUS_LABEL[status as keyof typeof ORDER_STATUS_LABEL] || status
+  }
+
+  const getOrderStatusColor = (status: string) => {
+    return ORDER_STATUS_COLOR[status as keyof typeof ORDER_STATUS_COLOR] || 'bg-gray-100 text-gray-800 border-gray-200'
+  }
+
+  const getPaymentStatusDisplay = (status: string) => {
+    return PAYMENT_STATUS_LABEL[status as keyof typeof PAYMENT_STATUS_LABEL] || status
+  }
+
+  const getPaymentStatusColor = (status: string) => {
+    return PAYMENT_STATUS_COLOR[status as keyof typeof PAYMENT_STATUS_COLOR] || 'bg-gray-100 text-gray-800 border-gray-200'
+  }
 
   // 取得有活躍訂單的桌台（包含外帶訂單）
   const getOccupiedTablesAndTakeout = () => {
@@ -89,8 +114,11 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       // 使用 table_id 匹配（適用於傳統POS）
       const matchById = tableId && order.table_id === tableId
       
-      return (matchByNumber || matchById) && 
-        ['pending', 'confirmed', 'preparing', 'ready', 'served'].includes(order.status || '')
+      // 顯示所有未結帳的訂單（排除已完成和已取消的訂單，且付款狀態不是已付款）
+      const isUnpaid = !['completed', 'cancelled'].includes(order.status || '') && 
+                      order.payment_status !== 'paid'
+      
+      return (matchByNumber || matchById) && isUnpaid
     }).sort((a, b) => new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime())
   }
 
@@ -98,7 +126,9 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const getTakeoutOrders = () => {
     return orders.filter(order => 
       isTakeoutOrder(order.order_number) &&
-      ['pending', 'confirmed', 'preparing', 'ready', 'served'].includes(order.status || '')
+      // 顯示所有未結帳的外帶訂單（排除已完成和已取消的訂單，且付款狀態不是已付款）
+      !['completed', 'cancelled'].includes(order.status || '') &&
+      order.payment_status !== 'paid'
     ).sort((a, b) => new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime())
   }
 
@@ -366,15 +396,20 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
             </div>
             
             <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 text-sm text-ui-muted">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span>自動刷新中</span>
+              </div>
               <button
                 onClick={() => {
+                  console.log('🔄 手動刷新資料...')
                   // 重置 loaded 狀態以觸發重新載入
                   usePOSStore.setState({ tablesLoaded: false, ordersLoaded: false })
                   loadTables()
                   loadOrders()
                 }}
                 className="p-2 text-ui-muted hover:text-ui-primary transition-colors"
-                title="重新載入資料"
+                title="立即刷新資料"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -389,8 +424,21 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-ui-primary rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-ui-primary">選擇要結帳的桌台</h2>
-            <div className="text-sm text-ui-muted">已載入桌台 {tables.length} • 訂單 {orders.length}</div>
+            <div>
+              <h2 className="text-xl font-semibold text-ui-primary">未結帳訂單</h2>
+              <p className="text-sm text-ui-muted mt-1">顯示所有尚未完成付款的訂單，包含待確認、已確認、準備中、備餐完成、已上菜等各種狀態</p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-ui-muted">總計 {getOccupiedTablesAndTakeout().length} 個桌台/外帶</div>
+              <div className="text-sm text-ui-muted">共 {getOccupiedTablesAndTakeout().reduce((sum, table) => {
+                const orders = table.is_takeout ? 
+                  getTakeoutOrders().filter(order => 
+                    order.order_number.replace(/^#?TOGO-/i, '') === table.name?.replace('外帶-', '')
+                  ) :
+                  getTableOrders(table.table_number || '', table.id)
+                return sum + orders.length
+              }, 0)} 筆訂單</div>
+            </div>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -415,9 +463,29 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     </div>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">{orders.length} 張</span>
                   </div>
+                  
+                  {/* 顯示訂單狀態 */}
+                  <div className="space-y-1 mb-2">
+                    {orders.map((order) => (
+                      <div key={order.id} className="flex items-center justify-between text-xs">
+                        <span className="text-gray-600 truncate max-w-[60%]">{order.order_number}</span>
+                        <div className="flex items-center space-x-1">
+                          <span className={`px-1.5 py-0.5 rounded border text-xs ${getOrderStatusColor(order.status || 'pending')}`}>
+                            {getOrderStatusDisplay(order.status || 'pending')}
+                          </span>
+                          <span className={`px-1.5 py-0.5 rounded border text-xs ${getPaymentStatusColor(order.payment_status || 'unpaid')}`}>
+                            {getPaymentStatusDisplay(order.payment_status || 'unpaid')}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-medium text-gray-900">NT$ {totalAmount.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500 truncate max-w-[60%]">{orders.map(order => order.order_number).join(', ')}</div>
+                    <div className="text-xs text-gray-500">
+                      {orders.length > 1 ? `共 ${orders.length} 筆訂單` : ''}
+                    </div>
                   </div>
                 </button>
               )

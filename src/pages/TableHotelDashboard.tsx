@@ -275,7 +275,8 @@ export const TableHotelDashboard: React.FC = () => {
   const startOrdering = (c: any) => {
     const t = c.table
     const res = c.seatedReservation || c.upcomingReservation
-    const qs = new URLSearchParams({ table:String(t.table_number), party:String(res?.party_size||''), name:res?.customer_name||'' })
+    const partySize = res?.party_size || 2 // 默認為 2 人而不是空字串
+    const qs = new URLSearchParams({ table:String(t.table_number), party:String(partySize), name:res?.customer_name||'' })
     goTo(`/ordering?${qs.toString()}`)
   }
 

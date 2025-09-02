@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訂單修改功能測試 - 更新版</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-title {
+            color: #2563eb;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .feature-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .feature-list li:before {
+            content: "✅ ";
+            color: #10b981;
+            font-weight: bold;
+        }
+        .updated-list li:before {
+            content: "🔄 ";
+            color: #f59e0b;
+        }
+        .instruction {
+            background-color: #fef3c7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .url-link {
+            background-color: #dbeafe;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        .new-feature {
+            background-color: #dcfce7;
+            border: 1px solid #16a34a;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #fef2f2;
+            border: 1px solid #ef4444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 訂單修改功能測試指南 - 更新版</h1>
+        
+        <div class="new-feature">
+            <strong>🎉 功能更新：</strong><br>
+            <strong>修改訂單現在會跳轉到點餐頁面</strong>，讓使用者可以：<br>
+            • 刪除現有項目<br>
+            • 新增新的項目<br>
+            • 修改項目數量<br>
+            • 使用完整的商品選擇界面
+        </div>
+
+        <div class="instruction">
+            <strong>⚠️ 測試前準備：</strong><br>
+            請確保開發服務器正在運行，並在瀏覽器中打開：<br>
+            <div class="url-link">http://localhost:5175</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">� 已修復的問題</div>
+            <ul class="updated-list">
+                <li>修復了金額顯示 "NaN" 的問題（price → unit_price）</li>
+                <li>移除了不完整的模態框編輯界面</li>
+                <li>改為跳轉到完整的點餐頁面進行編輯</li>
+                <li>添加了編輯模式的視覺提示</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">�📋 已實現的功能</div>
+            <ul class="feature-list">
+                <li>在桌台管理的訂單詳情中點擊「修改訂單」按鈕</li>
+                <li>自動跳轉到點餐頁面並進入編輯模式</li>
+                <li>購物車標題顯示「修改訂單」和「編輯模式」標籤</li>
+                <li>按鈕文字改為「更新訂單」</li>
+                <li>保留原有的桌號和客戶信息</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🧪 新的測試步驟</div>
+            <ol>
+                <li><strong>前往桌台管理頁面：</strong>
+                    <br>在主選單中點擊「桌台管理」
+                </li>
+                <li><strong>選擇有訂單的桌台：</strong>
+                    <br>找一個顯示有訂單的桌台，點擊查看訂單詳情
+                </li>
+                <li><strong>點擊修改訂單：</strong>
+                    <br>在訂單詳情模態框中點擊「修改訂單」按鈕
+                </li>
+                <li><strong>驗證跳轉：</strong>
+                    <br>確認頁面跳轉到點餐頁面，URL 包含 editMode=true 參數
+                </li>
+                <li><strong>檢查編輯模式提示：</strong>
+                    <br>確認購物車標題顯示「修改訂單」和「編輯模式」標籤
+                </li>
+                <li><strong>測試商品操作：</strong>
+                    <br>• 添加新商品到購物車<br>
+                    • 修改現有商品數量<br>
+                    • 刪除不需要的商品
+                </li>
+                <li><strong>確認按鈕文字：</strong>
+                    <br>驗證提交按鈕顯示「更新訂單」而非「送出訂單」
+                </li>
+                <li><strong>測試訂單更新：</strong>
+                    <br>點擊「更新訂單」按鈕並確認更新成功
+                </li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">✅ 驗證要點</div>
+            <ul class="feature-list">
+                <li>修改訂單按鈕能正確跳轉到點餐頁面</li>
+                <li>編輯模式的視覺提示清楚顯示</li>
+                <li>可以正常添加、修改、刪除商品</li>
+                <li>金額計算正確，無 NaN 顯示</li>
+                <li>更新訂單功能正常運作</li>
+                <li>桌號和客戶信息正確保留</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">� 測試 URL 範例</div>
+            <p>編輯模式的點餐頁面 URL 格式：</p>
+            <div class="url-link">
+                http://localhost:5175/ordering?table=1&orderId=xxx-xxx-xxx&editMode=true&party=2
+            </div>
+            <p><strong>參數說明：</strong></p>
+            <ul>
+                <li><code>table</code>: 桌號</li>
+                <li><code>orderId</code>: 要編輯的訂單 ID</li>
+                <li><code>editMode</code>: 設為 true 啟用編輯模式</li>
+                <li><code>party</code>: 用餐人數</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <strong>🚨 可能的問題：</strong>
+            <ul>
+                <li><strong>如果跳轉失敗：</strong> 檢查 goToEditOrder 函數和 URL 構造</li>
+                <li><strong>如果編輯模式未啟用：</strong> 檢查 URL 參數解析和狀態設置</li>
+                <li><strong>如果商品操作異常：</strong> 檢查點餐頁面的編輯模式處理</li>
+                <li><strong>如果更新失敗：</strong> 檢查訂單更新邏輯和數據庫操作</li>
+            </ul>
+        </div>
+
+        <div class="instruction">
+            <strong>📝 測試完成後：</strong><br>
+            請回報測試結果，特別注意：<br>
+            • 是否成功跳轉到點餐頁面<br>
+            • 編輯模式的視覺提示是否清楚<br>
+            • 商品操作是否流暢<br>
+            • 訂單更新是否成功<br>
+            如果功能正常，這將大大提升餐廳的營運效率！
+        </div>
+    </div>
+
+    <script>
+        // 簡單的頁面載入時間戳
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📋 訂單修改功能測試頁面已載入 (更新版) - ' + new Date().toLocaleString('zh-TW'));
+            
+            // 如果有 URL 參數，顯示相關信息
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('test')) {
+                console.log('🧪 測試模式啟動');
+            }
+        });
+    </script>
+</body>
+</html>

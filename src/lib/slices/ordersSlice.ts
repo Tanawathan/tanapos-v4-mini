@@ -1,7 +1,7 @@
 import { StateCreator } from 'zustand'
 import { supabase } from '../supabase'
 import { Order, OrderItem } from '../types'
-import { generateDineInOrderNumber, generateTakeawayOrderNumber } from '../../utils/orderNumberGenerator'
+import { generateDineInOrderNumber, generateTakeawayOrderNumber, generateDeliveryOrderNumber } from '../../utils/orderNumberGenerator'
 
 export interface OrdersSliceState {
   orders: Order[]
@@ -101,6 +101,7 @@ export const createOrdersSlice: StateCreator<OrdersSliceState & { tables: any[];
     }
   },
   createOrderWithTableUpdate: async (orderData) => {
+    console.log('🔍 createOrderWithTableUpdate 接收到的資料:', orderData)
     const safeId = () => {
       try { if (crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID() } catch {}
       const hex = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(-4)
@@ -109,7 +110,18 @@ export const createOrdersSlice: StateCreator<OrdersSliceState & { tables: any[];
     const { updateTableStatus, clearCart, setSelectedTable } = get()
     try {
       const isTakeout = !!orderData.is_takeout || orderData.order_type === 'takeout'
-      const orderNumber = isTakeout ? generateTakeawayOrderNumber() : generateDineInOrderNumber((orderData.table_number || 1).toString())
+      const isDelivery = orderData.order_type === 'delivery'
+      
+      // 生成訂單號
+      let orderNumber: string
+      if (isDelivery && orderData.delivery_platform) {
+        orderNumber = generateDeliveryOrderNumber(orderData.delivery_platform as 'uber' | 'foodpanda')
+      } else if (isTakeout) {
+        orderNumber = generateTakeawayOrderNumber()
+      } else {
+        orderNumber = generateDineInOrderNumber((orderData.table_number || 1).toString())
+      }
+      
       const now = new Date().toISOString()
       const newOrder: Order = {
         id: safeId(),
@@ -117,11 +129,12 @@ export const createOrdersSlice: StateCreator<OrdersSliceState & { tables: any[];
         restaurant_id: orderData.restaurant_id,
         table_id: orderData.table_id,
         session_id: null,
-        order_type: isTakeout ? 'takeout' : 'dine_in',
+        order_type: isDelivery ? 'delivery' : (isTakeout ? 'takeout' : 'dine_in'),
+        // delivery_platform: isDelivery ? (orderData.delivery_platform || null) : null, // 資料庫中沒有此欄位，暫時不包含
         customer_name: orderData.customer_name || '',
         customer_phone: orderData.customer_phone || '',
         customer_email: null,
-        table_number: isTakeout ? null : (orderData.table_number || null),
+        table_number: (isTakeout || isDelivery) ? null : (orderData.table_number || null),
         party_size: orderData.party_size || 1,
         subtotal: orderData.subtotal,
         discount_amount: 0,
@@ -137,12 +150,18 @@ export const createOrdersSlice: StateCreator<OrdersSliceState & { tables: any[];
         notes: orderData.notes || '',
         metadata: orderData.reservation_id ? { reservation_id: orderData.reservation_id } : null
       }
+      console.log('🔍 準備建立的訂單物件:', newOrder)
       set(state => ({ orders: [...state.orders, newOrder] }))
       if (!isTakeout && orderData.table_id) {
         updateTableStatus(orderData.table_id, 'occupied', { orderId: newOrder.id, customer_count: orderData.party_size || 1, seated_at: now, order_number: newOrder.order_number })
       }
+      console.log('🔍 開始插入訂單到資料庫...')
       const { error: orderError } = await supabase.from('orders').insert([newOrder])
-      if (orderError) throw orderError
+      if (orderError) {
+        console.error('訂單插入錯誤:', orderError)
+        console.error('訂單資料:', newOrder)
+        throw orderError
+      }
       if (orderData.items && orderData.items.length > 0) {
         const nowISO = now
         const orderItems: any[] = []

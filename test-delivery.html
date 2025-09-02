@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外送訂單測試</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+        }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        button:hover { 
+            background: #0056b3; 
+        }
+        .result { 
+            margin-top: 20px; 
+            padding: 10px; 
+            border-radius: 4px; 
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+    </style>
+</head>
+<body>
+    <h1>外送訂單建立測試</h1>
+    
+    <form id="orderForm">
+        <div class="form-group">
+            <label>外送平台:</label>
+            <select id="platform">
+                <option value="uber">Uber Eats</option>
+                <option value="foodpanda">Foodpanda</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>客戶姓名:</label>
+            <input type="text" id="customerName" value="測試客戶" required>
+        </div>
+        
+        <div class="form-group">
+            <label>客戶電話:</label>
+            <input type="text" id="customerPhone" value="0912345678">
+        </div>
+        
+        <div class="form-group">
+            <label>訂單金額:</label>
+            <input type="number" id="totalAmount" value="105" required>
+        </div>
+        
+        <button type="submit">建立外送訂單</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js';
+        
+        // Supabase 設定
+        const supabaseUrl = 'https://kwxrlglsukzpfhrwhrvv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3eHJsZ2xzdWt6cGZocndocnZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ1MzE2MjYsImV4cCI6MjA1MDEwNzYyNn0.CdN6KQH_J8m1e5Mb3vVJlFx8wg9JQqjyRZsmbGN1SQA';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        // 餐廳 ID
+        const RESTAURANT_ID = '11111111-1111-1111-1111-111111111111';
+        
+        // 生成 UUID
+        function generateUUID() {
+            try { 
+                if (crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID() 
+            } catch {}
+            const hex = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(-4)
+            return `${hex()}${hex()}-${hex()}-${hex()}-${hex()}-${hex()}${hex()}${hex()}`
+        }
+        
+        // 生成外送訂單編號
+        function generateDeliveryOrderNumber(platform) {
+            const randomNumber = Math.floor(100000 + Math.random() * 900000);
+            const timestamp = Date.now().toString().slice(-3);
+            const platformPrefix = platform === 'uber' ? 'Uber' : 'Foodpanda';
+            return `${platformPrefix}-${randomNumber}${timestamp}`;
+        }
+        
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>建立訂單中...</p>';
+            
+            try {
+                const platform = document.getElementById('platform').value;
+                const customerName = document.getElementById('customerName').value;
+                const customerPhone = document.getElementById('customerPhone').value;
+                const totalAmount = parseFloat(document.getElementById('totalAmount').value);
+                
+                const orderNumber = generateDeliveryOrderNumber(platform);
+                const now = new Date().toISOString();
+                
+                const orderData = {
+                    id: generateUUID(),
+                    order_number: orderNumber,
+                    restaurant_id: RESTAURANT_ID,
+                    table_id: null,
+                    session_id: null,
+                    order_type: 'delivery',
+                    customer_name: customerName,
+                    customer_phone: customerPhone,
+                    customer_email: null,
+                    table_number: null,
+                    party_size: 1,
+                    subtotal: totalAmount - 5,
+                    discount_amount: 0,
+                    tax_amount: 5,
+                    service_charge: 0,
+                    total_amount: totalAmount,
+                    status: 'pending',
+                    payment_status: 'unpaid',
+                    ordered_at: now,
+                    created_at: now,
+                    updated_at: now,
+                    ai_optimized: false,
+                    notes: `${platform === 'uber' ? 'Uber Eats' : 'Foodpanda'} 外送訂單`,
+                    source: 'pos'
+                };
+                
+                console.log('準備建立訂單:', orderData);
+                
+                const { data, error } = await supabase
+                    .from('orders')
+                    .insert([orderData])
+                    .select();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h3>✅ 訂單建立成功！</h3>
+                        <p><strong>訂單編號:</strong> ${orderNumber}</p>
+                        <p><strong>平台:</strong> ${platform === 'uber' ? 'Uber Eats' : 'Foodpanda'}</p>
+                        <p><strong>客戶:</strong> ${customerName}</p>
+                        <p><strong>金額:</strong> $${totalAmount}</p>
+                        <p><strong>ID:</strong> ${data[0].id}</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('建立訂單失敗:', error);
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ 訂單建立失敗</h3>
+                        <p><strong>錯誤:</strong> ${error.message}</p>
+                        <p><strong>詳細資訊:</strong> ${JSON.stringify(error, null, 2)}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

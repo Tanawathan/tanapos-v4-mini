@@ -34,6 +34,8 @@ interface OrderingContext {
   partySize?: number
   customerName?: string
   takeout?: boolean // 外帶模式
+  delivery?: boolean // 外送模式
+  deliveryPlatform?: 'uber' | 'foodpanda' // 外送平台
 }
 
 interface OrderingTotals { subtotal: number; tax: number; total: number }

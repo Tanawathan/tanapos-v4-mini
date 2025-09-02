@@ -160,6 +160,7 @@ export interface Order {
   session_id?: string | null
   order_number: string
   order_type?: string
+  // delivery_platform?: string | null  // 資料庫中尚未建立此欄位
   customer_name?: string
   customer_phone?: string
   customer_email?: string | null

@@ -26,6 +26,18 @@ export function generateTakeawayOrderNumber(prefix: string = 'TOGO'): string {
 }
 
 /**
+ * 生成唯一的外送訂單編號
+ * @param platform 外送平台 ('uber' | 'foodpanda')
+ * @returns 格式: Uber-XXXXXX 或 Foodpanda-XXXXXX
+ */
+export function generateDeliveryOrderNumber(platform: 'uber' | 'foodpanda'): string {
+  const randomNumber = generateRandomNumber(6)
+  const timestamp = Date.now().toString().slice(-3)
+  const platformPrefix = platform === 'uber' ? 'Uber' : 'Foodpanda'
+  return `${platformPrefix}-${randomNumber}${timestamp}`
+}
+
+/**
  * 生成唯一的取餐號
  * @param prefix 前綴，默認為 'TO'
  * @returns 格式: TO-XXX (3位隨機數字)
@@ -65,10 +77,12 @@ export function generateDineInOrderNumber(
 export function validateOrderNumber(orderNumber: string): boolean {
   // 外帶訂單格式: TOGO-數字
   const takeawayPattern = /^TOGO-\d+$/
+  // 外送訂單格式: Uber-數字 或 Foodpanda-數字
+  const deliveryPattern = /^(Uber|Foodpanda)-\d+$/
   // 內用訂單格式: 數字-數字 或 數字-數字-A數字
   const dineInPattern = /^\d+-\d+(-A\d+)?$/
   
-  return takeawayPattern.test(orderNumber) || dineInPattern.test(orderNumber)
+  return takeawayPattern.test(orderNumber) || deliveryPattern.test(orderNumber) || dineInPattern.test(orderNumber)
 }
 
 /**
@@ -77,13 +91,22 @@ export function validateOrderNumber(orderNumber: string): boolean {
  * @returns 訂單編號信息
  */
 export function parseOrderNumber(orderNumber: string): {
-  type: 'takeaway' | 'dine-in' | 'unknown'
+  type: 'takeaway' | 'delivery' | 'dine-in' | 'unknown'
+  deliveryPlatform?: 'uber' | 'foodpanda'
   tableNumber?: string
   isAdditional?: boolean
   additionalSequence?: number
 } {
   if (orderNumber.startsWith('TOGO-')) {
     return { type: 'takeaway' }
+  }
+  
+  if (orderNumber.startsWith('Uber-')) {
+    return { type: 'delivery', deliveryPlatform: 'uber' }
+  }
+  
+  if (orderNumber.startsWith('Foodpanda-')) {
+    return { type: 'delivery', deliveryPlatform: 'foodpanda' }
   }
   
   const dineInMatch = orderNumber.match(/^(\d+)-\d+(-A(\d+))?$/)
