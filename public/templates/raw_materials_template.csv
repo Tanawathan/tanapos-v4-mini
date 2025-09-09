@@ -1,0 +1,4 @@
+name,unit,category,current_stock,min_stock,max_stock,cost_per_unit
+雞胸肉,公斤,肉類,0,10,50,180
+高筋麵粉,公斤,麵粉類,0,5,25,35
+新鮮蘑菇,公斤,蔬菜類,0,2,8,120

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TanaPOS v4 - 庫存管理系統測試</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 自定義 CSS 變量用於圖表顏色 */
+    :root {
+      --color-blue-500: #3b82f6;
+      --color-green-500: #10b981;
+      --color-yellow-500: #f59e0b;
+      --color-red-500: #ef4444;
+      --color-purple-500: #8b5cf6;
+      --color-pink-500: #ec4899;
+      --color-indigo-500: #6366f1;
+      --color-gray-500: #6b7280;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="min-h-screen">
+    <!-- 導航欄 -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <h1 class="text-xl font-bold text-gray-900">TanaPOS v4</h1>
+            </div>
+            <div class="ml-6">
+              <span class="text-sm text-gray-600">庫存管理系統</span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-sm text-gray-500">測試環境</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主內容 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- 頁面標題 -->
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">庫存儀表板</h2>
+        <p class="mt-1 text-sm text-gray-600">查看庫存概況和關鍵指標</p>
+      </div>
+
+      <!-- 關鍵指標卡片 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- 總產品數量 -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600">總產品數量</p>
+              <div class="mt-1">
+                <p class="text-2xl font-semibold text-gray-900">1,247</p>
+              </div>
+              <div class="mt-2 flex items-center text-sm text-green-600">
+                <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                5.2%
+                <span class="text-gray-500 ml-1">較上期</span>
+              </div>
+            </div>
+            <div class="p-3 rounded-lg bg-blue-50 text-blue-600 border-blue-200">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4-8-4m16 0v10l-8 4-8-4V7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 低庫存告警 -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600">低庫存告警</p>
+              <div class="mt-1">
+                <p class="text-2xl font-semibold text-gray-900">23</p>
+                <p class="text-sm text-gray-500 mt-1">需要補貨</p>
+              </div>
+              <div class="mt-2 flex items-center text-sm text-green-600">
+                <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                </svg>
+                12.3%
+                <span class="text-gray-500 ml-1">較上期</span>
+              </div>
+            </div>
+            <div class="p-3 rounded-lg bg-red-50 text-red-600 border-red-200">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 庫存總值 -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600">庫存總值</p>
+              <div class="mt-1">
+                <p class="text-2xl font-semibold text-gray-900">NT$ 2,847,392</p>
+              </div>
+              <div class="mt-2 flex items-center text-sm text-green-600">
+                <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                8.7%
+                <span class="text-gray-500 ml-1">較上期</span>
+              </div>
+            </div>
+            <div class="p-3 rounded-lg bg-green-50 text-green-600 border-green-200">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 月周轉率 -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600">月周轉率</p>
+              <div class="mt-1">
+                <p class="text-2xl font-semibold text-gray-900">8.5%</p>
+                <p class="text-sm text-gray-500 mt-1">庫存效率</p>
+              </div>
+              <div class="mt-2 flex items-center text-sm text-green-600">
+                <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                2.1%
+                <span class="text-gray-500 ml-1">較上期</span>
+              </div>
+            </div>
+            <div class="p-3 rounded-lg bg-purple-50 text-purple-600 border-purple-200">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 圖表區域 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- 分類庫存分布 -->
+        <div class="bg-white p-6 rounded-lg border border-gray-200">
+          <div class="flex items-center mb-4">
+            <svg class="h-5 w-5 text-gray-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-900">分類庫存分布</h3>
+          </div>
+          <div class="flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-4xl">📊</div>
+              <p class="mt-2 text-gray-500">圓餅圖</p>
+              <p class="text-sm text-gray-400">React 組件載入中...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7日庫存變動趨勢 -->
+        <div class="bg-white p-6 rounded-lg border border-gray-200">
+          <div class="flex items-center mb-4">
+            <svg class="h-5 w-5 text-gray-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-900">7日庫存變動趨勢</h3>
+          </div>
+          <div class="flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-4xl">📈</div>
+              <p class="mt-2 text-gray-500">折線圖</p>
+              <p class="text-sm text-gray-400">React 組件載入中...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 熱門產品出貨量 -->
+      <div class="bg-white p-6 rounded-lg border border-gray-200 mb-8">
+        <div class="flex items-center mb-4">
+          <svg class="h-5 w-5 text-gray-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900">熱門產品出貨量</h3>
+        </div>
+        
+        <div class="space-y-3">
+          <div class="flex items-center">
+            <div class="w-20 text-sm text-gray-600 truncate">可樂</div>
+            <div class="flex-1 mx-3">
+              <div class="bg-gray-200 rounded-full h-6 relative">
+                <div class="h-6 rounded-full bg-blue-500 transition-all duration-500" style="width: 100%"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-white">245</div>
+              </div>
+            </div>
+            <div class="flex items-center text-sm text-green-600">
+              <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              12.5%
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <div class="w-20 text-sm text-gray-600 truncate">漢堡</div>
+            <div class="flex-1 mx-3">
+              <div class="bg-gray-200 rounded-full h-6 relative">
+                <div class="h-6 rounded-full bg-blue-500 transition-all duration-500" style="width: 80%"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-white">198</div>
+              </div>
+            </div>
+            <div class="flex items-center text-sm text-red-600">
+              <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+              </svg>
+              3.2%
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <div class="w-20 text-sm text-gray-600 truncate">薯條</div>
+            <div class="flex-1 mx-3">
+              <div class="bg-gray-200 rounded-full h-6 relative">
+                <div class="h-6 rounded-full bg-blue-500 transition-all duration-500" style="width: 68%"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-xs font-medium text-white">167</div>
+              </div>
+            </div>
+            <div class="flex items-center text-sm text-green-600">
+              <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              8.7%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 最近告警 -->
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">最近告警</h3>
+          <button class="text-sm text-blue-600 hover:text-blue-800">查看全部</button>
+        </div>
+        
+        <div class="space-y-3">
+          <div class="p-3 rounded-lg border border-red-200 bg-red-50">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <p class="font-medium text-red-800">可樂庫存不足</p>
+                <p class="text-sm text-gray-600 mt-1">產品ID: p1 | 當前庫存: 5</p>
+              </div>
+              <div class="text-xs text-gray-500">今天</div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-lg border border-yellow-200 bg-yellow-50">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <p class="font-medium text-yellow-800">漢堡庫存不足</p>
+                <p class="text-sm text-gray-600 mt-1">產品ID: p2 | 當前庫存: 8</p>
+              </div>
+              <div class="text-xs text-gray-500">今天</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 頁腳信息 -->
+  <footer class="bg-white border-t border-gray-200 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="text-center text-sm text-gray-500">
+        <p>TanaPOS v4 庫存管理系統 - 開發測試版本</p>
+        <p class="mt-1">此頁面展示了 React 組件的靜態預覽，實際系統將使用動態數據</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,5 +1,15 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import {
+  InventoryHomePage,
+  ProductInventory,
+  InventoryTransactions,
+  InventoryCount,
+  RawMaterials,
+  AutoRestockSystem,
+  InventoryAnalyticsDashboard,
+  DataImportExport
+} from '../features/inventory/pages';
 import { useState, useEffect } from 'react'
 import HomePage from '../pages/HomePage'
 import OrdersPage from '../components/OrdersPage'
@@ -194,6 +204,73 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        
+        {/* 庫存管理路由 */}
+        <Route 
+          path="/inventory" 
+          element={
+            <ProtectedRoute>
+              <InventoryHomePage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/inventory/products" 
+          element={
+            <ProtectedRoute>
+              <ProductInventory />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/inventory/transactions" 
+          element={
+            <ProtectedRoute>
+              <InventoryTransactions />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/inventory/count" 
+          element={
+            <ProtectedRoute>
+              <InventoryCount />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/inventory/materials" 
+          element={
+            <ProtectedRoute>
+              <RawMaterials />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/inventory/restock" 
+          element={
+            <ProtectedRoute>
+              <AutoRestockSystem />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/inventory/analytics" 
+          element={
+            <ProtectedRoute>
+              <InventoryAnalyticsDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/inventory/import-export" 
+          element={
+            <ProtectedRoute>
+              <DataImportExport />
+            </ProtectedRoute>
+          } 
+        />
+        
         <Route 
           path="/mobile" 
           element={

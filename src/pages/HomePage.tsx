@@ -270,6 +270,18 @@ const HomePage: React.FC = () => {
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                <div className="text-4xl mb-4">📦</div>
+                <h3 className="text-xl font-semibold mb-2">庫存管理</h3>
+                <p className="text-gray-600 mb-4">管理產品庫存和原料</p>
+                <Link 
+                  to="/inventory"
+                  className="bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 w-full transition-colors inline-block"
+                >
+                  庫存管理
+                </Link>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
                 <div className="text-4xl mb-4">⚙️</div>
                 <h3 className="text-xl font-semibold mb-2">系統設定</h3>
                 <p className="text-gray-600 mb-4">主題、通知、系統設定</p>
